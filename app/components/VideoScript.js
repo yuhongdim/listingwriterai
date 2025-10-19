@@ -24,25 +24,58 @@ const VideoScript = ({ usageCount, setUsageCount }) => {
     duration: '60',
     platform: 'youtube',
     style: 'professional',
+    videoType: 'property-tour',
     keyFeatures: '',
-    callToAction: '联系我们了解更多详情'
+    callToAction: 'Contact us for more details',
+    targetAudience: 'buyers',
+    mood: 'inspiring'
   })
   const [generatedScript, setGeneratedScript] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
   const [copySuccess, setCopySuccess] = useState(false)
 
   const platforms = [
-    { id: 'youtube', name: 'YouTube', duration: '60-180秒' },
-    { id: 'tiktok', name: 'TikTok', duration: '15-60秒' },
-    { id: 'instagram', name: 'Instagram', duration: '15-90秒' },
-    { id: 'facebook', name: 'Facebook', duration: '30-120秒' }
+    { id: 'youtube', name: 'YouTube', duration: '60-180 seconds', icon: '📺' },
+    { id: 'tiktok', name: 'TikTok', duration: '15-60 seconds', icon: '🎵' },
+    { id: 'instagram', name: 'Instagram Reels', duration: '15-90 seconds', icon: '📸' },
+    { id: 'facebook', name: 'Facebook', duration: '30-120 seconds', icon: '👥' },
+    { id: 'linkedin', name: 'LinkedIn', duration: '30-90 seconds', icon: '💼' }
+  ]
+
+  const videoTypes = [
+    { id: 'property-tour', name: 'Property Tour', desc: 'Complete walkthrough of the property' },
+    { id: 'neighborhood-guide', name: 'Neighborhood Guide', desc: 'Showcase local amenities and lifestyle' },
+    { id: 'testimonial', name: 'Client Testimonial', desc: 'Happy client sharing their experience' },
+    { id: 'market-update', name: 'Market Update', desc: 'Local real estate market insights' },
+    { id: 'listing-highlight', name: 'Listing Highlight', desc: 'Quick showcase of key features' },
+    { id: 'agent-intro', name: 'Agent Introduction', desc: 'Personal brand and expertise showcase' },
+    { id: 'before-after', name: 'Before & After', desc: 'Property transformation story' },
+    { id: 'investment-analysis', name: 'Investment Analysis', desc: 'ROI and investment potential' }
   ]
 
   const styles = [
-    { id: 'professional', name: '专业风格', desc: '正式、权威、突出专业性' },
-    { id: 'lifestyle', name: '生活方式', desc: '温馨、舒适、强调生活品质' },
-    { id: 'luxury', name: '奢华风格', desc: '高端、精致、突出独特性' },
-    { id: 'modern', name: '现代简约', desc: '简洁、时尚、突出设计感' }
+    { id: 'professional', name: 'Professional', desc: 'Formal, authoritative, business-focused', color: 'blue' },
+    { id: 'lifestyle', name: 'Lifestyle', desc: 'Warm, comfortable, life-quality focused', color: 'green' },
+    { id: 'luxury', name: 'Luxury', desc: 'High-end, sophisticated, exclusive', color: 'purple' },
+    { id: 'modern', name: 'Modern', desc: 'Clean, trendy, design-focused', color: 'gray' },
+    { id: 'storytelling', name: 'Storytelling', desc: 'Narrative-driven, emotional connection', color: 'pink' },
+    { id: 'educational', name: 'Educational', desc: 'Informative, helpful, expert guidance', color: 'orange' }
+  ]
+
+  const targetAudiences = [
+    { id: 'buyers', name: 'Home Buyers', desc: 'People looking to purchase' },
+    { id: 'sellers', name: 'Home Sellers', desc: 'Property owners wanting to sell' },
+    { id: 'investors', name: 'Real Estate Investors', desc: 'Investment-focused audience' },
+    { id: 'renters', name: 'Renters', desc: 'People looking for rental properties' },
+    { id: 'first-time', name: 'First-Time Buyers', desc: 'New to real estate market' }
+  ]
+
+  const moods = [
+    { id: 'inspiring', name: 'Inspiring', desc: 'Motivational and uplifting' },
+    { id: 'trustworthy', name: 'Trustworthy', desc: 'Reliable and professional' },
+    { id: 'exciting', name: 'Exciting', desc: 'Energetic and dynamic' },
+    { id: 'calming', name: 'Calming', desc: 'Peaceful and reassuring' },
+    { id: 'urgent', name: 'Urgent', desc: 'Time-sensitive and compelling' }
   ]
 
   const handleInputChange = (field, value) => {
@@ -508,6 +541,54 @@ const VideoScript = ({ usageCount, setUsageCount }) => {
                 </label>
               ))}
             </div>
+          </div>
+
+          <div className="md:col-span-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">视频类型</label>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+              {videoTypes.map((type) => (
+                <label key={type.id} className="flex items-center space-x-2 p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50">
+                  <input
+                    type="radio"
+                    name="videoType"
+                    value={type.id}
+                    checked={formData.videoType === type.id}
+                    onChange={(e) => handleInputChange('videoType', e.target.value)}
+                    className="text-blue-600"
+                  />
+                  <div>
+                    <p className="font-medium text-sm">{type.name}</p>
+                    <p className="text-xs text-gray-500">{type.desc}</p>
+                  </div>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">目标受众</label>
+            <select
+              value={formData.targetAudience}
+              onChange={(e) => handleInputChange('targetAudience', e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              {targetAudiences.map((audience) => (
+                <option key={audience.id} value={audience.id}>{audience.name}</option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">视频情绪</label>
+            <select
+              value={formData.mood}
+              onChange={(e) => handleInputChange('mood', e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              {moods.map((mood) => (
+                <option key={mood.id} value={mood.id}>{mood.name}</option>
+              ))}
+            </select>
           </div>
         </div>
 

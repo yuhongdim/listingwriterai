@@ -11,12 +11,18 @@ import {
   ChevronRight,
   Star,
   Copy,
-  CheckCircle
+  CheckCircle,
+  Target,
+  Globe,
+  FileText,
+  Wand2
 } from 'lucide-react'
 import Sidebar from './components/Sidebar'
 import Dashboard from './components/Dashboard'
 import EmailCenter from './components/EmailCenter'
 import VideoScript from './components/VideoScript'
+import SocialMediaGenerator from './components/SocialMediaGenerator'
+import Pricing from './components/Pricing'
 import usageTracker from './utils/usageTracker'
 
 export default function ListingWriterAI() {
@@ -29,7 +35,11 @@ export default function ListingWriterAI() {
     squareFeet: '',
     location: '',
     specialFeatures: '',
-    writingStyle: 'Professional'
+    writingStyle: 'Professional',
+    contentLength: 'Medium',
+    targetKeywords: '',
+    priceRange: '',
+    yearBuilt: ''
   })
   const [generatedContent, setGeneratedContent] = useState('')
   const [copySuccess, setCopySuccess] = useState(false)
@@ -55,7 +65,7 @@ export default function ListingWriterAI() {
 
   const handleGenerate = async () => {
     if (!validateForm()) {
-      alert('请填写所有必填字段')
+      alert('Please fill in all required fields')
       return
     }
 
@@ -78,7 +88,7 @@ export default function ListingWriterAI() {
       })
 
       if (!response.ok) {
-        throw new Error(`生成失败: ${response.status}`)
+        throw new Error(`Generation failed: ${response.status}`)
       }
 
       const data = await response.json()
@@ -89,11 +99,11 @@ export default function ListingWriterAI() {
         const newCount = usageTracker.incrementUsage()
         setUsageCount(newCount)
       } else {
-        throw new Error('API返回的内容为空')
+        throw new Error('API returned empty content')
       }
     } catch (error) {
       console.error('Generation Error:', error)
-      alert(`生成失败：${error.message}`)
+      alert(`Generation failed: ${error.message}`)
     } finally {
       setIsLoading(false)
     }
@@ -191,6 +201,10 @@ export default function ListingWriterAI() {
         return <EmailCenter usageCount={usageCount} setUsageCount={setUsageCount} />
       case 'video':
         return <VideoScript usageCount={usageCount} setUsageCount={setUsageCount} />
+      case 'social':
+        return <SocialMediaGenerator usageCount={usageCount} setUsageCount={setUsageCount} />
+      case 'pricing':
+        return <Pricing />
       default:
         return <Dashboard usageCount={usageCount} setCurrentPage={setCurrentPage} />
     }
@@ -229,254 +243,341 @@ function CreateListing({
   usageCount,
   handleExport
 }) {
+  const writingStyles = [
+    {
+      key: 'Professional',
+      label: 'Professional',
+      description: 'Clear, factual, and business-focused tone',
+      icon: FileText,
+      color: 'blue'
+    },
+    {
+      key: 'Luxury',
+      label: 'Luxury',
+      description: 'Elegant, sophisticated, and premium language',
+      icon: Star,
+      color: 'purple'
+    },
+    {
+      key: 'Storytelling',
+      label: 'Storytelling',
+      description: 'Emotional, narrative-driven descriptions',
+      icon: Wand2,
+      color: 'green'
+    }
+  ]
+
+  const contentLengths = [
+    { key: 'Short', label: 'Short (100 words)', description: 'Concise and to the point' },
+    { key: 'Medium', label: 'Medium (200 words)', description: 'Balanced detail and brevity' },
+    { key: 'Long', label: 'Long (300 words)', description: 'Comprehensive and detailed' }
+  ]
+
   return (
-    <div className="p-8 max-w-6xl mx-auto">
+    <div className="p-8 max-w-7xl mx-auto">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Create Property Listing</h1>
-        <p className="text-gray-600">Fill in property details and AI will generate professional listing descriptions</p>
-        <div className="mt-4 text-sm text-gray-500">
-          Free uses remaining: {usageCount}/3
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Smart Listing Generator</h1>
+        <p className="text-gray-600">AI-powered property descriptions with multiple styles, lengths, and SEO optimization</p>
+        <div className="mt-4 flex items-center space-x-4">
+          <div className="flex items-center px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-sm">
+            <Target className="h-4 w-4 mr-1" />
+            Free uses: {usageCount}/3
+          </div>
+          <div className="flex items-center px-3 py-1 bg-green-50 text-green-700 rounded-full text-sm">
+            <Sparkles className="h-4 w-4 mr-1" />
+            SEO Optimized
+          </div>
         </div>
       </div>
 
       <div className="grid lg:grid-cols-2 gap-8">
-        {/* Form Section */}
-        <div className="bg-white rounded-2xl shadow-lg p-6">
-          <h2 className="text-xl font-semibold mb-6">Property Information</h2>
-          
-          <div className="space-y-6">
-            {/* Property Type */}
+        {/* Enhanced Form Section */}
+        <div className="space-y-6">
+          {/* Basic Property Information */}
+          <div className="bg-white rounded-2xl shadow-lg p-6">
+            <h2 className="text-xl font-semibold mb-6 flex items-center">
+              <Home className="h-5 w-5 mr-2 text-blue-600" />
+              Property Information
+            </h2>
+            
+            <div className="space-y-6">
+              {/* Property Type */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Property Type *
+                </label>
+                <select
+                  value={formData.propertyType}
+                  onChange={(e) => handleInputChange('propertyType', e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  <option value="">Select Property Type</option>
+                  <option value="Single Family Home">Single Family Home</option>
+                  <option value="Apartment">Apartment</option>
+                  <option value="Townhouse">Townhouse</option>
+                  <option value="Duplex">Duplex</option>
+                  <option value="Condo">Condo</option>
+                  <option value="Commercial Property">Commercial Property</option>
+                  <option value="Land">Land</option>
+                </select>
+              </div>
+
+              {/* Bedrooms, Bathrooms, Square Feet */}
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Bedrooms *
+                  </label>
+                  <input
+                    type="number"
+                    value={formData.bedrooms}
+                    onChange={(e) => handleInputChange('bedrooms', e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="3"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Bathrooms *
+                  </label>
+                  <input
+                    type="number"
+                    step="0.5"
+                    value={formData.bathrooms}
+                    onChange={(e) => handleInputChange('bathrooms', e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="2"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Square Feet *
+                  </label>
+                  <input
+                    type="number"
+                    value={formData.squareFeet}
+                    onChange={(e) => handleInputChange('squareFeet', e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="1200"
+                  />
+                </div>
+              </div>
+
+              {/* Location */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Location *
+                </label>
+                <input
+                  type="text"
+                  value={formData.location}
+                  onChange={(e) => handleInputChange('location', e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="e.g., Downtown Austin, TX"
+                />
+              </div>
+
+              {/* Price Range and Year Built */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Price Range
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.priceRange}
+                    onChange={(e) => handleInputChange('priceRange', e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="$450,000"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Year Built
+                  </label>
+                  <input
+                    type="number"
+                    value={formData.yearBuilt}
+                    onChange={(e) => handleInputChange('yearBuilt', e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="2020"
+                  />
+                </div>
+              </div>
+
+              {/* Special Features */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Special Features
+                </label>
+                <textarea
+                  value={formData.specialFeatures}
+                  onChange={(e) => handleInputChange('specialFeatures', e.target.value)}
+                  rows={4}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Hardwood floors, granite countertops, walk-in closet, garage, pool..."
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Writing Style Selection */}
+          <div className="bg-white rounded-2xl shadow-lg p-6">
+            <h3 className="text-lg font-semibold mb-4 flex items-center">
+              <Wand2 className="h-5 w-5 mr-2 text-purple-600" />
+              Writing Style
+            </h3>
+            <div className="grid grid-cols-1 gap-3">
+              {writingStyles.map((style) => (
+                <button
+                  key={style.key}
+                  onClick={() => handleInputChange('writingStyle', style.key)}
+                  className={`p-4 rounded-xl border-2 transition-all text-left ${
+                    formData.writingStyle === style.key
+                      ? `border-${style.color}-500 bg-${style.color}-50`
+                      : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                >
+                  <div className="flex items-start space-x-3">
+                    <style.icon className={`h-5 w-5 mt-0.5 ${
+                      formData.writingStyle === style.key 
+                        ? `text-${style.color}-600` 
+                        : 'text-gray-400'
+                    }`} />
+                    <div>
+                      <div className="font-medium text-gray-900">{style.label}</div>
+                      <div className="text-sm text-gray-600">{style.description}</div>
+                    </div>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Content Length Selection */}
+          <div className="bg-white rounded-2xl shadow-lg p-6">
+            <h3 className="text-lg font-semibold mb-4 flex items-center">
+              <FileText className="h-5 w-5 mr-2 text-green-600" />
+              Content Length
+            </h3>
+            <div className="space-y-3">
+              {contentLengths.map((length) => (
+                <button
+                  key={length.key}
+                  onClick={() => handleInputChange('contentLength', length.key)}
+                  className={`w-full p-3 rounded-lg border-2 transition-all text-left ${
+                    formData.contentLength === length.key
+                      ? 'border-green-500 bg-green-50'
+                      : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                >
+                  <div className="font-medium text-gray-900">{length.label}</div>
+                  <div className="text-sm text-gray-600">{length.description}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* SEO Keywords */}
+          <div className="bg-white rounded-2xl shadow-lg p-6">
+            <h3 className="text-lg font-semibold mb-4 flex items-center">
+              <Globe className="h-5 w-5 mr-2 text-orange-600" />
+              SEO Optimization
+            </h3>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Property Type *
-              </label>
-              <select
-                value={formData.propertyType}
-                onChange={(e) => handleInputChange('propertyType', e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                <option value="">Select Property Type</option>
-                <option value="Single Family Home">Single Family Home</option>
-                <option value="Apartment">Apartment</option>
-                <option value="Townhouse">Townhouse</option>
-                <option value="Duplex">Duplex</option>
-                <option value="Commercial Property">Commercial Property</option>
-                <option value="Land">Land</option>
-              </select>
-            </div>
-
-            {/* Bedrooms, Bathrooms, Square Feet */}
-            <div className="grid grid-cols-3 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Bedrooms *
-                </label>
-                <input
-                  type="number"
-                  value={formData.bedrooms}
-                  onChange={(e) => handleInputChange('bedrooms', e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="3"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Bathrooms *
-                </label>
-                <input
-                  type="number"
-                  step="0.5"
-                  value={formData.bathrooms}
-                  onChange={(e) => handleInputChange('bathrooms', e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="2"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Square Feet *
-                </label>
-                <input
-                  type="number"
-                  value={formData.squareFeet}
-                  onChange={(e) => handleInputChange('squareFeet', e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="1200"
-                />
-              </div>
-            </div>
-
-            {/* Location */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Location *
+                Target Keywords (Optional)
               </label>
               <input
                 type="text"
-                value={formData.location}
-                onChange={(e) => handleInputChange('location', e.target.value)}
+                value={formData.targetKeywords}
+                onChange={(e) => handleInputChange('targetKeywords', e.target.value)}
                 className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="e.g., Downtown Los Angeles, CA"
+                placeholder="e.g., tech hub, outdoor lifestyle, family-friendly"
               />
+              <p className="text-xs text-gray-500 mt-2">
+                AI will automatically include local market keywords and optimize for search engines
+              </p>
             </div>
-
-            {/* Special Features */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Special Features
-              </label>
-              <textarea
-                value={formData.specialFeatures}
-                onChange={(e) => handleInputChange('specialFeatures', e.target.value)}
-                rows={4}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Hardwood floors, granite countertops, walk-in closet, garage..."
-              />
-            </div>
-
-            {/* Writing Style */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-4">
-                Writing Style
-              </label>
-              <div className="flex space-x-4">
-                {[
-                  { key: 'Professional', label: 'Professional' },
-                  { key: 'Luxury', label: 'Luxury' },
-                  { key: 'Modern', label: 'Modern' }
-                ].map((style) => (
-                  <button
-                    key={style.key}
-                    onClick={() => handleInputChange('writingStyle', style.key)}
-                    className={`px-6 py-3 rounded-xl font-medium transition-colors ${
-                      formData.writingStyle === style.key
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                    }`}
-                  >
-                    {style.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Usage Info */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-blue-700">
-                  Daily uses remaining: <span className="font-semibold">{3 - usageCount}</span>/3
-                </span>
-                {usageCount >= 3 && (
-                  <span className="text-blue-600 text-xs">
-                    {typeof window !== 'undefined' && usageTracker.formatTimeUntilReset()}
-                  </span>
-                )}
-              </div>
-              {usageCount >= 3 && (
-                <div className="mt-1 text-xs text-blue-600">
-                  Free quota exhausted, resets at midnight
-                </div>
-              )}
-            </div>
-
-            {/* Generate Button */}
-            <button
-              onClick={handleGenerate}
-              disabled={isLoading || !validateForm() || usageCount >= 3}
-              className={`w-full py-4 rounded-xl font-semibold text-lg transition-all ${
-                isLoading || !validateForm() || usageCount >= 3
-                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  : 'bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700'
-              }`}
-            >
-              {isLoading ? (
-                <div className="flex items-center justify-center space-x-2">
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  <span>Generating...</span>
-                </div>
-              ) : usageCount >= 3 ? (
-                'Daily free limit reached'
-              ) : (
-                <div className="flex items-center justify-center space-x-2">
-                  <Sparkles className="h-5 w-5" />
-                  <span>Generate Listing</span>
-                </div>
-              )}
-            </button>
           </div>
+
+          {/* Generate Button */}
+          <button
+            onClick={handleGenerate}
+            disabled={!validateForm() || isLoading}
+            className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-4 px-6 rounded-xl font-semibold text-lg hover:shadow-lg transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center space-x-2"
+          >
+            {isLoading ? (
+              <>
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                <span>Generating...</span>
+              </>
+            ) : (
+              <>
+                <Sparkles className="h-5 w-5" />
+                <span>Generate Smart Listing</span>
+              </>
+            )}
+          </button>
         </div>
 
         {/* Results Section */}
         <div className="bg-white rounded-2xl shadow-lg p-6">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-semibold">Generated Content</h2>
-            {generatedContent && (
-              <button
-                onClick={handleCopy}
-                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                  copySuccess
-                    ? 'bg-green-100 text-green-800'
-                    : 'bg-blue-100 text-blue-800 hover:bg-blue-200'
-                }`}
-              >
-                <div className="flex items-center space-x-2">
-                  {copySuccess ? (
-                    <Check className="h-4 w-4" />
-                  ) : (
-                    <Copy className="h-4 w-4" />
-                  )}
-                  <span>{copySuccess ? 'Copied!' : 'Copy'}</span>
-                </div>
-              </button>
-            )}
-          </div>
+          <h2 className="text-xl font-semibold mb-6">Generated Content</h2>
           
           {generatedContent ? (
             <div className="space-y-4">
-              <div className="p-4 bg-gray-50 rounded-xl">
-                <div className="text-gray-700 leading-relaxed whitespace-pre-line">
-                  {generatedContent}
+              <div className="bg-gray-50 rounded-xl p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center space-x-2">
+                    <CheckCircle className="h-5 w-5 text-green-500" />
+                    <span className="font-medium text-gray-900">
+                      {formData.writingStyle} Style • {formData.contentLength} Length
+                    </span>
+                  </div>
+                  <button
+                    onClick={handleCopy}
+                    className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    {copySuccess ? (
+                      <>
+                        <CheckCircle className="h-4 w-4" />
+                        <span>Copied!</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="h-4 w-4" />
+                        <span>Copy</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+                <div className="prose prose-gray max-w-none">
+                  <p className="whitespace-pre-wrap text-gray-700 leading-relaxed">
+                    {generatedContent}
+                  </p>
                 </div>
               </div>
+              
               <div className="flex space-x-3">
                 <button
                   onClick={resetForm}
-                  className="flex-1 py-2 border border-gray-300 rounded-lg font-medium hover:bg-gray-50 transition-colors"
+                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
                 >
-                  Generate New
+                  Create New
                 </button>
-                <div className="flex-1 relative group">
-                  <button className="w-full py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors">
-                    Export Content
-                  </button>
-                  <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10">
-                    <button
-                      onClick={() => handleExport('txt')}
-                      className="w-full px-4 py-2 text-left hover:bg-gray-50 first:rounded-t-lg"
-                    >
-                      Export as TXT
-                    </button>
-                    <button
-                      onClick={() => handleExport('pdf')}
-                      className="w-full px-4 py-2 text-left hover:bg-gray-50"
-                    >
-                      Export as PDF
-                    </button>
-                    <button
-                      onClick={() => handleExport('csv')}
-                      className="w-full px-4 py-2 text-left hover:bg-gray-50 last:rounded-b-lg"
-                    >
-                      Export as CSV
-                    </button>
-                  </div>
-                </div>
+                <button
+                  onClick={handleExport}
+                  className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                >
+                  Export Content
+                </button>
               </div>
             </div>
           ) : (
-            <div className="text-center py-12 text-gray-500">
-              <Sparkles className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-              <p>Fill in the property details on the left and click generate</p>
-              <p className="text-sm mt-2">AI will create professional listing descriptions for you</p>
+            <div className="text-center py-12">
+              <Sparkles className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+              <p className="text-gray-500">Fill in the property details and click "Generate Smart Listing" to create your content</p>
             </div>
           )}
         </div>

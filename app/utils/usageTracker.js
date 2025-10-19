@@ -1,11 +1,17 @@
 'use client'
 
+import pricingTiers from './pricingTiers'
+
 // 使用计数管理工具
 class UsageTracker {
   constructor() {
     this.storageKey = 'listingwriterai_usage'
-    this.dailyLimit = 3
     this.resetHour = 0 // 每天0点重置
+  }
+
+  // 获取当前每日限制（基于用户层级）
+  getDailyLimit() {
+    return pricingTiers.getDailyLimit()
   }
 
   // 获取当前使用数据
@@ -52,12 +58,15 @@ class UsageTracker {
 
   // 检查是否可以使用
   canUse() {
-    return this.getCurrentCount() < this.dailyLimit
+    const dailyLimit = this.getDailyLimit()
+    if (dailyLimit === -1) return true // unlimited
+    return this.getCurrentCount() < dailyLimit
   }
 
   // 增加使用次数
   incrementUsage() {
     const data = this.getUsageData()
+    const dailyLimit = this.getDailyLimit()
     
     if (this.shouldReset(data.date)) {
       // 新的一天，重置并设为1
@@ -66,7 +75,7 @@ class UsageTracker {
       return 1
     } else {
       // 同一天，增加计数
-      const newCount = Math.min(data.count + 1, this.dailyLimit)
+      const newCount = dailyLimit === -1 ? data.count + 1 : Math.min(data.count + 1, dailyLimit)
       const newData = { count: newCount, date: data.date }
       this.saveUsageData(newData)
       return newCount
@@ -75,7 +84,9 @@ class UsageTracker {
 
   // 获取剩余使用次数
   getRemainingCount() {
-    return Math.max(0, this.dailyLimit - this.getCurrentCount())
+    const dailyLimit = this.getDailyLimit()
+    if (dailyLimit === -1) return -1 // unlimited
+    return Math.max(0, dailyLimit - this.getCurrentCount())
   }
 
   // 获取重置时间（下一个0点）
