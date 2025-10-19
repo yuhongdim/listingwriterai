@@ -22,8 +22,14 @@ import {
   BarChart3
 } from 'lucide-react'
 import usageTracker from '../utils/usageTracker'
+import errorHandler from '../utils/errorHandler'
+import LoadingSpinner, { ContentGeneratingLoader, ApiLoadingSpinner } from './LoadingSpinner'
+import { useToast } from './Toast'
 
 const SocialMediaGenerator = ({ usageCount, setUsageCount }) => {
+  // Toast hook
+  const { success, error, warning, info } = useToast()
+  
   const [formData, setFormData] = useState({
     propertyType: '',
     location: '',
@@ -124,13 +130,13 @@ const SocialMediaGenerator = ({ usageCount, setUsageCount }) => {
 
   const generateContent = async () => {
     if (!validateForm()) {
-      alert('Please fill in all required fields and select at least one platform')
+      warning('表单验证', '请填写所有必填字段并选择至少一个平台')
       return
     }
 
     if (!usageTracker.canUse()) {
       const resetTime = usageTracker.formatTimeUntilReset()
-      alert(`You've reached today's free usage limit (3 times). ${resetTime}`)
+      warning('使用限制', `您已达到今日免费使用限制（3次）。${resetTime}`)
       return
     }
 
@@ -145,11 +151,18 @@ const SocialMediaGenerator = ({ usageCount, setUsageCount }) => {
         const newCount = usageTracker.incrementUsage()
         setUsageCount(newCount)
         setIsLoading(false)
+        
+        // 显示成功消息
+        success('内容生成成功', '社交媒体内容已成功生成！')
       }, 2000)
 
-    } catch (error) {
-      console.error('Generation Error:', error)
-      alert(`Generation failed: ${error.message}`)
+    } catch (err) {
+      console.error('Generation Error:', err)
+      
+      // 使用错误处理器
+      const { userMessage } = errorHandler.handleApiError(err, false)
+      error('生成失败', userMessage)
+      
       setIsLoading(false)
     }
   }
@@ -371,13 +384,31 @@ Perfect for ${base.audience.toLowerCase()}!
     return ctas[goal]?.[platform] || "Contact me for more information!"
   }
 
+  // 调度发布
+  const schedulePost = (platform, content) => {
+    if (!postSchedule.date || !postSchedule.time) {
+      warning('调度设置', '请设置发布日期和时间')
+      return
+    }
+
+    const newScheduledPost = {
+      id: Date.now(),
+      platform,
+      content,
+      scheduledTime: new Date(`${postSchedule.date}T${postSchedule.time}`),
+      status: 'scheduled'
+    }
+    setScheduledPosts(prev => [...prev, newScheduledPost])
+    info('调度成功', '帖子已成功添加到发布计划')
+  }
+
   const copyToClipboard = async (text, platform) => {
     try {
       await navigator.clipboard.writeText(text)
-      setCopySuccess(platform)
-      setTimeout(() => setCopySuccess(''), 2000)
+      success('复制成功', `${platform} 内容已复制到剪贴板`)
     } catch (err) {
       console.error('Failed to copy text: ', err)
+      error('复制失败', '无法复制到剪贴板，请手动复制')
     }
   }
 
@@ -824,13 +855,13 @@ Perfect for ${base.audience.toLowerCase()}!
           >
             {isLoading ? (
               <>
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                <span>Generating Content...</span>
+                <ApiLoadingSpinner />
+                <span>正在生成内容...</span>
               </>
             ) : (
               <>
                 <Sparkles className="h-5 w-5" />
-                <span>Generate Social Media Content</span>
+                <span>生成社交媒体内容</span>
               </>
             )}
           </button>

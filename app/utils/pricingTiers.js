@@ -1,250 +1,202 @@
-// 定价层级管理工具
-class PricingTiers {
-  constructor() {
-    this.tiers = {
-      free: {
-        id: 'free',
-        name: '免费版',
-        dailyLimit: 3,
-        features: {
-          basicListing: true,
-          emailTemplates: true,
-          videoScript: true,
-          socialMedia: true,
-          export: false,
-          customerManagement: false,
-          teamCollaboration: false,
-          customBranding: false,
-          prioritySupport: false,
-          analytics: false,
-          apiAccess: false,
-          bulkGeneration: false
-        },
-        restrictions: {
-          maxTemplates: 5,
-          maxExports: 0,
-          maxTeamMembers: 1,
-          storageGB: 0.1
-        }
+// Pricing Tiers Management
+const pricingTiers = {
+  // Pricing plan configuration
+  tiers: {
+    free: {
+      id: 'free',
+      name: 'Free',
+      price: 0,
+      period: 'month',
+      dailyLimit: 3, // 3 per feature per day
+      features: {
+        basicGeneration: true,
+        emailCenter: false,
+        videoScript: false,
+        socialMedia: false,
+        analytics: false,
+        export: true,
+        priority: 'low'
       },
-      starter: {
-        id: 'starter',
-        name: 'Starter',
-        dailyLimit: 50,
-        features: {
-          basicListing: true,
-          emailTemplates: true,
-          videoScript: true,
-          socialMedia: true,
-          export: true,
-          customerManagement: true,
-          teamCollaboration: false,
-          customBranding: false,
-          prioritySupport: false,
-          analytics: true,
-          apiAccess: false,
-          bulkGeneration: false
-        },
-        restrictions: {
-          maxTemplates: 20,
-          maxExports: 100,
-          maxTeamMembers: 1,
-          storageGB: 1
-        }
+      description: 'Perfect for trying out our platform',
+      highlights: ['3 generations per feature daily', 'Basic content generation', 'Content export']
+    },
+    pro: {
+      id: 'pro',
+      name: 'Professional',
+      price: 29,
+      period: 'month',
+      dailyLimit: 100, // Increased from 50
+      features: {
+        basicGeneration: true,
+        emailCenter: true,
+        videoScript: true,
+        socialMedia: true,
+        analytics: false,
+        export: true,
+        priority: 'normal'
       },
-      pro: {
-        id: 'pro',
-        name: 'Pro',
-        dailyLimit: 200,
-        features: {
-          basicListing: true,
-          emailTemplates: true,
-          videoScript: true,
-          socialMedia: true,
-          export: true,
-          customerManagement: true,
-          teamCollaboration: true,
-          customBranding: true,
-          prioritySupport: true,
-          analytics: true,
-          apiAccess: true,
-          bulkGeneration: true
-        },
-        restrictions: {
-          maxTemplates: -1, // unlimited
-          maxExports: 1000,
-          maxTeamMembers: 5,
-          storageGB: 10
-        }
+      description: 'Ideal for professionals and small teams',
+      highlights: ['100 generations daily', 'All features included', 'Email marketing', 'Video scripts', 'Social media content']
+    },
+    team: {
+      id: 'team',
+      name: 'Team',
+      price: 69,
+      period: 'month',
+      dailyLimit: 500, // New team tier with higher limits
+      features: {
+        basicGeneration: true,
+        emailCenter: true,
+        videoScript: true,
+        socialMedia: true,
+        analytics: true,
+        export: true,
+        priority: 'high',
+        teamCollaboration: true,
+        bulkGeneration: true
       },
-      agency: {
-        id: 'agency',
-        name: 'Agency',
-        dailyLimit: -1, // unlimited
-        features: {
-          basicListing: true,
-          emailTemplates: true,
-          videoScript: true,
-          socialMedia: true,
-          export: true,
-          customerManagement: true,
-          teamCollaboration: true,
-          customBranding: true,
-          prioritySupport: true,
-          analytics: true,
-          apiAccess: true,
-          bulkGeneration: true,
-          whiteLabel: true,
-          dedicatedSupport: true
-        },
-        restrictions: {
-          maxTemplates: -1, // unlimited
-          maxExports: -1, // unlimited
-          maxTeamMembers: -1, // unlimited
-          storageGB: -1 // unlimited
-        }
-      }
+      description: 'Perfect for growing teams and agencies',
+      highlights: ['500 generations daily', 'Advanced analytics', 'Team collaboration', 'Bulk generation', 'Priority support']
+    },
+    enterprise: {
+      id: 'enterprise',
+      name: 'Enterprise',
+      price: 199,
+      period: 'month',
+      dailyLimit: -1, // Unlimited
+      features: {
+        basicGeneration: true,
+        emailCenter: true,
+        videoScript: true,
+        socialMedia: true,
+        analytics: true,
+        export: true,
+        priority: 'highest',
+        teamCollaboration: true,
+        bulkGeneration: true,
+        apiAccess: true,
+        customBranding: true,
+        dedicatedSupport: true
+      },
+      description: 'For large organizations with custom needs',
+      highlights: ['Unlimited generations', 'API access', 'Custom branding', 'Dedicated support', 'White-label solution']
     }
-    
-    // 从localStorage获取当前用户层级，默认为免费版
-    this.currentTier = this.getCurrentTier()
-  }
+  },
 
-  // 获取当前用户层级
+  // Get current user tier
   getCurrentTier() {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('userTier')
-      return saved || 'free'
+    if (typeof localStorage === 'undefined') {
+      return this.tiers.free
     }
-    return 'free'
-  }
-
-  // 设置用户层级
-  setUserTier(tierId) {
-    if (this.tiers[tierId]) {
-      this.currentTier = tierId
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('userTier', tierId)
-      }
-      return true
-    }
-    return false
-  }
-
-  // 获取当前层级信息
-  getCurrentTierInfo() {
-    return this.tiers[this.currentTier]
-  }
-
-  // 检查是否有某个功能权限
-  hasFeature(featureName) {
-    const tierInfo = this.getCurrentTierInfo()
-    return tierInfo.features[featureName] || false
-  }
-
-  // 获取每日使用限制
-  getDailyLimit() {
-    const tierInfo = this.getCurrentTierInfo()
-    return tierInfo.dailyLimit
-  }
-
-  // 检查是否达到每日限制
-  isAtDailyLimit(currentUsage) {
-    const limit = this.getDailyLimit()
-    if (limit === -1) return false // unlimited
-    return currentUsage >= limit
-  }
-
-  // 获取剩余使用次数
-  getRemainingUsage(currentUsage) {
-    const limit = this.getDailyLimit()
-    if (limit === -1) return -1 // unlimited
-    return Math.max(0, limit - currentUsage)
-  }
-
-  // 检查是否可以使用某个功能
-  canUseFeature(featureName, currentUsage = 0) {
-    // 首先检查功能权限
-    if (!this.hasFeature(featureName)) {
-      return {
-        allowed: false,
-        reason: 'feature_not_available',
-        message: '此功能在您当前的方案中不可用'
-      }
-    }
-
-    // 检查使用限制
-    if (this.isAtDailyLimit(currentUsage)) {
-      return {
-        allowed: false,
-        reason: 'daily_limit_reached',
-        message: '已达到每日使用限制'
-      }
-    }
-
-    return {
-      allowed: true,
-      reason: 'ok',
-      message: '可以使用'
-    }
-  }
-
-  // 获取升级建议
-  getUpgradeRecommendation(featureName) {
-    const currentTierInfo = this.getCurrentTierInfo()
     
-    // 找到包含该功能的最低层级
-    for (const [tierId, tierInfo] of Object.entries(this.tiers)) {
-      if (tierInfo.features[featureName] && tierId !== this.currentTier) {
-        return {
-          recommendedTier: tierId,
-          tierName: tierInfo.name,
-          message: `升级到 ${tierInfo.name} 以使用此功能`
-        }
+    try {
+      const saved = localStorage.getItem('userTier')
+      if (saved) {
+        const tierId = JSON.parse(saved)
+        return this.tiers[tierId] || this.tiers.free
+      }
+    } catch (error) {
+      console.error('Failed to get current tier:', error)
+    }
+    
+    return this.tiers.free
+  },
+
+  // Set user tier
+  setUserTier(tierId) {
+    if (!this.tiers[tierId]) {
+      throw new Error('Invalid tier ID')
+    }
+    
+    if (typeof localStorage !== 'undefined') {
+      try {
+        localStorage.setItem('userTier', JSON.stringify(tierId))
+        return true
+      } catch (error) {
+        console.error('Failed to set user tier:', error)
+        return false
+      }
+    }
+    
+    return false
+  },
+
+  // Get daily limit
+  getDailyLimit() {
+    return this.getCurrentTier().dailyLimit
+  },
+
+  // Check feature permission
+  hasFeature(featureName) {
+    const currentTier = this.getCurrentTier()
+    return currentTier.features[featureName] || false
+  },
+
+  // Get all tiers
+  getAllTiers() {
+    return Object.values(this.tiers)
+  },
+
+  // Compare tiers
+  compareTiers(currentTierId, targetTierId) {
+    const tierOrder = ['free', 'pro', 'team', 'enterprise']
+    const currentIndex = tierOrder.indexOf(currentTierId)
+    const targetIndex = tierOrder.indexOf(targetTierId)
+    
+    return {
+      isUpgrade: targetIndex > currentIndex,
+      isDowngrade: targetIndex < currentIndex,
+      isSame: targetIndex === currentIndex
+    }
+  },
+
+  // Get upgrade recommendation
+  getUpgradeRecommendation(currentUsage) {
+    const currentTier = this.getCurrentTier()
+    
+    if (currentTier.id === 'free' && currentUsage >= currentTier.dailyLimit * 0.8) {
+      return {
+        recommended: this.tiers.pro,
+        reason: 'You\'re approaching your free tier limit. Upgrade to Professional for more features and higher limits.'
+      }
+    }
+    
+    if (currentTier.id === 'pro' && currentUsage >= currentTier.dailyLimit * 0.8) {
+      return {
+        recommended: this.tiers.team,
+        reason: 'Upgrade to Team plan for advanced analytics and team collaboration features.'
+      }
+    }
+
+    if (currentTier.id === 'team' && currentUsage >= currentTier.dailyLimit * 0.8) {
+      return {
+        recommended: this.tiers.enterprise,
+        reason: 'Upgrade to Enterprise for unlimited usage and premium support.'
       }
     }
     
     return null
-  }
+  },
 
-  // 获取所有层级信息（用于定价页面）
-  getAllTiers() {
-    return this.tiers
-  }
+  // Calculate yearly savings
+  calculateYearlySavings(tierId) {
+    const tier = this.tiers[tierId]
+    if (!tier || tier.price === 0) return 0
+    
+    const monthlyTotal = tier.price * 12
+    const yearlyPrice = tier.price * 10 // 2 months free with annual billing
+    return monthlyTotal - yearlyPrice
+  },
 
-  // 比较两个层级
-  compareTiers(tierA, tierB) {
-    const tierOrder = ['free', 'starter', 'pro', 'agency']
-    const indexA = tierOrder.indexOf(tierA)
-    const indexB = tierOrder.indexOf(tierB)
-    return indexA - indexB
-  }
-
-  // 检查是否可以降级
-  canDowngrade(targetTier) {
-    return this.compareTiers(targetTier, this.currentTier) < 0
-  }
-
-  // 检查是否可以升级
-  canUpgrade(targetTier) {
-    return this.compareTiers(targetTier, this.currentTier) > 0
-  }
-
-  // 获取功能限制信息
-  getRestriction(restrictionName) {
-    const tierInfo = this.getCurrentTierInfo()
-    return tierInfo.restrictions[restrictionName]
-  }
-
-  // 检查是否超过限制
-  isOverRestriction(restrictionName, currentValue) {
-    const limit = this.getRestriction(restrictionName)
-    if (limit === -1) return false // unlimited
-    return currentValue >= limit
+  // Get feature usage limits per day for free tier
+  getFeatureUsageLimits() {
+    return {
+      basicGeneration: 3,
+      emailTemplate: 3,
+      videoScript: 3,
+      socialMedia: 3
+    }
   }
 }
-
-// 创建全局实例
-const pricingTiers = new PricingTiers()
 
 export default pricingTiers

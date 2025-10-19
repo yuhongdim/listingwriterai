@@ -23,10 +23,23 @@ import EmailCenter from './components/EmailCenter'
 import VideoScript from './components/VideoScript'
 import SocialMediaGenerator from './components/SocialMediaGenerator'
 import Pricing from './components/Pricing'
+import LandingPage from './components/LandingPage'
+import Analytics from './components/Analytics'
 import usageTracker from './utils/usageTracker'
+import { ToastContainer, useToast } from './components/Toast'
+import errorHandler from './utils/errorHandler'
+import PerformanceMonitor from './components/PerformanceMonitor'
+import { useAuth } from './hooks/useAuth'
+import DataManager from './components/DataManager'
 
 export default function ListingWriterAI() {
-  const [currentPage, setCurrentPage] = useState('dashboard')
+  // Auth hook
+  const { user, isAuthenticated, updateUsage } = useAuth()
+  
+  // Toast hook
+  const { toasts, removeToast, success, error, warning, info } = useToast()
+  
+  const [currentPage, setCurrentPage] = useState('landing')
   const [isLoading, setIsLoading] = useState(false)
   const [formData, setFormData] = useState({
     propertyType: '',
@@ -45,6 +58,7 @@ export default function ListingWriterAI() {
   const [copySuccess, setCopySuccess] = useState(false)
   const [usageCount, setUsageCount] = useState(0)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  const [showDataManager, setShowDataManager] = useState(false)
 
   // 使用 useEffect 初始化使用计数
   useEffect(() => {
@@ -98,12 +112,19 @@ export default function ListingWriterAI() {
         setGeneratedContent(data.content)
         const newCount = usageTracker.incrementUsage()
         setUsageCount(newCount)
+        
+        // 更新用户使用量（如果已登录）
+        if (isAuthenticated) {
+          updateUsage()
+        }
+        
+        success('内容生成成功！')
       } else {
         throw new Error('API returned empty content')
       }
     } catch (error) {
       console.error('Generation Error:', error)
-      alert(`Generation failed: ${error.message}`)
+      error(`生成失败: ${error.message}`)
     } finally {
       setIsLoading(false)
     }
@@ -112,10 +133,9 @@ export default function ListingWriterAI() {
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(generatedContent)
-      setCopySuccess(true)
-      setTimeout(() => setCopySuccess(false), 2000)
+      success('内容已复制到剪贴板')
     } catch (error) {
-      alert('复制失败')
+      error('复制失败')
     }
   }
 
@@ -179,6 +199,8 @@ export default function ListingWriterAI() {
   // 渲染当前页面内容
   const renderCurrentPage = () => {
     switch (currentPage) {
+      case 'landing':
+        return <LandingPage onGetStarted={() => setCurrentPage('dashboard')} />
       case 'dashboard':
         return <Dashboard usageCount={usageCount} setCurrentPage={setCurrentPage} />
       case 'create':
@@ -203,26 +225,30 @@ export default function ListingWriterAI() {
         return <VideoScript usageCount={usageCount} setUsageCount={setUsageCount} />
       case 'social':
         return <SocialMediaGenerator usageCount={usageCount} setUsageCount={setUsageCount} />
+      case 'analytics':
+        return <Analytics />
       case 'pricing':
         return <Pricing />
       default:
-        return <Dashboard usageCount={usageCount} setCurrentPage={setCurrentPage} />
+        return <LandingPage onGetStarted={() => setCurrentPage('dashboard')} />
     }
   }
 
   return (
-    <div className="flex h-screen bg-gray-50">
-      {/* 侧边栏 */}
-      <Sidebar 
-        currentPage={currentPage}
-        setCurrentPage={setCurrentPage}
-        usageCount={usageCount}
-        collapsed={sidebarCollapsed}
-        setCollapsed={setSidebarCollapsed}
-      />
+    <div className={currentPage === 'landing' ? '' : 'flex h-screen bg-gray-50'}>
+      {/* 侧边栏 - 只在非Landing页面显示 */}
+      {currentPage !== 'landing' && (
+        <Sidebar 
+          currentPage={currentPage}
+          setCurrentPage={setCurrentPage}
+          usageCount={usageCount}
+          collapsed={sidebarCollapsed}
+          setCollapsed={setSidebarCollapsed}
+        />
+      )}
       
       {/* 主内容区域 */}
-      <div className={`flex-1 transition-all duration-300 ${sidebarCollapsed ? 'ml-16' : 'ml-64'}`}>
+      <div className={currentPage === 'landing' ? '' : `flex-1 transition-all duration-300 ${sidebarCollapsed ? 'ml-16' : 'ml-64'}`}>
         {renderCurrentPage()}
       </div>
     </div>
@@ -567,6 +593,12 @@ function CreateListing({
                   Create New
                 </button>
                 <button
+                  onClick={() => setShowDataManager(true)}
+                  className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                >
+                  数据管理
+                </button>
+                <button
                   onClick={handleExport}
                   className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
                 >
@@ -582,6 +614,23 @@ function CreateListing({
           )}
         </div>
       </div>
+      
+      {/* Toast Container */}
+      <ToastContainer toasts={toasts} onRemove={removeToast} />
+      
+      {/* Performance Monitor */}
+      <PerformanceMonitor />
+      
+      {/* Data Manager */}
+      <DataManager 
+        isOpen={showDataManager}
+        onClose={() => setShowDataManager(false)}
+        onContentSelect={(content) => {
+          setGeneratedContent(content)
+          setShowDataManager(false)
+          success('内容已加载')
+        }}
+      />
     </div>
   )
 }

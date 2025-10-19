@@ -1,0 +1,283 @@
+'use client'
+
+import { useState } from 'react'
+import { 
+  User, 
+  Mail, 
+  Building, 
+  Calendar, 
+  Crown, 
+  Settings, 
+  LogOut, 
+  Edit3, 
+  Save, 
+  X,
+  Shield,
+  Zap,
+  BarChart3,
+  Clock
+} from 'lucide-react'
+import { useAuth } from '../hooks/useAuth'
+import { useToast } from './Toast'
+
+export default function UserProfile({ isOpen, onClose }) {
+  const { user, logout, getUserStats } = useAuth()
+  const { success, error } = useToast()
+  const [isEditing, setIsEditing] = useState(false)
+  const [editData, setEditData] = useState({
+    name: user?.name || '',
+    company: user?.company || ''
+  })
+
+  if (!isOpen || !user) return null
+
+  const stats = getUserStats()
+
+  const handleSave = () => {
+    // 这里应该调用API更新用户信息
+    success('个人信息已更新')
+    setIsEditing(false)
+  }
+
+  const handleLogout = () => {
+    logout()
+    onClose()
+    success('已安全退出')
+  }
+
+  const getPlanBadge = (plan) => {
+    const badges = {
+      free: { label: '免费版', color: 'bg-gray-100 text-gray-800', icon: User },
+      pro: { label: '专业版', color: 'bg-blue-100 text-blue-800', icon: Zap },
+      premium: { label: '高级版', color: 'bg-purple-100 text-purple-800', icon: Crown }
+    }
+    return badges[plan] || badges.free
+  }
+
+  const planBadge = getPlanBadge(user.plan)
+  const PlanIcon = planBadge.icon
+
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString('zh-CN', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    })
+  }
+
+  const getUsagePercentage = () => {
+    if (stats?.maxUsage === -1) return 0 // 无限制
+    return Math.min((stats?.usageCount || 0) / (stats?.maxUsage || 1) * 100, 100)
+  }
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        {/* 头部 */}
+        <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-6 text-white">
+          <div className="flex justify-between items-start">
+            <div className="flex items-center space-x-4">
+              <div className="bg-white bg-opacity-20 p-3 rounded-full">
+                <User className="h-8 w-8" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold">{user.name}</h2>
+                <p className="text-blue-100">{user.email}</p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-2">
+              <div className={`px-3 py-1 rounded-full text-sm font-medium ${planBadge.color}`}>
+                <PlanIcon className="h-4 w-4 inline mr-1" />
+                {planBadge.label}
+              </div>
+              <button
+                onClick={onClose}
+                className="text-white hover:text-gray-200 transition-colors"
+              >
+                <X className="h-6 w-6" />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div className="p-6 space-y-6">
+          {/* 使用统计 */}
+          <div className="bg-gray-50 rounded-xl p-6">
+            <h3 className="text-lg font-semibold mb-4 flex items-center">
+              <BarChart3 className="h-5 w-5 mr-2 text-blue-600" />
+              使用统计
+            </h3>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-white p-4 rounded-lg">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm text-gray-600">今日使用</span>
+                  <Zap className="h-4 w-4 text-orange-500" />
+                </div>
+                <div className="text-2xl font-bold text-gray-900">
+                  {stats?.usageCount || 0}
+                  {stats?.maxUsage !== -1 && (
+                    <span className="text-sm text-gray-500">/{stats?.maxUsage}</span>
+                  )}
+                </div>
+                {stats?.maxUsage !== -1 && (
+                  <div className="mt-2">
+                    <div className="bg-gray-200 rounded-full h-2">
+                      <div 
+                        className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                        style={{ width: `${getUsagePercentage()}%` }}
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+              <div className="bg-white p-4 rounded-lg">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm text-gray-600">会员时长</span>
+                  <Clock className="h-4 w-4 text-green-500" />
+                </div>
+                <div className="text-2xl font-bold text-gray-900">
+                  {Math.floor((Date.now() - new Date(user.createdAt).getTime()) / (1000 * 60 * 60 * 24))}
+                </div>
+                <div className="text-sm text-gray-500">天</div>
+              </div>
+            </div>
+          </div>
+
+          {/* 个人信息 */}
+          <div className="bg-white border border-gray-200 rounded-xl p-6">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold flex items-center">
+                <Settings className="h-5 w-5 mr-2 text-gray-600" />
+                个人信息
+              </h3>
+              <button
+                onClick={() => setIsEditing(!isEditing)}
+                className="text-blue-600 hover:text-blue-700 flex items-center space-x-1"
+              >
+                {isEditing ? <X className="h-4 w-4" /> : <Edit3 className="h-4 w-4" />}
+                <span>{isEditing ? '取消' : '编辑'}</span>
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  姓名
+                </label>
+                {isEditing ? (
+                  <input
+                    type="text"
+                    value={editData.name}
+                    onChange={(e) => setEditData(prev => ({ ...prev, name: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                ) : (
+                  <div className="flex items-center space-x-2">
+                    <User className="h-4 w-4 text-gray-400" />
+                    <span className="text-gray-900">{user.name}</span>
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  邮箱地址
+                </label>
+                <div className="flex items-center space-x-2">
+                  <Mail className="h-4 w-4 text-gray-400" />
+                  <span className="text-gray-900">{user.email}</span>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  公司名称
+                </label>
+                {isEditing ? (
+                  <input
+                    type="text"
+                    value={editData.company}
+                    onChange={(e) => setEditData(prev => ({ ...prev, company: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="请输入公司名称"
+                  />
+                ) : (
+                  <div className="flex items-center space-x-2">
+                    <Building className="h-4 w-4 text-gray-400" />
+                    <span className="text-gray-900">{user.company || '未设置'}</span>
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  注册时间
+                </label>
+                <div className="flex items-center space-x-2">
+                  <Calendar className="h-4 w-4 text-gray-400" />
+                  <span className="text-gray-900">{formatDate(user.createdAt)}</span>
+                </div>
+              </div>
+
+              {isEditing && (
+                <div className="flex space-x-3 pt-4">
+                  <button
+                    onClick={handleSave}
+                    className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2"
+                  >
+                    <Save className="h-4 w-4" />
+                    <span>保存更改</span>
+                  </button>
+                  <button
+                    onClick={() => setIsEditing(false)}
+                    className="flex-1 bg-gray-200 text-gray-800 py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors"
+                  >
+                    取消
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* 账户功能 */}
+          <div className="bg-white border border-gray-200 rounded-xl p-6">
+            <h3 className="text-lg font-semibold mb-4 flex items-center">
+              <Shield className="h-5 w-5 mr-2 text-gray-600" />
+              账户管理
+            </h3>
+            <div className="space-y-3">
+              <button className="w-full text-left p-3 rounded-lg hover:bg-gray-50 transition-colors flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <Crown className="h-5 w-5 text-purple-600" />
+                  <div>
+                    <div className="font-medium text-gray-900">升级计划</div>
+                    <div className="text-sm text-gray-500">解锁更多功能和使用次数</div>
+                  </div>
+                </div>
+              </button>
+              
+              <button className="w-full text-left p-3 rounded-lg hover:bg-gray-50 transition-colors flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <Settings className="h-5 w-5 text-gray-600" />
+                  <div>
+                    <div className="font-medium text-gray-900">账户设置</div>
+                    <div className="text-sm text-gray-500">修改密码、通知设置等</div>
+                  </div>
+                </div>
+              </button>
+            </div>
+          </div>
+
+          {/* 退出登录 */}
+          <button
+            onClick={handleLogout}
+            className="w-full bg-red-50 text-red-600 py-3 px-4 rounded-lg hover:bg-red-100 transition-colors flex items-center justify-center space-x-2 font-medium"
+          >
+            <LogOut className="h-5 w-5" />
+            <span>退出登录</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}

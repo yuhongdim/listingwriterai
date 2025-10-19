@@ -11,14 +11,23 @@ import {
   Settings,
   Menu,
   X,
-  CreditCard
+  CreditCard,
+  User,
+  LogIn,
+  Crown
 } from 'lucide-react'
 import usageTracker from '../utils/usageTracker'
 import pricingTiers from '../utils/pricingTiers'
+import { useAuth } from '../hooks/useAuth'
+import AuthModal from './AuthModal'
+import UserProfile from './UserProfile'
 
 const Sidebar = ({ currentPage, setCurrentPage, usageCount, collapsed, setCollapsed }) => {
   // 使用传入的collapsed状态而不是本地状态
   const isCollapsed = collapsed
+  const { user, isAuthenticated } = useAuth()
+  const [showAuthModal, setShowAuthModal] = useState(false)
+  const [showUserProfile, setShowUserProfile] = useState(false)
 
   // 获取当前用户层级信息
   const currentTier = pricingTiers.getCurrentTierInfo()
@@ -45,7 +54,9 @@ const Sidebar = ({ currentPage, setCurrentPage, usageCount, collapsed, setCollap
         {!isCollapsed && (
           <div>
             <h1 className="text-xl font-bold gradient-text">ListingWriterAI</h1>
-            <p className="text-sm text-gray-500">{currentTier.name}</p>
+            <p className="text-sm text-gray-500">
+              {isAuthenticated ? user?.plan || 'Free' : 'Guest Mode'}
+            </p>
           </div>
         )}
         <button
@@ -55,6 +66,37 @@ const Sidebar = ({ currentPage, setCurrentPage, usageCount, collapsed, setCollap
           {isCollapsed ? <Menu size={20} /> : <X size={20} />}
         </button>
       </div>
+
+      {/* User Section */}
+      {!isCollapsed && (
+        <div className="p-4 border-b border-gray-200">
+          {isAuthenticated ? (
+            <button
+              onClick={() => setShowUserProfile(true)}
+              className="w-full flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              <div className="bg-gradient-to-r from-blue-500 to-purple-500 p-2 rounded-full">
+                <User className="h-4 w-4 text-white" />
+              </div>
+              <div className="flex-1 text-left">
+                <div className="font-medium text-gray-900">{user?.name}</div>
+                <div className="text-sm text-gray-500 flex items-center">
+                  {user?.plan === 'premium' && <Crown className="h-3 w-3 mr-1 text-purple-500" />}
+                  {user?.plan || 'Free'}
+                </div>
+              </div>
+            </button>
+          ) : (
+            <button
+              onClick={() => setShowAuthModal(true)}
+              className="w-full flex items-center justify-center space-x-2 p-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg hover:shadow-lg transition-all"
+            >
+              <LogIn className="h-4 w-4" />
+              <span>登录/注册</span>
+            </button>
+          )}
+        </div>
+      )}
 
       {/* Usage Counter */}
       {!isCollapsed && (
@@ -129,6 +171,22 @@ const Sidebar = ({ currentPage, setCurrentPage, usageCount, collapsed, setCollap
             <p>Real Estate Marketing Platform</p>
           </div>
         </div>
+      )}
+
+      {/* Auth Modal */}
+      {showAuthModal && (
+        <AuthModal 
+          isOpen={showAuthModal}
+          onClose={() => setShowAuthModal(false)}
+        />
+      )}
+
+      {/* User Profile Modal */}
+      {showUserProfile && (
+        <UserProfile 
+          isOpen={showUserProfile}
+          onClose={() => setShowUserProfile(false)}
+        />
       )}
     </div>
   )

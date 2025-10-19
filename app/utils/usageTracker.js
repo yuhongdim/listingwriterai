@@ -2,11 +2,54 @@
 
 import pricingTiers from './pricingTiers'
 
-// 使用计数管理工具
+// 使用量追踪工具类
 class UsageTracker {
   constructor() {
-    this.storageKey = 'listingwriterai_usage'
-    this.resetHour = 0 // 每天0点重置
+    this.storageKey = 'listingai_usage'
+    this.data = this.loadData()
+    this.listeners = []
+  }
+
+  // 加载数据
+  loadData() {
+    if (typeof localStorage === 'undefined') {
+      return {
+        daily: {},
+        monthly: {},
+        total: 0,
+        features: {},
+        lastReset: new Date().toISOString()
+      }
+    }
+    
+    try {
+      const stored = localStorage.getItem(this.storageKey)
+      if (stored) {
+        return JSON.parse(stored)
+      }
+    } catch (error) {
+      console.error('Failed to load usage data:', error)
+    }
+    
+    return {
+      daily: {},
+      monthly: {},
+      total: 0,
+      features: {},
+      lastReset: new Date().toISOString()
+    }
+  }
+
+  // 保存数据
+  saveData() {
+    if (typeof localStorage !== 'undefined') {
+      try {
+        localStorage.setItem(this.storageKey, JSON.stringify(this.data))
+      } catch (error) {
+        console.error('Failed to save usage data:', error)
+      }
+    }
+    this.notifyListeners()
   }
 
   // 获取当前每日限制（基于用户层级）
@@ -120,6 +163,23 @@ class UsageTracker {
   clearUsageData() {
     if (typeof window === 'undefined') return
     localStorage.removeItem(this.storageKey)
+  }
+
+  // 清理数据
+  clearData() {
+    this.data = {
+      daily: {},
+      monthly: {},
+      total: 0,
+      features: {},
+      lastReset: new Date().toISOString()
+    }
+    
+    if (typeof localStorage !== 'undefined') {
+      localStorage.removeItem(this.storageKey)
+    }
+    
+    this.notifyListeners()
   }
 
   // 重置使用次数（用于测试）
