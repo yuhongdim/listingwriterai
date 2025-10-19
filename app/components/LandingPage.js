@@ -327,10 +327,10 @@ const LandingPage = ({ onGetStarted }) => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              用户真实反馈
+              Real User Testimonials
             </h2>
             <p className="text-xl text-gray-600">
-              看看其他房产专业人士如何通过我们的AI工具提升业绩
+              See how other real estate professionals boost their performance with our AI tools
             </p>
           </div>
           
@@ -364,15 +364,15 @@ const LandingPage = ({ onGetStarted }) => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              选择适合您的方案
+              Choose Your Perfect Plan
             </h2>
             <p className="text-xl text-gray-600 mb-8">
-              灵活的定价方案，满足不同规模用户的需求
+              Flexible pricing plans to meet the needs of users at different scales
             </p>
             
             <div className="flex items-center justify-center mb-8">
               <span className={`mr-3 ${!isYearly ? 'text-gray-900 font-semibold' : 'text-gray-500'}`}>
-                月付
+                Monthly
               </span>
               <button
                 onClick={() => setIsYearly(!isYearly)}
@@ -387,11 +387,11 @@ const LandingPage = ({ onGetStarted }) => {
                 />
               </button>
               <span className={`ml-3 ${isYearly ? 'text-gray-900 font-semibold' : 'text-gray-500'}`}>
-                年付
+                Yearly
               </span>
               {isYearly && (
                 <span className="ml-2 px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
-                  省20%
+                  Save 20%
                 </span>
               )}
             </div>
@@ -410,7 +410,7 @@ const LandingPage = ({ onGetStarted }) => {
                 {plan.popular && (
                   <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
                     <span className="bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-semibold">
-                      最受欢迎
+                      Most Popular
                     </span>
                   </div>
                 )}
@@ -420,10 +420,10 @@ const LandingPage = ({ onGetStarted }) => {
                   <p className="text-gray-600 mb-4">{plan.description}</p>
                   <div className="mb-4">
                     <span className="text-4xl font-bold text-gray-900">
-                      ¥{isYearly ? plan.price.yearly : plan.price.monthly}
+                      ${isYearly ? plan.price.yearly : plan.price.monthly}
                     </span>
                     <span className="text-gray-500">
-                      /{isYearly ? '年' : '月'}
+                      /{isYearly ? 'year' : 'month'}
                     </span>
                   </div>
                 </div>

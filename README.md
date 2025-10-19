@@ -76,54 +76,55 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 - OpenAI API
 - Vercel (deployment)
 
-一个基于 AI 的房产描述生成器，专为房地产经纪人设计。使用 Next.js 14 和 Tailwind CSS 构建，集成星狐云API。
+## About
 
-## 功能特性
+An AI-powered property description generator designed specifically for real estate agents. Built with Next.js 14 and Tailwind CSS, integrated with advanced AI technology.
 
-- 🏠 智能房产描述生成
-- 🎨 三种写作风格（专业、奢华、现代）
-- 📱 响应式设计，支持移动端
-- ⚡ 60秒快速生成
-- 📋 一键复制功能
-- 🔒 符合 Fair Housing Act 规定
+## Key Features
 
-## 技术栈
+- 🏠 Intelligent property description generation
+- 🎨 Three writing styles (Professional, Luxury, Modern)
+- 📱 Responsive design with mobile support
+- ⚡ Generate content in 60 seconds
+- 📋 One-click copy functionality
+- 🔒 Fair Housing Act compliant
 
-- **前端**: Next.js 14 (App Router)
-- **样式**: Tailwind CSS
-- **图标**: Lucide React
-- **AI**: 星狐云API (GPT-3.5-turbo)
-- **部署**: Vercel
+## Technology Stack
 
-## 快速开始
+- **Frontend**: Next.js 14 (App Router)
+- **Styling**: Tailwind CSS
+- **Icons**: Lucide React
+- **AI**: Advanced AI API (GPT-3.5-turbo)
+- **Deployment**: Vercel
 
-### 1. 安装依赖
+## Getting Started
+
+### 1. Install Dependencies
 
 ```bash
 npm install
 ```
 
-### 2. 配置环境变量
+### 2. Configure Environment Variables
 
-复制 `.env.local` 文件并添加您的星狐云API配置：
+Copy the `.env.local` file and add your AI API configuration:
 
 ```bash
-XINGHU_API_KEY=your_xinghu_api_key_here
-XINGHU_API_URL=https://xinghuapi.com/v1/chat/completions
+OPENAI_API_KEY=your_openai_api_key_here
 ```
 
-获取 API 密钥：
-1. 访问 [星狐云控制台](https://xinghuapi.com/console)
-2. 创建账户并获取 API 密钥
-3. 将密钥添加到 `.env.local` 文件
+Get your API key:
+1. Visit your AI service provider console
+2. Create an account and obtain an API key
+3. Add the key to your `.env.local` file
 
-### 3. 启动开发服务器
+### 3. Start Development Server
 
 ```bash
 npm run dev
 ```
 
-访问 [http://localhost:3000](http://localhost:3000) 查看应用。
+Visit [http://localhost:3000](http://localhost:3000) to view the application.
 
 ## 项目结构
 

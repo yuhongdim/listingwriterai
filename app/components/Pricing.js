@@ -61,22 +61,22 @@ const Pricing = () => {
       name: 'Pro',
       icon: Crown,
       price: { monthly: 79, yearly: 790 },
-      description: '适合专业团队',
+      description: 'Perfect for professional teams',
       features: [
-        '每日200次AI生成',
-        '所有高级模板',
-        '批量内容生成',
-        '高级客户管理',
-        '团队协作功能',
-        '自定义品牌',
-        '优先客服支持',
-        '数据分析报告',
-        '集成CRM系统',
-        'API访问权限'
+        '200 daily AI generations',
+        'All premium templates',
+        'Bulk content generation',
+        'Advanced client management',
+        'Team collaboration features',
+        'Custom branding',
+        'Priority customer support',
+        'Analytics reports',
+        'CRM system integration',
+        'API access'
       ],
       limitations: [
-        '团队成员限5人',
-        '存储空间10GB'
+        'Team members limited to 5',
+        '10GB storage space'
       ],
       buttonText: '选择Pro',
       popular: false,
@@ -279,21 +279,21 @@ const Pricing = () => {
               </p>
             </div>
             <div className="bg-white rounded-lg p-6 shadow-sm">
-              <h3 className="font-semibold text-gray-900 mb-2">支持哪些支付方式？</h3>
+              <h3 className="font-semibold text-gray-900 mb-2">What payment methods are supported?</h3>
               <p className="text-gray-600 text-sm">
-                我们支持信用卡、借记卡、支付宝、微信支付等多种支付方式。
+                We support various payment methods including credit cards, debit cards, PayPal, and other major payment processors.
               </p>
             </div>
             <div className="bg-white rounded-lg p-6 shadow-sm">
-              <h3 className="font-semibold text-gray-900 mb-2">有免费试用期吗？</h3>
+              <h3 className="font-semibold text-gray-900 mb-2">Is there a free trial?</h3>
               <p className="text-gray-600 text-sm">
-                所有付费方案都提供14天免费试用，无需信用卡，试用期结束后可选择继续订阅。
+                All paid plans include a 14-day free trial with no credit card required. You can choose to continue your subscription after the trial period.
               </p>
             </div>
             <div className="bg-white rounded-lg p-6 shadow-sm">
-              <h3 className="font-semibold text-gray-900 mb-2">如何获得技术支持？</h3>
+              <h3 className="font-semibold text-gray-900 mb-2">How do I get technical support?</h3>
               <p className="text-gray-600 text-sm">
-                Pro和Agency用户享有优先支持，可通过邮件、在线聊天或电话获得帮助。
+                Pro and Agency users enjoy priority support through email, live chat, or phone assistance.
               </p>
             </div>
           </div>
