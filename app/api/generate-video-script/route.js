@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import aiClient from '../../utils/aiClient'
 
 export async function POST(request) {
   try {
@@ -24,78 +25,27 @@ export async function POST(request) {
       )
     }
 
-    // 使用星狐云API生成视频脚本
-    const apiKey = process.env.XINGHU_API_KEY
-    const apiUrl = process.env.XINGHU_API_URL
-
-    if (!apiKey || !apiUrl) {
-      // 如果没有配置API，返回模拟脚本
-      return generateMockVideoScript({
-        propertyType, location, bedrooms, bathrooms, squareFeet, 
-        specialFeatures, duration, platform, style, keyFeatures, callToAction
-      })
-    }
-
-    // 构建提示词
-    const prompt = `请为以下房产生成一个${duration}秒的${platform}平台视频脚本，风格为${style}：
-
-房产信息：
-- 类型：${propertyType}
-- 位置：${location}
-- 卧室：${bedrooms}室
-- 卫生间：${bathrooms}卫
-- 面积：${squareFeet}平方米
-- 特色：${specialFeatures}
-- 重点特征：${keyFeatures.join('、')}
-
-请按以下格式生成分段式脚本：
-1. 开场（0-5秒）：吸引注意力的开场白
-2. 房产介绍（5-20秒）：基本信息和位置优势
-3. 特色展示（20-45秒）：重点特征和亮点
-4. 结尾呼吁（45-${duration}秒）：${callToAction}
-
-每段请包含：
-- 时间轴
-- 画面描述
-- 旁白文案
-- 拍摄建议
-
-请用中文回复，格式清晰。`
-
     try {
-      const response = await fetch(apiUrl, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${apiKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'gpt-3.5-turbo',
-          messages: [
-            {
-              role: 'user',
-              content: prompt
-            }
-          ],
-          max_tokens: 2000,
-          temperature: 0.7
-        })
+      // 使用AI客户端生成视频脚本
+      const result = await aiClient.generateVideoScript({
+        propertyType, 
+        location, 
+        bedrooms, 
+        bathrooms, 
+        squareFeet, 
+        specialFeatures, 
+        duration, 
+        platform, 
+        style, 
+        keyFeatures, 
+        callToAction
       })
-
-      if (!response.ok) {
-        throw new Error('API请求失败')
-      }
-
-      const data = await response.json()
-      const script = data.choices?.[0]?.message?.content
-
-      if (!script) {
-        throw new Error('未获取到有效脚本')
-      }
 
       return NextResponse.json({
         success: true,
-        script: script,
+        script: result.content,
+        usage: result.usage,
+        model: result.model,
         metadata: {
           duration,
           platform,
@@ -106,7 +56,7 @@ export async function POST(request) {
       })
 
     } catch (apiError) {
-      console.error('API调用失败:', apiError)
+      console.error('AI API调用失败:', apiError)
       // API失败时返回模拟脚本
       return generateMockVideoScript({
         propertyType, location, bedrooms, bathrooms, squareFeet, 

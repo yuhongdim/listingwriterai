@@ -143,26 +143,69 @@ const SocialMediaGenerator = ({ usageCount, setUsageCount }) => {
     setIsLoading(true)
 
     try {
-      // Mock API call - replace with actual API endpoint
-      const mockContent = generateMockContent(formData, selectedPlatforms)
+      // 调用真实的API端点
+      const response = await fetch('/api/generate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          contentType: 'social',
+          propertyType: formData.propertyType,
+          location: formData.location,
+          bedrooms: formData.bedrooms,
+          bathrooms: formData.bathrooms,
+          squareFeet: formData.squareFeet,
+          priceRange: formData.priceRange,
+          specialFeatures: formData.keyFeatures,
+          platform: selectedPlatforms[0], // 主要平台
+          targetAudience: formData.targetAudience,
+          emotion: formData.tone,
+          contentGoal: formData.contentGoal
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error(`API请求失败: ${response.status}`)
+      }
+
+      const data = await response.json()
       
-      setTimeout(() => {
-        setGeneratedContent(mockContent)
+      if (data.content) {
+        // 为所有选中的平台生成内容
+        const platformContent = {}
+        selectedPlatforms.forEach(platformId => {
+          platformContent[platformId] = {
+            text: data.content,
+            hashtags: data.hashtags || generateHashtags(formData, platformId),
+            callToAction: generateCTA(formData.contentGoal, platformId),
+            engagement: { likes: Math.floor(Math.random() * 200), comments: Math.floor(Math.random() * 50), shares: Math.floor(Math.random() * 30) }
+          }
+        })
+        
+        setGeneratedContent(platformContent)
         const newCount = usageTracker.incrementUsage()
         setUsageCount(newCount)
-        setIsLoading(false)
         
-        // 显示成功消息
         success('内容生成成功', '社交媒体内容已成功生成！')
-      }, 2000)
+      } else {
+        throw new Error('API返回空内容')
+      }
 
     } catch (err) {
       console.error('Generation Error:', err)
       
+      // 如果API失败，使用模拟内容作为后备
+      warning('API调用失败', '使用模拟内容作为后备')
+      const mockContent = generateMockContent(formData, selectedPlatforms)
+      setGeneratedContent(mockContent)
+      const newCount = usageTracker.incrementUsage()
+      setUsageCount(newCount)
+      
       // 使用错误处理器
       const { userMessage } = errorHandler.handleApiError(err, false)
       error('生成失败', userMessage)
-      
+    } finally {
       setIsLoading(false)
     }
   }

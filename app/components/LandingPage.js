@@ -146,9 +146,16 @@ const LandingPage = ({ onGetStarted }) => {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-blue-50 via-white to-purple-50 pt-20 pb-32">
+      <section className="relative bg-gradient-to-br from-blue-50 via-white to-purple-50 pt-20 pb-32 overflow-hidden">
+        <div className="absolute inset-0 z-0">
+          <img 
+            src="/images/hero-bg.svg" 
+            alt="AI Real Estate Background" 
+            className="w-full h-full object-cover opacity-30"
+          />
+        </div>
         <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-10">
           <div className="text-center">
             <div className="inline-flex items-center px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-medium mb-8">
               <Sparkles className="w-4 h-4 mr-2" />
@@ -248,13 +255,12 @@ const LandingPage = ({ onGetStarted }) => {
             
             <div className="lg:pl-8">
               <div className="bg-white rounded-2xl shadow-xl p-8">
-                <div className="aspect-video bg-gradient-to-br from-blue-100 to-purple-100 rounded-lg flex items-center justify-center mb-6">
-                  <div className="text-center">
-                    {features[activeFeature].icon}
-                    <p className="mt-4 text-lg font-semibold text-gray-700">
-                      {features[activeFeature].title}
-                    </p>
-                  </div>
+                <div className="aspect-video bg-gradient-to-br from-blue-100 to-purple-100 rounded-lg flex items-center justify-center mb-6 overflow-hidden">
+                  <img 
+                    src={`/images/feature-${activeFeature === 0 ? 'ai' : activeFeature === 1 ? 'analytics' : 'automation'}.svg`}
+                    alt={features[activeFeature].title}
+                    className="w-full h-full object-contain"
+                  />
                 </div>
                 <div className="space-y-4">
                   <div className="flex items-center text-green-600">
@@ -290,8 +296,12 @@ const LandingPage = ({ onGetStarted }) => {
           
           <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <span className="text-2xl font-bold text-blue-600">1</span>
+              <div className="w-32 h-24 mx-auto mb-6 bg-blue-50 rounded-lg flex items-center justify-center overflow-hidden">
+                <img 
+                  src="/images/how-it-works-step1.svg"
+                  alt="Enter Property Details"
+                  className="w-full h-full object-contain"
+                />
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-4">Enter Property Details</h3>
               <p className="text-gray-600">
@@ -300,8 +310,12 @@ const LandingPage = ({ onGetStarted }) => {
             </div>
             
             <div className="text-center">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <span className="text-2xl font-bold text-green-600">2</span>
+              <div className="w-32 h-24 mx-auto mb-6 bg-green-50 rounded-lg flex items-center justify-center overflow-hidden">
+                <img 
+                  src="/images/how-it-works-step2.svg"
+                  alt="AI Content Generation"
+                  className="w-full h-full object-contain"
+                />
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-4">AI Content Generation</h3>
               <p className="text-gray-600">
@@ -310,8 +324,12 @@ const LandingPage = ({ onGetStarted }) => {
             </div>
             
             <div className="text-center">
-              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <span className="text-2xl font-bold text-purple-600">3</span>
+              <div className="w-32 h-24 mx-auto mb-6 bg-purple-50 rounded-lg flex items-center justify-center overflow-hidden">
+                <img 
+                  src="/images/how-it-works-step3.svg"
+                  alt="Publish & Promote"
+                  className="w-full h-full object-contain"
+                />
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-4">Publish & Promote</h3>
               <p className="text-gray-600">
@@ -346,7 +364,13 @@ const LandingPage = ({ onGetStarted }) => {
                   "{testimonial.content}"
                 </p>
                 <div className="flex items-center">
-                  <div className="text-3xl mr-4">{testimonial.avatar}</div>
+                  <div className="w-12 h-12 mr-4 rounded-full overflow-hidden">
+                    <img 
+                      src={`/images/testimonial-avatar-${index + 1}.svg`}
+                      alt={testimonial.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
                   <div>
                     <div className="font-semibold text-gray-900">{testimonial.name}</div>
                     <div className="text-sm text-gray-500">{testimonial.role}</div>

@@ -1,0 +1,59 @@
+<svg width="300" height="200" viewBox="0 0 300 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="aiGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3B82F6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1E40AF;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background circle -->
+  <circle cx="150" cy="100" r="80" fill="url(#aiGrad)" opacity="0.1"/>
+  
+  <!-- Brain/AI icon -->
+  <path d="M120 70 C110 65, 100 75, 105 85 C100 90, 105 100, 115 95 C120 105, 140 105, 145 95 C155 100, 160 90, 155 85 C160 75, 150 65, 140 70 C135 60, 125 60, 120 70 Z" fill="url(#aiGrad)"/>
+  
+  <!-- Neural network nodes -->
+  <circle cx="130" cy="80" r="3" fill="#3B82F6"/>
+  <circle cx="145" cy="85" r="3" fill="#3B82F6"/>
+  <circle cx="135" cy="95" r="3" fill="#3B82F6"/>
+  <circle cx="150" cy="90" r="3" fill="#3B82F6"/>
+  
+  <!-- Connections -->
+  <line x1="130" y1="80" x2="145" y2="85" stroke="#3B82F6" stroke-width="1" opacity="0.6"/>
+  <line x1="145" y1="85" x2="135" y2="95" stroke="#3B82F6" stroke-width="1" opacity="0.6"/>
+  <line x1="135" y1="95" x2="150" y2="90" stroke="#3B82F6" stroke-width="1" opacity="0.6"/>
+  
+  <!-- Data streams -->
+  <rect x="80" y="120" width="40" height="8" fill="#E5E7EB" rx="4"/>
+  <rect x="80" y="135" width="60" height="8" fill="#E5E7EB" rx="4"/>
+  <rect x="80" y="150" width="35" height="8" fill="#E5E7EB" rx="4"/>
+  
+  <!-- Processing animation -->
+  <rect x="80" y="120" width="20" height="8" fill="#3B82F6" rx="4" opacity="0.8">
+    <animate attributeName="width" values="20;40;20" dur="2s" repeatCount="indefinite"/>
+  </rect>
+  <rect x="80" y="135" width="30" height="8" fill="#3B82F6" rx="4" opacity="0.8">
+    <animate attributeName="width" values="30;60;30" dur="2.5s" repeatCount="indefinite"/>
+  </rect>
+  <rect x="80" y="150" width="15" height="8" fill="#3B82F6" rx="4" opacity="0.8">
+    <animate attributeName="width" values="15;35;15" dur="1.8s" repeatCount="indefinite"/>
+  </rect>
+  
+  <!-- Output document -->
+  <rect x="180" y="120" width="50" height="60" fill="#FFF" stroke="#E5E7EB" stroke-width="2" rx="4"/>
+  <rect x="190" y="130" width="30" height="4" fill="#3B82F6" rx="2"/>
+  <rect x="190" y="140" width="25" height="4" fill="#6B7280" rx="2"/>
+  <rect x="190" y="150" width="30" height="4" fill="#6B7280" rx="2"/>
+  <rect x="190" y="160" width="20" height="4" fill="#6B7280" rx="2"/>
+  
+  <!-- Magic sparkles -->
+  <circle cx="160" cy="60" r="2" fill="#F59E0B">
+    <animate attributeName="opacity" values="0;1;0" dur="1.5s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="170" cy="110" r="1.5" fill="#F59E0B">
+    <animate attributeName="opacity" values="0;1;0" dur="2s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="190" cy="80" r="2.5" fill="#F59E0B">
+    <animate attributeName="opacity" values="0;1;0" dur="1.8s" repeatCount="indefinite"/>
+  </circle>
+</svg>

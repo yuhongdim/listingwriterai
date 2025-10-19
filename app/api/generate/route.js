@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import aiClient from '../../utils/aiClient'
 
 export async function POST(request) {
   try {
@@ -79,16 +80,33 @@ async function handleListingGeneration(body) {
     )
   }
 
-  const mockContent = generateMockContent(body)
-  console.log('Generated content:', mockContent)
-  
-  return NextResponse.json({ 
-    content: mockContent 
-  }, {
-    headers: {
-      'Content-Type': 'application/json; charset=utf-8'
-    }
-  })
+  try {
+    // 使用AI客户端生成内容
+    const result = await aiClient.generateListing(body)
+    console.log('Generated content:', result.content)
+    
+    return NextResponse.json({ 
+      content: result.content,
+      usage: result.usage,
+      model: result.model
+    }, {
+      headers: {
+        'Content-Type': 'application/json; charset=utf-8'
+      }
+    })
+  } catch (error) {
+    console.error('AI generation failed, using fallback:', error)
+    // AI失败时使用模拟内容
+    const mockContent = generateMockContent(body)
+    return NextResponse.json({ 
+      content: mockContent,
+      fallback: true
+    }, {
+      headers: {
+        'Content-Type': 'application/json; charset=utf-8'
+      }
+    })
+  }
 }
 
 // 处理社交媒体内容生成

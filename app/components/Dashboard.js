@@ -31,22 +31,23 @@ import {
   Edit,
   Trash2
 } from 'lucide-react'
-import { usePerformance, useCache, useDebounce, useMemoryMonitor, useOptimizationTips } from '../hooks/usePerformance'
-import performanceOptimizer from '../utils/performanceOptimizer'
+// 暂时注释掉性能监控相关的导入，避免客户端错误
+// import { usePerformance, useCache, useDebounce, useMemoryMonitor, useOptimizationTips } from '../hooks/usePerformance'
+// import performanceOptimizer from '../utils/performanceOptimizer'
 
 const Dashboard = ({ usageCount, setCurrentPage }) => {
   const [activeTab, setActiveTab] = useState('overview')
   
-  // 性能监控
-  const { metrics, measureApiCall } = usePerformance('Dashboard')
-  const { setCache, getCache } = useCache()
-  const memoryUsage = useMemoryMonitor()
-  const optimizationTips = useOptimizationTips()
+  // 暂时注释掉性能监控相关的hooks
+  // const { metrics, measureApiCall } = usePerformance('Dashboard')
+  // const { setCache, getCache } = useCache()
+  // const memoryUsage = useMemoryMonitor()
+  // const optimizationTips = useOptimizationTips()
 
-  // 防抖搜索
-  const debouncedSearch = useDebounce((query) => {
+  // 简单的搜索处理函数，替代防抖搜索
+  const handleSearch = (query) => {
     console.log('搜索:', query)
-  }, 300)
+  }
 
   // 标签页配置
   const tabs = [

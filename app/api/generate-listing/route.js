@@ -1,111 +1,102 @@
 import { NextResponse } from 'next/server'
+import aiClient from '../../utils/aiClient'
 
 export async function POST(request) {
   try {
     const { 
       propertyType, 
+      location, 
       bedrooms, 
       bathrooms, 
       squareFeet, 
-      location, 
-      specialFeatures, 
-      writingStyle, 
-      contentLength, 
-      targetKeywords, 
-      priceRange, 
-      yearBuilt,
-      listingType = 'sale' // sale, rent, commercial
+      specialFeatures,
+      style = 'professional',
+      targetAudience = 'general',
+      keyFeatures = [],
+      priceRange = '',
+      neighborhood = ''
     } = await request.json()
 
     // 验证必填字段
     if (!propertyType || !location) {
       return NextResponse.json(
-        { error: '房产类型和位置是必填字段' },
+        { error: '房产类型和位置为必填项' },
         { status: 400 }
       )
     }
 
-    // 根据写作风格调整语调
-    const stylePrompts = {
-      'Professional': '使用专业、正式的房地产术语，突出投资价值和市场优势',
-      'Friendly': '使用温馨、亲切的语调，强调家的温暖感和生活便利性',
-      'Luxury': '使用高端、奢华的描述，突出独特性和尊贵感',
-      'Modern': '使用现代、时尚的表达，强调科技感和设计美学',
-      'Family-Oriented': '使用家庭友好的语调，突出安全性和教育资源'
+    try {
+      // 使用AI客户端生成房源描述
+      const result = await aiClient.generateListing({
+        propertyType, 
+        location, 
+        bedrooms, 
+        bathrooms, 
+        squareFeet, 
+        specialFeatures,
+        style,
+        targetAudience,
+        keyFeatures,
+        priceRange,
+        neighborhood
+      })
+
+      return NextResponse.json({
+        success: true,
+        description: result.content,
+        usage: result.usage,
+        model: result.model,
+        metadata: {
+          propertyType,
+          location,
+          style,
+          targetAudience
+        }
+      })
+
+    } catch (apiError) {
+      console.error('AI API调用失败:', apiError)
+      // API失败时返回模拟描述
+      return generateMockListing({
+        propertyType, location, bedrooms, bathrooms, squareFeet, 
+        specialFeatures, style, targetAudience, keyFeatures, priceRange, neighborhood
+      })
     }
-
-    // 根据内容长度调整字数
-    const lengthGuides = {
-      'Short': '150-200字的简洁描述',
-      'Medium': '300-400字的详细介绍', 
-      'Long': '500-600字的全面展示'
-    }
-
-    // 构建AI提示词
-    const prompt = `
-作为专业的房地产文案撰写专家，请为以下房产生成${lengthGuides[contentLength] || '300-400字的详细介绍'}的营销文案。
-
-房产信息：
-- 房产类型：${propertyType}
-- 卧室数量：${bedrooms || '未指定'}
-- 浴室数量：${bathrooms || '未指定'}
-- 建筑面积：${squareFeet ? `${squareFeet}平方英尺` : '未指定'}
-- 位置：${location}
-- 建造年份：${yearBuilt || '未指定'}
-- 价格范围：${priceRange || '面议'}
-- 特色功能：${specialFeatures || '无特殊说明'}
-- 目标关键词：${targetKeywords || '无'}
-- 房源类型：${listingType === 'sale' ? '出售' : listingType === 'rent' ? '出租' : '商业'}
-
-写作要求：
-${stylePrompts[writingStyle] || stylePrompts['Professional']}
-
-请生成包含以下结构的文案：
-1. 吸引人的标题
-2. 房产亮点概述
-3. 详细特色描述
-4. 位置优势
-5. 投资/居住价值
-6. 行动号召
-
-请确保文案具有说服力，能够吸引潜在买家/租客的注意。
-`
-
-    // 模拟AI生成（实际项目中应该调用真实的AI API）
-    const generatedContent = await generateListingContent(prompt, {
-      propertyType,
-      bedrooms,
-      bathrooms,
-      squareFeet,
-      location,
-      specialFeatures,
-      writingStyle,
-      contentLength,
-      priceRange,
-      yearBuilt,
-      listingType
-    })
-
-    return NextResponse.json({
-      success: true,
-      content: generatedContent,
-      metadata: {
-        propertyType,
-        location,
-        writingStyle,
-        contentLength,
-        generatedAt: new Date().toISOString(),
-        wordCount: generatedContent.split(' ').length
-      }
-    })
 
   } catch (error) {
-    console.error('房源文案生成错误:', error)
+    console.error('房源描述生成错误:', error)
     return NextResponse.json(
-      { error: '生成房源文案时发生错误，请稍后重试' },
+      { error: '描述生成失败，请重试' },
       { status: 500 }
     )
   }
+}
+
+// 生成模拟房源描述的函数
+function generateMockListing({
+  propertyType, location, bedrooms, bathrooms, squareFeet, 
+  specialFeatures, style, targetAudience, keyFeatures, priceRange, neighborhood
+}) {
+  const mockDescriptions = {
+    apartment: `精美${bedrooms}室${bathrooms}卫公寓，位于${location}黄金地段。面积${squareFeet}平方米，${specialFeatures}。现代化装修，生活便利，交通便捷。`,
+    house: `独栋别墅，${bedrooms}室${bathrooms}卫，坐落于${location}优质社区。建筑面积${squareFeet}平方米，${specialFeatures}。私人花园，停车位充足。`,
+    condo: `豪华公寓，${bedrooms}室${bathrooms}卫，${location}核心位置。面积${squareFeet}平方米，${specialFeatures}。物业管理完善，配套设施齐全。`,
+    townhouse: `联排别墅，${bedrooms}室${bathrooms}卫，位于${location}宁静社区。面积${squareFeet}平方米，${specialFeatures}。独立入户，私密性佳。`
+  }
+
+  const description = mockDescriptions[propertyType] || `优质房产，${bedrooms}室${bathrooms}卫，位于${location}。面积${squareFeet}平方米，${specialFeatures}。`
+
+  return NextResponse.json({
+    success: true,
+    description: description,
+    metadata: {
+      propertyType,
+      location,
+      style,
+      targetAudience,
+      generated: 'mock'
+    }
+  })
 }
 
 // 模拟AI内容生成函数
