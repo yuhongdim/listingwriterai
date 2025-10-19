@@ -1,0 +1,118 @@
+'use client'
+
+// 使用计数管理工具
+class UsageTracker {
+  constructor() {
+    this.storageKey = 'listingwriterai_usage'
+    this.dailyLimit = 3
+    this.resetHour = 0 // 每天0点重置
+  }
+
+  // 获取当前使用数据
+  getUsageData() {
+    if (typeof window === 'undefined') return { count: 0, date: new Date().toDateString() }
+    
+    const stored = localStorage.getItem(this.storageKey)
+    if (!stored) {
+      return { count: 0, date: new Date().toDateString() }
+    }
+    
+    try {
+      return JSON.parse(stored)
+    } catch {
+      return { count: 0, date: new Date().toDateString() }
+    }
+  }
+
+  // 保存使用数据
+  saveUsageData(data) {
+    if (typeof window === 'undefined') return
+    localStorage.setItem(this.storageKey, JSON.stringify(data))
+  }
+
+  // 检查是否需要重置计数
+  shouldReset(lastDate) {
+    const today = new Date().toDateString()
+    return lastDate !== today
+  }
+
+  // 获取当前使用次数
+  getCurrentCount() {
+    const data = this.getUsageData()
+    
+    if (this.shouldReset(data.date)) {
+      // 如果是新的一天，重置计数
+      const newData = { count: 0, date: new Date().toDateString() }
+      this.saveUsageData(newData)
+      return 0
+    }
+    
+    return data.count
+  }
+
+  // 检查是否可以使用
+  canUse() {
+    return this.getCurrentCount() < this.dailyLimit
+  }
+
+  // 增加使用次数
+  incrementUsage() {
+    const data = this.getUsageData()
+    
+    if (this.shouldReset(data.date)) {
+      // 新的一天，重置并设为1
+      const newData = { count: 1, date: new Date().toDateString() }
+      this.saveUsageData(newData)
+      return 1
+    } else {
+      // 同一天，增加计数
+      const newCount = Math.min(data.count + 1, this.dailyLimit)
+      const newData = { count: newCount, date: data.date }
+      this.saveUsageData(newData)
+      return newCount
+    }
+  }
+
+  // 获取剩余使用次数
+  getRemainingCount() {
+    return Math.max(0, this.dailyLimit - this.getCurrentCount())
+  }
+
+  // 获取重置时间（下一个0点）
+  getResetTime() {
+    const now = new Date()
+    const tomorrow = new Date(now)
+    tomorrow.setDate(tomorrow.getDate() + 1)
+    tomorrow.setHours(0, 0, 0, 0)
+    return tomorrow
+  }
+
+  // 获取距离重置的时间（毫秒）
+  getTimeUntilReset() {
+    return this.getResetTime().getTime() - new Date().getTime()
+  }
+
+  // 格式化重置倒计时
+  formatTimeUntilReset() {
+    const ms = this.getTimeUntilReset()
+    const hours = Math.floor(ms / (1000 * 60 * 60))
+    const minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60))
+    
+    if (hours > 0) {
+      return `${hours}小时${minutes}分钟后重置`
+    } else {
+      return `${minutes}分钟后重置`
+    }
+  }
+
+  // 清除使用数据（用于测试或重置）
+  clearUsageData() {
+    if (typeof window === 'undefined') return
+    localStorage.removeItem(this.storageKey)
+  }
+}
+
+// 创建单例实例
+const usageTracker = new UsageTracker()
+
+export default usageTracker

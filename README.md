@@ -1,6 +1,6 @@
 # ListingWriterAI
 
-一个基于 AI 的房产描述生成器，专为房地产经纪人设计。使用 Next.js 14 和 Tailwind CSS 构建，集成 Anthropic Claude API。
+一个基于 AI 的房产描述生成器，专为房地产经纪人设计。使用 Next.js 14 和 Tailwind CSS 构建，集成星狐云API。
 
 ## 功能特性
 
@@ -16,7 +16,7 @@
 - **前端**: Next.js 14 (App Router)
 - **样式**: Tailwind CSS
 - **图标**: Lucide React
-- **AI**: Anthropic Claude API
+- **AI**: 星狐云API (GPT-3.5-turbo)
 - **部署**: Vercel
 
 ## 快速开始
@@ -29,14 +29,15 @@ npm install
 
 ### 2. 配置环境变量
 
-复制 `.env.local` 文件并添加您的 Anthropic API 密钥：
+复制 `.env.local` 文件并添加您的星狐云API配置：
 
 ```bash
-ANTHROPIC_API_KEY=your_actual_api_key_here
+XINGHU_API_KEY=your_xinghu_api_key_here
+XINGHU_API_URL=https://xinghuapi.com/v1/chat/completions
 ```
 
 获取 API 密钥：
-1. 访问 [Anthropic Console](https://console.anthropic.com/)
+1. 访问 [星狐云控制台](https://xinghuapi.com/console)
 2. 创建账户并获取 API 密钥
 3. 将密钥添加到 `.env.local` 文件
 

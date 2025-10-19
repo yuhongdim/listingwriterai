@@ -40,34 +40,34 @@ ${specialFeatures ? `- 特色：${specialFeatures}` : ''}
 
 请直接返回房源描述内容，不需要其他说明。`
 
-    // 调用 Anthropic API
-    const anthropicResponse = await fetch('https://api.anthropic.com/v1/messages', {
+    // 调用星狐云API
+    const xinghuResponse = await fetch(process.env.XINGHU_API_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': process.env.ANTHROPIC_API_KEY,
-        'anthropic-version': '2023-06-01'
+        'Authorization': `Bearer ${process.env.XINGHU_API_KEY}`
       },
       body: JSON.stringify({
-        model: 'claude-3-sonnet-20240229',
-        max_tokens: 1000,
+        model: 'gpt-3.5-turbo',
         messages: [{
           role: 'user',
           content: prompt
-        }]
+        }],
+        max_tokens: 1000,
+        temperature: 0.7
       })
     })
 
-    if (!anthropicResponse.ok) {
-      console.error('Anthropic API error:', anthropicResponse.status, anthropicResponse.statusText)
+    if (!xinghuResponse.ok) {
+      console.error('星狐云API error:', xinghuResponse.status, xinghuResponse.statusText)
       
       // 如果 API 调用失败，返回模拟内容
       const mockContent = generateMockContent(body)
       return NextResponse.json({ content: mockContent })
     }
 
-    const anthropicData = await anthropicResponse.json()
-    const generatedContent = anthropicData.content[0].text
+    const xinghuData = await xinghuResponse.json()
+    const generatedContent = xinghuData.choices[0].message.content
 
     return NextResponse.json({ content: generatedContent })
 
