@@ -1,4 +1,80 @@
-# ListingWriterAI
+# ListingWriter AI
+
+AI-powered real estate marketing platform for generating listings, emails, and social media content.
+
+## Features
+
+- 🏠 **AI Listing Generator**: Create compelling property descriptions
+- 📧 **Email Marketing**: Generate and send bulk email campaigns
+- 📱 **Social Media Content**: Create engaging social media posts
+- 🎬 **Video Scripts**: Generate professional video marketing scripts
+- 📊 **Analytics Dashboard**: Track performance and engagement
+- 💰 **Flexible Pricing**: Free, Professional, and Team plans
+
+## Quick Start
+
+### Prerequisites
+
+- Node.js 18+ 
+- OpenAI API key
+
+### Installation
+
+1. Clone the repository:
+```bash
+git clone https://github.com/yuhongdim/listingwriterai.git
+cd listingwriterai
+```
+
+2. Install dependencies:
+```bash
+npm install
+```
+
+3. Set up environment variables:
+```bash
+cp .env.example .env.local
+```
+Edit `.env.local` and add your OpenAI API key.
+
+4. Run the development server:
+```bash
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+## Deployment
+
+### Deploy to Vercel
+
+1. Push your code to GitHub
+2. Visit [vercel.com](https://vercel.com) and sign in
+3. Click "New Project" and import your GitHub repository
+4. Add your environment variables in Vercel dashboard
+5. Deploy!
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/yuhongdim/listingwriterai)
+
+## Environment Variables
+
+- `OPENAI_API_KEY`: Your OpenAI API key (required)
+- `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`: Email configuration (optional)
+- `NEXT_PUBLIC_APP_URL`: Your app URL for production
+
+## Pricing Plans
+
+- **Free**: 3 generations per feature per day
+- **Professional**: $29/month, 100 generations per day
+- **Team**: $69/month, 500 generations per day
+
+## Tech Stack
+
+- Next.js 14
+- React 18
+- Tailwind CSS
+- OpenAI API
+- Vercel (deployment)
 
 一个基于 AI 的房产描述生成器，专为房地产经纪人设计。使用 Next.js 14 和 Tailwind CSS 构建，集成星狐云API。
 
