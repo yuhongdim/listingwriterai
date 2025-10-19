@@ -105,10 +105,17 @@ class UsageTracker {
     }
   }
 
-  // 清除使用数据（用于测试或重置）
+  // 清除使用数据（用于测试）
   clearUsageData() {
     if (typeof window === 'undefined') return
     localStorage.removeItem(this.storageKey)
+  }
+
+  // 重置使用次数（用于测试）
+  resetUsage() {
+    const newData = { count: 0, date: new Date().toDateString() }
+    this.saveUsageData(newData)
+    return 0
   }
 }
 
