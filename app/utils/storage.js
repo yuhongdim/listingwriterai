@@ -1,6 +1,6 @@
 /**
- * 数据存储管理器
- * 支持本地存储、云存储和数据同步
+ * Data storage manager
+ * Supports local storage, cloud storage and data synchronization
  */
 
 class StorageManager {
@@ -10,7 +10,7 @@ class StorageManager {
     this.syncQueue = []
     this.isOnline = typeof navigator !== 'undefined' ? navigator.onLine : true
     
-    // 监听网络状态（仅在浏览器环境中）
+    // Listen to network status (only in browser environment)
     if (typeof window !== 'undefined') {
       window.addEventListener('online', () => {
         this.isOnline = true
@@ -23,7 +23,7 @@ class StorageManager {
     }
   }
 
-  // 本地存储操作
+  // Local storage operations
   setLocal(key, value) {
     if (typeof localStorage === 'undefined') return false
     
@@ -68,7 +68,7 @@ class StorageManager {
     }
   }
 
-  // 获取所有本地存储的键
+  // Get all local storage keys
   getAllLocalKeys() {
     if (typeof localStorage === 'undefined') return []
     
@@ -82,10 +82,10 @@ class StorageManager {
     return keys
   }
 
-  // 云存储操作（模拟）
+  // Cloud storage operations (simulated)
   async setCloud(key, value, userId = null) {
     if (!this.isOnline) {
-      // 离线时加入同步队列
+      // Add to sync queue when offline
       this.syncQueue.push({
         action: 'set',
         key,
@@ -112,14 +112,14 @@ class StorageManager {
       })
 
       if (response.ok) {
-        // 同时保存到本地作为缓存
+        // Also save to local as cache
         this.setLocal(`cloud_${key}`, value)
         return true
       }
       return false
     } catch (error) {
       console.error('Cloud storage error:', error)
-      // 失败时保存到本地
+      // Save to local on failure
       this.setLocal(key, value)
       this.syncQueue.push({
         action: 'set',
@@ -134,7 +134,7 @@ class StorageManager {
 
   async getCloud(key, userId = null) {
     if (!this.isOnline) {
-      // 离线时从本地缓存获取
+      // Get from local cache when offline
       return this.getLocal(`cloud_${key}`)
     }
 
@@ -147,12 +147,12 @@ class StorageManager {
 
       if (response.ok) {
         const data = await response.json()
-        // 更新本地缓存
+        // Update local cache
         this.setLocal(`cloud_${key}`, data.value)
         return data.value
       }
       
-      // 云端获取失败时尝试本地缓存
+      // Try local cache when cloud fetch fails
       return this.getLocal(`cloud_${key}`)
     } catch (error) {
       console.error('Cloud storage read error:', error)
@@ -192,7 +192,7 @@ class StorageManager {
     }
   }
 
-  // 数据同步
+  // Data synchronization
   async syncPendingData() {
     if (!this.isOnline || this.syncQueue.length === 0) return
 
@@ -211,23 +211,23 @@ class StorageManager {
         }
       } catch (error) {
         console.error('Sync error:', error)
-        // 同步失败的项目重新加入队列
+        // Re-add failed sync items to queue
         this.syncQueue.push(item)
       }
     }
   }
 
-  // 获取认证令牌
+  // Get authentication token
   getAuthToken() {
     return this.getLocal('auth_token') || ''
   }
 
-  // 用户数据管理
+  // User data management
   async saveUserData(userId, data) {
     const key = `user_data_${userId}`
     const success = await this.setCloud(key, data, userId)
     
-    // 同时保存到本地
+    // Also save to local
     this.setLocal(key, data)
     
     return success
@@ -236,10 +236,10 @@ class StorageManager {
   async getUserData(userId) {
     const key = `user_data_${userId}`
     
-    // 优先从云端获取
+    // Get from cloud first
     let data = await this.getCloud(key, userId)
     
-    // 如果云端没有，尝试本地
+    // If not in cloud, try local
     if (!data) {
       data = this.getLocal(key)
     }
@@ -247,7 +247,7 @@ class StorageManager {
     return data
   }
 
-  // 内容历史管理
+  // Content history management
   async saveContentHistory(userId, content) {
     const historyKey = `content_history_${userId}`
     let history = await this.getUserData(userId) || { contents: [] }
@@ -261,7 +261,7 @@ class StorageManager {
     
     history.contents.unshift(newContent)
     
-    // 限制历史记录数量
+    // Limit history count
     if (history.contents.length > 100) {
       history.contents = history.contents.slice(0, 100)
     }
@@ -276,7 +276,7 @@ class StorageManager {
     return data.contents.slice(0, limit)
   }
 
-  // 模板管理
+  // Template management
   async saveTemplate(userId, template) {
     const templatesKey = `templates_${userId}`
     let templates = this.getLocal(templatesKey) || []
@@ -298,10 +298,10 @@ class StorageManager {
   async getTemplates(userId) {
     const templatesKey = `templates_${userId}`
     
-    // 优先从云端获取
+    // Get from cloud first
     let templates = await this.getCloud(templatesKey, userId)
     
-    // 如果云端没有，尝试本地
+    // If not in cloud, try local
     if (!templates) {
       templates = this.getLocal(templatesKey) || []
     }
@@ -321,7 +321,7 @@ class StorageManager {
     return true
   }
 
-  // 设置管理
+  // Settings management
   async saveSettings(userId, settings) {
     const settingsKey = `settings_${userId}`
     
@@ -334,10 +334,10 @@ class StorageManager {
   async getSettings(userId) {
     const settingsKey = `settings_${userId}`
     
-    // 优先从云端获取
+    // Get from cloud first
     let settings = await this.getCloud(settingsKey, userId)
     
-    // 如果云端没有，尝试本地
+    // If not in cloud, try local
     if (!settings) {
       settings = this.getLocal(settingsKey) || {
         theme: 'light',
@@ -350,7 +350,7 @@ class StorageManager {
     return settings
   }
 
-  // 数据导出
+  // Data export
   async exportUserData(userId) {
     const userData = await this.getUserData(userId)
     const templates = await this.getTemplates(userId)
@@ -365,7 +365,7 @@ class StorageManager {
     }
   }
 
-  // 数据导入
+  // Data import
   async importUserData(userId, data) {
     try {
       if (data.userData) {
@@ -389,8 +389,8 @@ class StorageManager {
     }
   }
 
-  // 清理过期数据
-  cleanupExpiredData(maxAge = 30 * 24 * 60 * 60 * 1000) { // 30天
+  // Clean up expired data
+  cleanupExpiredData(maxAge = 30 * 24 * 60 * 60 * 1000) { // 30 days
     if (typeof localStorage === 'undefined') return
     
     const keys = this.getAllLocalKeys()
@@ -406,13 +406,13 @@ class StorageManager {
           }
         }
       } catch (error) {
-        // 如果解析失败，删除该项
+        // Delete item if parsing fails
         this.removeLocal(key)
       }
     })
   }
 
-  // 获取存储统计信息
+  // Get storage statistics
   getStorageStats() {
     if (typeof localStorage === 'undefined') {
       return {
@@ -452,7 +452,7 @@ class StorageManager {
   }
 }
 
-// 创建全局实例
+// Create global instance
 const storageManager = new StorageManager()
 
 export default storageManager

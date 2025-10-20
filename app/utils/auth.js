@@ -1,6 +1,6 @@
 'use client'
 
-// 用户认证工具类
+// User authentication utility class
 class AuthManager {
   constructor() {
     this.currentUser = null
@@ -9,7 +9,7 @@ class AuthManager {
     this.init()
   }
 
-  // 初始化认证状态
+  // Initialize authentication state
   init() {
     if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
       const savedUser = localStorage.getItem('listingai_user')
@@ -27,7 +27,7 @@ class AuthManager {
     }
   }
 
-  // 添加认证状态监听器
+  // Add listener for authentication state
   addListener(callback) {
     this.listeners.push(callback)
     return () => {
@@ -35,40 +35,40 @@ class AuthManager {
     }
   }
 
-  // 通知所有监听器
+  // Notify all listeners
   notifyListeners() {
     this.listeners.forEach(callback => callback(this.currentUser))
   }
 
-  // 用户注册
+  // User registration
   async register(userData) {
     try {
-      // 验证输入数据
+      // Validate input data
       if (!userData.email || !userData.password || !userData.name) {
-        throw new Error('请填写所有必填字段')
+        throw new Error('Please fill in all required fields')
       }
 
-      // 检查邮箱格式
+      // Check email format
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
       if (!emailRegex.test(userData.email)) {
-        throw new Error('请输入有效的邮箱地址')
+        throw new Error('Please enter a valid email address')
       }
 
-      // 检查密码强度
+      // Check password strength
       if (userData.password.length < 6) {
-        throw new Error('密码长度至少6位')
+        throw new Error('Password must be at least 6 characters long')
       }
 
-      // 检查用户是否已存在
+      // Check if user already exists
       if (typeof localStorage !== 'undefined') {
         const existingUsers = JSON.parse(localStorage.getItem('listingai_users') || '[]')
         const userExists = existingUsers.find(user => user.email === userData.email)
         
         if (userExists) {
-          throw new Error('该邮箱已被注册')
+          throw new Error('This email is already registered')
         }
 
-        // 创建新用户
+        // Create new user
         const newUser = {
           id: Date.now().toString(),
           name: userData.name,
@@ -85,11 +85,11 @@ class AuthManager {
           permissions: ['basic_generation', 'export_content']
         }
 
-        // 保存用户到本地存储
+        // Save user to local storage
         existingUsers.push(newUser)
         localStorage.setItem('listingai_users', JSON.stringify(existingUsers))
 
-        // 生成token并设置当前用户
+        // Generate token and set current user
         const userWithToken = { ...newUser, token: this.generateToken(newUser) }
         delete userWithToken.password
         
@@ -101,17 +101,17 @@ class AuthManager {
         return { success: true, user: userWithToken }
       }
       
-      return { success: false, error: '存储不可用' }
+      return { success: false, error: 'Storage not available' }
     } catch (error) {
       return { success: false, error: error.message }
     }
   }
 
-  // 用户登录
+  // User login
   async login(email, password) {
     try {
       if (!email || !password) {
-        throw new Error('请输入邮箱和密码')
+        throw new Error('Please enter email and password')
       }
 
       if (typeof localStorage !== 'undefined') {
@@ -119,10 +119,10 @@ class AuthManager {
         const user = users.find(u => u.email === email && u.password === password)
         
         if (!user) {
-          throw new Error('邮箱或密码错误')
+          throw new Error('Incorrect email or password')
         }
 
-        // 生成新token
+        // Generate new token
         const userWithToken = { ...user, token: this.generateToken(user) }
         delete userWithToken.password
         
@@ -134,13 +134,106 @@ class AuthManager {
         return { success: true, user: userWithToken }
       }
       
-      return { success: false, error: '存储不可用' }
+      return { success: false, error: 'Storage not available' }
     } catch (error) {
       return { success: false, error: error.message }
     }
   }
 
-  // 用户登出
+  // User object login (new simplified method)
+  async loginWithUser(userObj) {
+    try {
+      if (!userObj || !userObj.email) {
+        throw new Error('Invalid user information')
+      }
+
+      if (typeof localStorage !== 'undefined') {
+        // Generate new token
+        const userWithToken = { 
+          ...userObj, 
+          token: this.generateToken(userObj),
+          id: userObj.id || this.generateUserId(),
+          createdAt: userObj.createdAt || new Date().toISOString(),
+          plan: userObj.plan || 'free',
+          usageCount: userObj.usageCount || 0,
+          maxUsage: userObj.maxUsage || 3
+        }
+        
+        // Save to local storage
+        localStorage.setItem('listingai_user', JSON.stringify(userWithToken))
+        
+        // Update user list
+        const users = JSON.parse(localStorage.getItem('listingai_users') || '[]')
+        const existingUserIndex = users.findIndex(u => u.email === userObj.email)
+        
+        if (existingUserIndex >= 0) {
+          users[existingUserIndex] = { ...userWithToken }
+        } else {
+          users.push({ ...userWithToken })
+        }
+        
+        localStorage.setItem('listingai_users', JSON.stringify(users))
+        
+        this.currentUser = userWithToken
+        this.isAuthenticated = true
+        
+        this.notifyListeners()
+        return { success: true, user: userWithToken }
+      }
+      
+      return { success: false, error: 'Storage not available' }
+    } catch (error) {
+      return { success: false, error: error.message }
+    }
+  }
+
+  // One-click email login (auto register or login)
+  async loginWithEmail(email) {
+    try {
+      if (!email || !this.isValidEmail(email)) {
+        throw new Error('Please enter a valid email address')
+      }
+
+      if (typeof localStorage !== 'undefined') {
+        const users = JSON.parse(localStorage.getItem('listingai_users') || '[]')
+        let user = users.find(u => u.email === email)
+        
+        // If user does not exist, auto create
+        if (!user) {
+          user = {
+            id: this.generateUserId(),
+            name: email.split('@')[0],
+            email: email,
+            plan: 'free',
+            usageCount: 0,
+            maxUsage: 3,
+            createdAt: new Date().toISOString(),
+            isNewUser: true
+          }
+          
+          users.push(user)
+          localStorage.setItem('listingai_users', JSON.stringify(users))
+        }
+
+        // Generate new token and login
+        const userWithToken = { ...user, token: this.generateToken(user) }
+        delete userWithToken.password
+        
+        localStorage.setItem('listingai_user', JSON.stringify(userWithToken))
+        this.currentUser = userWithToken
+        this.isAuthenticated = true
+        
+        this.notifyListeners()
+        return { success: true, user: userWithToken }
+      }
+      
+      return { success: false, error: 'Storage not available' }
+    } catch (error) {
+      return { success: false, error: error.message }
+    }
+  }
+
+  // User logout
   logout() {
     this.currentUser = null
     this.isAuthenticated = false
@@ -152,29 +245,29 @@ class AuthManager {
     this.notifyListeners()
   }
 
-  // 检查是否已登录
+  // Check if user is authenticated
   isAuthenticated() {
     return !!this.currentUser && this.isTokenValid()
   }
 
-  // 获取当前用户
+  // Get current user
   getCurrentUser() {
     return this.currentUser
   }
 
-  // 检查用户权限
+  // Check user permissions
   hasPermission(feature) {
     if (!this.currentUser) return false
     return this.currentUser.features[feature] || false
   }
 
-  // 检查用户角色
+  // Check user role
   hasRole(role) {
     if (!this.currentUser) return false
     return this.currentUser.role === role || this.currentUser.role === 'admin'
   }
 
-  // 更新用户使用次数
+  // Update user usage count
   updateUsageCount(count) {
     if (!this.currentUser) return false
     
@@ -185,7 +278,7 @@ class AuthManager {
     return true
   }
 
-  // 升级用户计划
+  // Upgrade user plan
   upgradePlan(planType) {
     if (!this.currentUser) return false
 
@@ -226,18 +319,18 @@ class AuthManager {
     return false
   }
 
-  // 验证邮箱格式
+  // Validate email format
   isValidEmail(email) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     return emailRegex.test(email)
   }
 
-  // 生成用户ID
+  // Generate user ID
   generateUserId() {
     return 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9)
   }
 
-  // 生成token
+  // Generate token
   generateToken(user) {
     const payload = {
       userId: user.id,
@@ -247,7 +340,7 @@ class AuthManager {
     return btoa(JSON.stringify(payload))
   }
 
-  // 验证token
+  // Validate token
   isTokenValid() {
     if (!this.currentUser?.token) return false
     
@@ -259,7 +352,7 @@ class AuthManager {
     }
   }
 
-  // 验证并刷新token
+  // Validate and refresh token
   validateToken() {
     if (!this.isTokenValid()) {
       this.logout()
@@ -268,7 +361,7 @@ class AuthManager {
     return true
   }
 
-  // 获取存储的用户列表
+  // Get stored users list
   getStoredUsers() {
     if (typeof window === 'undefined') return []
     
@@ -280,7 +373,7 @@ class AuthManager {
     }
   }
 
-  // 更新存储的用户信息
+  // Update stored user information
   updateStoredUser(updatedUser) {
     const users = this.getStoredUsers()
     const index = users.findIndex(u => u.id === updatedUser.id)
@@ -291,25 +384,25 @@ class AuthManager {
     }
   }
 
-  // 重置密码（简化版）
+  // Reset password (simplified version)
   async resetPassword(email) {
     try {
       const users = this.getStoredUsers()
       const user = users.find(u => u.email === email)
       
       if (!user) {
-        throw new Error('用户不存在')
+        throw new Error('User does not exist')
       }
 
-      // 实际应用中应发送邮件
+      // In a real application, an email should be sent
       console.log('Password reset email sent to:', email)
-      return { success: true, message: '重置密码邮件已发送' }
+      return { success: true, message: 'Password reset email has been sent' }
     } catch (error) {
       return { success: false, error: error.message }
     }
   }
 
-  // 获取用户统计信息
+  // Get user stats
   getUserStats() {
     if (!this.currentUser) return null
 
@@ -322,10 +415,10 @@ class AuthManager {
     }
   }
 
-  // 更新用户信息
+  // Update user information
   updateUser(updates) {
     if (!this.isAuthenticated || !this.currentUser) {
-      return { success: false, error: '用户未登录' }
+      return { success: false, error: 'User not logged in' }
     }
 
     try {
@@ -350,7 +443,7 @@ class AuthManager {
     }
   }
 
-  // 更新用户使用量
+  // Update user usage
   updateUsage(increment = 1) {
     if (!this.isAuthenticated || !this.currentUser) return
 
@@ -364,7 +457,7 @@ class AuthManager {
     this.notifyListeners()
   }
 
-  // 获取所有用户（管理员功能）
+  // Get all users (admin function)
   getAllUsers() {
     if (!this.hasPermission('admin_access')) {
       return []
@@ -378,10 +471,10 @@ class AuthManager {
     return []
   }
 
-  // 更新用户状态（管理员功能）
+  // Update user status (admin function)
   updateUserStatus(userId, status) {
     if (!this.hasPermission('admin_access')) {
-      return { success: false, error: '权限不足' }
+      return { success: false, error: 'Insufficient permissions' }
     }
 
     try {
@@ -396,14 +489,14 @@ class AuthManager {
         }
       }
       
-      return { success: false, error: '用户不存在' }
+      return { success: false, error: 'User does not exist' }
     } catch (error) {
       return { success: false, error: error.message }
     }
   }
 }
 
-// 创建全局实例
+// Create global instance
 const authManager = new AuthManager()
 
 export default authManager

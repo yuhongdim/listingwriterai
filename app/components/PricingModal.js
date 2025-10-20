@@ -12,15 +12,15 @@ const PricingModal = ({ isOpen, onClose, currentPlan = 'free' }) => {
       name: 'Free',
       icon: Star,
       price: { monthly: 0, yearly: 0 },
-      description: '适合个人用户试用',
+      description: 'Perfect for individual users to try',
       features: [
-        '每日3次AI生成',
-        '基础房源描述',
-        '标准邮件模板',
-        '基础视频脚本',
-        '社交媒体内容（有限）'
+        '3 AI generations per day',
+        'Basic property descriptions',
+        'Standard email templates',
+        'Basic video scripts',
+        'Social media content (limited)'
       ],
-      buttonText: '当前套餐',
+      buttonText: 'Current Plan',
       color: 'gray'
     },
     {
@@ -28,19 +28,19 @@ const PricingModal = ({ isOpen, onClose, currentPlan = 'free' }) => {
       name: 'Starter',
       icon: Zap,
       price: { monthly: 9.9, yearly: 99 },
-      description: '适合个人经纪人',
+      description: 'Perfect for individual agents',
       features: [
-        '每日100次AI生成',
-        '每月500封邮件',
-        '高级房源描述模板',
-        '个性化邮件营销',
-        '专业视频脚本',
-        '完整社交媒体套件',
-        'PDF/Word导出',
-        '基础客户管理',
-        '邮件自动化'
+        '100 AI generations per day',
+        '500 emails per month',
+        'Advanced property description templates',
+        'Personalized email marketing',
+        'Professional video scripts',
+        'Complete social media suite',
+        'PDF/Word export',
+        'Basic customer management',
+        'Email automation'
       ],
-      buttonText: '升级到Starter',
+      buttonText: 'Upgrade to Starter',
       popular: true,
       color: 'blue'
     },
@@ -49,21 +49,21 @@ const PricingModal = ({ isOpen, onClose, currentPlan = 'free' }) => {
       name: 'Pro',
       icon: Crown,
       price: { monthly: 59, yearly: 590 },
-      description: '适合专业团队',
+      description: 'Perfect for professional teams',
       features: [
-        '每日500次AI生成',
-        '每月5000封邮件',
-        '所有高级模板',
-        '批量内容生成',
-        '高级客户管理',
-        '团队协作功能',
-        '自定义品牌',
-        '优先客户支持',
-        '分析报告',
-        'CRM系统集成',
-        'API访问'
+        '500 AI generations per day',
+        '5000 emails per month',
+        'All advanced templates',
+        'Bulk content generation',
+        'Advanced customer management',
+        'Team collaboration features',
+        'Custom branding',
+        'Priority customer support',
+        'Analytics reports',
+        'CRM system integration',
+        'API access'
       ],
-      buttonText: '升级到Pro',
+      buttonText: 'Upgrade to Pro',
       color: 'purple'
     },
     {
@@ -71,22 +71,22 @@ const PricingModal = ({ isOpen, onClose, currentPlan = 'free' }) => {
       name: 'Agency',
       icon: Building,
       price: { monthly: 199, yearly: 1990 },
-      description: '适合大型机构',
+      description: 'Perfect for large agencies',
       features: [
-        '无限AI生成',
-        '无限邮件发送',
-        '白标解决方案',
-        '无限团队成员',
-        '无限存储空间',
-        '专属客户经理',
-        '24/7优先支持',
-        '自定义集成',
-        '高级分析报告',
-        '多品牌管理',
-        '企业级安全',
-        '培训和入门支持'
+        'Unlimited AI generations',
+        'Unlimited email sending',
+        'White-label solution',
+        'Unlimited team members',
+        'Unlimited storage space',
+        'Dedicated account manager',
+        '24/7 priority support',
+        'Custom integrations',
+        'Advanced analytics reports',
+        'Multi-brand management',
+        'Enterprise-grade security',
+        'Training and onboarding support'
       ],
-      buttonText: '联系销售',
+      buttonText: 'Contact Sales',
       color: 'gold'
     }
   ]
@@ -128,8 +128,8 @@ const PricingModal = ({ isOpen, onClose, currentPlan = 'free' }) => {
       <div className="bg-white rounded-2xl max-w-6xl w-full max-h-[90vh] overflow-y-auto">
         <div className="sticky top-0 bg-white border-b border-gray-200 p-6 flex justify-between items-center">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">升级您的套餐</h2>
-            <p className="text-gray-600 mt-1">解锁更多强大功能，提升您的营销效率</p>
+            <h2 className="text-2xl font-bold text-gray-900">Upgrade Your Plan</h2>
+            <p className="text-gray-600 mt-1">Unlock more powerful features and boost your marketing efficiency</p>
           </div>
           <button
             onClick={onClose}
@@ -143,8 +143,8 @@ const PricingModal = ({ isOpen, onClose, currentPlan = 'free' }) => {
           {/* Billing Toggle */}
           <div className="flex items-center justify-center mb-8">
             <span className={`mr-3 ${billingCycle === 'monthly' ? 'text-gray-900 font-medium' : 'text-gray-500'}`}>
-              月付
-            </span>
+               Monthly
+             </span>
             <button
               onClick={() => setBillingCycle(billingCycle === 'monthly' ? 'yearly' : 'monthly')}
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
@@ -158,13 +158,13 @@ const PricingModal = ({ isOpen, onClose, currentPlan = 'free' }) => {
               />
             </button>
             <span className={`ml-3 ${billingCycle === 'yearly' ? 'text-gray-900 font-medium' : 'text-gray-500'}`}>
-              年付
-            </span>
-            {billingCycle === 'yearly' && (
-              <span className="ml-2 bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
-                节省17%
-              </span>
-            )}
+               Yearly
+             </span>
+             {billingCycle === 'yearly' && (
+               <span className="ml-2 bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                 Save 17%
+               </span>
+             )}
           </div>
 
           {/* Pricing Cards */}
@@ -184,7 +184,7 @@ const PricingModal = ({ isOpen, onClose, currentPlan = 'free' }) => {
                   {plan.popular && !isCurrent && (
                     <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
                       <span className="bg-blue-500 text-white px-3 py-1 rounded-full text-xs font-medium">
-                        推荐
+                        Recommended
                       </span>
                     </div>
                   )}
@@ -192,7 +192,7 @@ const PricingModal = ({ isOpen, onClose, currentPlan = 'free' }) => {
                   {isCurrent && (
                     <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
                       <span className="bg-green-500 text-white px-3 py-1 rounded-full text-xs font-medium">
-                        当前套餐
+                        Current Plan
                       </span>
                     </div>
                   )}
@@ -215,13 +215,13 @@ const PricingModal = ({ isOpen, onClose, currentPlan = 'free' }) => {
                         </span>
                         {plan.price[billingCycle] > 0 && (
                           <span className="text-gray-500 ml-1 text-sm">
-                            /{billingCycle === 'monthly' ? '月' : '年'}
+                            /{billingCycle === 'monthly' ? 'month' : 'year'}
                           </span>
                         )}
                       </div>
                       {billingCycle === 'yearly' && plan.price.monthly > 0 && (
                         <p className="text-xs text-gray-500 mt-1">
-                          相当于 ¥{Math.round(plan.price.yearly * 7 / 12)}/月
+                          Equivalent to ¥{Math.round(plan.price.yearly * 7 / 12)}/month
                         </p>
                       )}
                     </div>
@@ -237,7 +237,7 @@ const PricingModal = ({ isOpen, onClose, currentPlan = 'free' }) => {
                         ))}
                         {plan.features.length > 5 && (
                           <li className="text-gray-500 text-sm ml-6">
-                            +{plan.features.length - 5} 更多功能...
+                            +{plan.features.length - 5} more features...
                           </li>
                         )}
                       </ul>
@@ -252,7 +252,7 @@ const PricingModal = ({ isOpen, onClose, currentPlan = 'free' }) => {
                       }`}
                       disabled={isCurrent}
                     >
-                      {isCurrent ? '当前套餐' : plan.buttonText}
+                      {isCurrent ? 'Current Plan' : plan.buttonText}
                     </button>
                   </div>
                 </div>
@@ -263,29 +263,29 @@ const PricingModal = ({ isOpen, onClose, currentPlan = 'free' }) => {
           {/* Benefits */}
           <div className="mt-8 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4 text-center">
-              升级后您将获得
+              Upgrade Benefits
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="text-center">
                 <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-2">
                   <Zap className="w-6 h-6 text-blue-600" />
                 </div>
-                <h4 className="font-medium text-gray-900 mb-1">更多生成次数</h4>
-                <p className="text-sm text-gray-600">满足您的高频使用需求</p>
+                <h4 className="font-medium text-gray-900 mb-1">More Generations</h4>
+                <p className="text-sm text-gray-600">Meet your high-frequency usage needs</p>
               </div>
               <div className="text-center">
                 <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-2">
                   <Crown className="w-6 h-6 text-purple-600" />
                 </div>
-                <h4 className="font-medium text-gray-900 mb-1">高级功能</h4>
-                <p className="text-sm text-gray-600">解锁所有专业工具</p>
+                <h4 className="font-medium text-gray-900 mb-1">Advanced Features</h4>
+                <p className="text-sm text-gray-600">Unlock all professional tools</p>
               </div>
               <div className="text-center">
                 <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-2">
                   <Building className="w-6 h-6 text-green-600" />
                 </div>
-                <h4 className="font-medium text-gray-900 mb-1">优先支持</h4>
-                <p className="text-sm text-gray-600">专业团队为您服务</p>
+                <h4 className="font-medium text-gray-900 mb-1">Priority Support</h4>
+                <p className="text-sm text-gray-600">Professional team at your service</p>
               </div>
             </div>
           </div>

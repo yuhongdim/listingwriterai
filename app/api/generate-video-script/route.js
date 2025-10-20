@@ -14,19 +14,19 @@ export async function POST(request) {
       platform = 'general',
       style = 'professional',
       keyFeatures = [],
-      callToAction = '联系我们了解更多详情'
+      callToAction = 'Contact us for more details'
     } = await request.json()
 
-    // 验证必填字段
+    // Validate required fields
     if (!propertyType || !location) {
       return NextResponse.json(
-        { error: '房产类型和位置为必填项' },
+        { error: 'Property type and location are required fields' },
         { status: 400 }
       )
     }
 
+    // Use AI client to generate video script
     try {
-      // 使用AI客户端生成视频脚本
       const result = await aiClient.generateVideoScript({
         propertyType, 
         location, 
@@ -43,31 +43,28 @@ export async function POST(request) {
 
       return NextResponse.json({
         success: true,
-        script: result.content,
-        usage: result.usage,
-        model: result.model,
-        metadata: {
-          duration,
-          platform,
-          style,
-          propertyType,
-          location
-        }
+        script: result.script || generateMockVideoScript({
+          propertyType, location, bedrooms, bathrooms, squareFeet, 
+          specialFeatures, duration, platform, style, keyFeatures, callToAction
+        })
       })
 
     } catch (apiError) {
-      console.error('AI API调用失败:', apiError)
-      // API失败时返回模拟脚本
-      return generateMockVideoScript({
-        propertyType, location, bedrooms, bathrooms, squareFeet, 
-        specialFeatures, duration, platform, style, keyFeatures, callToAction
+      console.error('AI API call failed:', apiError)
+      // Return mock script when API fails
+      return NextResponse.json({
+        success: true,
+        script: generateMockVideoScript({
+          propertyType, location, bedrooms, bathrooms, squareFeet, 
+          specialFeatures, duration, platform, style, keyFeatures, callToAction
+        })
       })
     }
 
   } catch (error) {
-    console.error('视频脚本生成错误:', error)
+    console.error('Video script generation error:', error)
     return NextResponse.json(
-      { error: '脚本生成失败，请重试' },
+      { error: 'Script generation failed, please try again' },
       { status: 500 }
     )
   }
@@ -77,49 +74,49 @@ function generateMockVideoScript({
   propertyType, location, bedrooms, bathrooms, squareFeet, 
   specialFeatures, duration, platform, style, keyFeatures, callToAction
 }) {
-  const script = `🎬 ${propertyType}视频脚本 - ${duration}秒版本
+  const script = `🎬 ${propertyType} Video Script - ${duration}s Version
 
-📍 地点：${location}
-🏠 房型：${bedrooms}室${bathrooms}卫，${squareFeet}㎡
-🎯 平台：${platform} | 风格：${style}
+📍 Location: ${location}
+🏠 Property: ${bedrooms} bed ${bathrooms} bath, ${squareFeet}㎡
+🎯 Platform: ${platform} | Style: ${style}
 
-═══════════════════════════════════════
+📝 SCRIPT CONTENT:
 
-⏰ 【开场段】0-5秒
-📹 画面：房产外观全景，阳光明媚
-🎙️ 旁白："寻找理想家园？这里有一处${propertyType}等您发现！"
-📝 拍摄建议：使用无人机拍摄，展现周边环境
+⏰ 【Opening】0-5s
+📹 Scene: Property exterior panoramic view, bright sunlight
+🎙️ Voiceover: "Looking for your ideal home? Here's a ${propertyType} waiting for you to discover!"
+📝 Shooting Tips: Use drone for aerial shots, showcase surrounding environment
 
-⏰ 【介绍段】5-20秒  
-📹 画面：从外观推进到室内，展示户型布局
-🎙️ 旁白："位于${location}的${bedrooms}室${bathrooms}卫${propertyType}，${squareFeet}平方米的舒适空间，地理位置优越，交通便利。"
-📝 拍摄建议：稳定器跟拍，流畅转场
+⏰ 【Introduction】5-20s
+📹 Scene: From exterior to interior, showing layout
+🎙️ Voiceover: "Located in ${location}, this ${bedrooms} bed ${bathrooms} bath ${propertyType}, ${squareFeet} square meters of comfortable space, excellent location, convenient transportation."
+📝 Shooting Tips: Stabilizer tracking, smooth transitions
 
-⏰ 【特色段】20-${Math.max(45, duration-15)}秒
-📹 画面：重点展示${specialFeatures || '精装修细节'}
-🎙️ 旁白："${keyFeatures.length > 0 ? keyFeatures.join('，') : '精装修设计，品质生活从这里开始'}。每一处细节都彰显品质，每一寸空间都充满温馨。"
-📝 拍摄建议：特写镜头展示亮点，配合柔和灯光
+⏰ 【Features】20-${Math.max(45, duration-15)}s
+📹 Scene: Highlight ${specialFeatures || 'premium renovation details'}
+🎙️ Voiceover: "${keyFeatures.length > 0 ? keyFeatures.join(', ') : 'Premium design, quality living starts here'}. Every detail showcases quality, every inch of space is filled with warmth."
+📝 Shooting Tips: Close-up shots of highlights, with soft lighting
 
-⏰ 【结尾段】${Math.max(45, duration-15)}-${duration}秒
-📹 画面：回到客厅全景，温馨家庭氛围
-🎙️ 旁白："${callToAction}，让我们为您开启美好生活新篇章！"
-📝 拍摄建议：温暖色调，展现居住氛围
+⏰ 【Closing】${Math.max(45, duration-15)}-${duration}s
+📹 Scene: Return to living room panoramic view, warm family atmosphere
+🎙️ Voiceover: "${callToAction}, let us open a new chapter of beautiful life for you!"
+📝 Shooting Tips: Warm tones, showcase living atmosphere
 
-═══════════════════════════════════════
+🎬 PRODUCTION NOTES:
 
-📋 拍摄清单：
-✅ 外观全景（无人机）
-✅ 室内布局（稳定器）  
-✅ 特色细节（特写镜头）
-✅ 生活场景（情景拍摄）
+📋 Shooting Checklist:
+✅ Exterior panoramic (drone)
+✅ Interior layout (stabilizer)
+✅ Feature details (close-up shots)
+✅ Living scenes (lifestyle shots)
 
-🎵 音乐建议：轻松愉悦的背景音乐，与旁白音量平衡
+🎵 Music Suggestion: Light and pleasant background music, balanced with voiceover volume
 
-⚡ 后期要点：
-- 转场自然流畅
-- 字幕清晰易读
-- 色调统一温馨
-- 节奏紧凑有序`
+⚡ Post-production Points:
+- Natural and smooth transitions
+- Clear and readable subtitles
+- Unified warm color tone
+- Compact and orderly rhythm`
 
   return NextResponse.json({
     success: true,

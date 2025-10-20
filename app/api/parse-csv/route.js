@@ -7,35 +7,35 @@ export async function POST(request) {
 
     if (!file) {
       return NextResponse.json(
-        { error: '请选择CSV文件' },
+        { error: 'Please select a CSV file' },
         { status: 400 }
       )
     }
 
-    // 检查文件类型
+    // Check file type
     if (!file.name.endsWith('.csv')) {
       return NextResponse.json(
-        { error: '请上传CSV格式文件' },
+        { error: 'Please upload a CSV format file' },
         { status: 400 }
       )
     }
 
-    // 读取文件内容
+    // Read file content
     const text = await file.text()
     const lines = text.split('\n').filter(line => line.trim())
 
-    if (lines.length === 0) {
+    if (lines.length < 2) {
       return NextResponse.json(
-        { error: 'CSV文件为空' },
+        { error: 'CSV file is empty' },
         { status: 400 }
       )
     }
 
-    // 解析CSV
-    const contacts = []
+    // Parse CSV
     const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''))
-    
-    // 查找邮箱和姓名列
+    const rows = lines.slice(1)
+
+    // Find email and name columns
     const emailIndex = headers.findIndex(h => 
       h.toLowerCase().includes('email') || 
       h.toLowerCase().includes('邮箱') ||
@@ -50,51 +50,47 @@ export async function POST(request) {
 
     if (emailIndex === -1) {
       return NextResponse.json(
-        { error: '未找到邮箱列，请确保CSV文件包含邮箱字段' },
+        { error: 'Email column not found, please ensure CSV file contains email field' },
         { status: 400 }
       )
     }
 
-    // 解析数据行
+    // Parse data rows
+    const contacts = []
     for (let i = 1; i < lines.length; i++) {
       const values = lines[i].split(',').map(v => v.trim().replace(/"/g, ''))
-      
-      if (values.length > emailIndex && values[emailIndex]) {
-        const email = values[emailIndex]
-        const name = nameIndex !== -1 && values[nameIndex] ? values[nameIndex] : email.split('@')[0]
-        
-        // 简单的邮箱验证
-        if (email.includes('@') && email.includes('.')) {
-          contacts.push({
-            email,
-            name,
-            source: 'csv_import'
-          })
-        }
+      const email = values[emailIndex]
+      const name = nameIndex !== -1 ? values[nameIndex] : ''
+
+      // Simple email validation
+      if (email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        contacts.push({
+          email,
+          name: name || email.split('@')[0],
+          source: 'CSV Import',
+          importedAt: new Date().toISOString()
+        })
       }
     }
 
     if (contacts.length === 0) {
       return NextResponse.json(
-        { error: '未找到有效的邮箱地址' },
+        { error: 'No valid email addresses found' },
         { status: 400 }
       )
     }
 
     return NextResponse.json({
       success: true,
-      message: `成功解析 ${contacts.length} 个联系人`,
       contacts,
-      summary: {
-        total: contacts.length,
-        headers: headers
-      }
+      message: `Successfully parsed ${contacts.length} contacts`,
+      total: contacts.length
     })
 
   } catch (error) {
-    console.error('CSV解析错误:', error)
+    console.error('CSV parsing error:', error)
     return NextResponse.json(
-      { error: 'CSV文件解析失败，请检查文件格式' },
+      { error: 'CSV file parsing failed, please check file format' },
       { status: 500 }
     )
   }

@@ -45,60 +45,60 @@ const Analytics = ({ setCurrentPage }) => {
 
   // 时间范围选项
   const timeRanges = [
-    { id: '7d', label: '最近7天' },
-    { id: '30d', label: '最近30天' },
-    { id: '90d', label: '最近90天' },
-    { id: '1y', label: '最近1年' }
+    { id: '7d', label: 'Last 7 Days' },
+    { id: '30d', label: 'Last 30 Days' },
+    { id: '90d', label: 'Last 90 Days' },
+    { id: '1y', label: 'Last Year' }
   ]
 
   // 核心指标数据
   const coreMetrics = [
     {
-      title: '总收入',
-      value: '¥45,280',
+      title: 'Total Revenue',
+      value: '$45,280',
       change: '+23.5%',
       trend: 'up',
       icon: DollarSign,
       color: 'text-green-600',
       bgColor: 'bg-green-100',
-      description: '本月营销活动带来的总收入'
+      description: 'Total revenue from marketing campaigns this month'
     },
     {
-      title: '活跃用户',
+      title: 'Active Users',
       value: '2,847',
       change: '+18.2%',
       trend: 'up',
       icon: Users,
       color: 'text-blue-600',
       bgColor: 'bg-blue-100',
-      description: '使用工作台功能的活跃用户数'
+      description: 'Active users using dashboard features'
     },
     {
-      title: '邮件发送量',
+      title: 'Emails Sent',
       value: '15,680',
       change: '+12.8%',
       trend: 'up',
       icon: Mail,
       color: 'text-purple-600',
       bgColor: 'bg-purple-100',
-      description: '通过系统发送的邮件总数'
+      description: 'Total emails sent through the system'
     },
     {
-      title: '转化率',
+      title: 'Conversion Rate',
       value: '8.4%',
       change: '-2.1%',
       trend: 'down',
       icon: Target,
       color: 'text-orange-600',
       bgColor: 'bg-orange-100',
-      description: '邮件营销的平均转化率'
+      description: 'Average conversion rate for email marketing'
     }
   ]
 
   // 功能使用统计
   const featureUsage = [
     {
-      name: '智能房源文案生成器',
+      name: 'Smart Property Listing Generator',
       usage: 1247,
       percentage: 85,
       icon: FileText,
@@ -106,7 +106,7 @@ const Analytics = ({ setCurrentPage }) => {
       growth: '+15%'
     },
     {
-      name: '批量邮件营销系统',
+      name: 'Bulk Email Marketing System',
       usage: 892,
       percentage: 68,
       icon: Mail,
@@ -114,7 +114,7 @@ const Analytics = ({ setCurrentPage }) => {
       growth: '+22%'
     },
     {
-      name: '社交媒体内容生成',
+      name: 'Social Media Content Generator',
       usage: 634,
       percentage: 52,
       icon: Share2,
@@ -122,7 +122,7 @@ const Analytics = ({ setCurrentPage }) => {
       growth: '+8%'
     },
     {
-      name: 'AI图片增强套件',
+      name: 'AI Image Enhancement Suite',
       usage: 456,
       percentage: 38,
       icon: Camera,
@@ -134,33 +134,33 @@ const Analytics = ({ setCurrentPage }) => {
   // 邮件营销热力图数据
   const emailHeatmapData = [
     {
-      title: '邮件开启率',
+      title: 'Email Open Rate',
       value: '24.8%',
-      benchmark: '行业平均: 21.3%',
+      benchmark: 'Industry Average: 21.3%',
       status: 'good',
       icon: Eye,
       heatmap: [85, 92, 78, 88, 95, 82, 90] // 一周的数据
     },
     {
-      title: '点击率',
+      title: 'Click Rate',
       value: '8.2%',
-      benchmark: '行业平均: 6.5%',
+      benchmark: 'Industry Average: 6.5%',
       status: 'good',
       icon: MousePointer,
       heatmap: [65, 72, 58, 68, 75, 62, 70]
     },
     {
-      title: '退订率',
+      title: 'Unsubscribe Rate',
       value: '1.2%',
-      benchmark: '行业平均: 2.1%',
+      benchmark: 'Industry Average: 2.1%',
       status: 'good',
       icon: TrendingDown,
       heatmap: [15, 12, 18, 14, 10, 16, 13]
     },
     {
-      title: '转化率',
+      title: 'Conversion Rate',
       value: '5.6%',
-      benchmark: '行业平均: 4.2%',
+      benchmark: 'Industry Average: 4.2%',
       status: 'excellent',
       icon: Target,
       heatmap: [45, 52, 38, 48, 55, 42, 50]
@@ -169,24 +169,24 @@ const Analytics = ({ setCurrentPage }) => {
 
   // 地理分布数据
   const geoData = [
-    { city: '北京', users: 847, percentage: 29.8, revenue: 12680 },
-    { city: '上海', users: 623, percentage: 21.9, revenue: 9840 },
-    { city: '深圳', users: 456, percentage: 16.0, revenue: 7320 },
-    { city: '广州', users: 334, percentage: 11.7, revenue: 5560 },
-    { city: '杭州', users: 287, percentage: 10.1, revenue: 4890 },
-    { city: '其他', users: 300, percentage: 10.5, revenue: 4990 }
+    { city: 'Beijing', users: 847, percentage: 29.8, revenue: 12680 },
+    { city: 'Shanghai', users: 623, percentage: 21.9, revenue: 9840 },
+    { city: 'Shenzhen', users: 456, percentage: 16.0, revenue: 7320 },
+    { city: 'Guangzhou', users: 334, percentage: 11.7, revenue: 5560 },
+    { city: 'Hangzhou', users: 287, percentage: 10.1, revenue: 4890 },
+    { city: 'Others', users: 300, percentage: 10.5, revenue: 4990 }
   ]
 
   // 设备分布数据
   const deviceData = [
-    { type: '桌面端', count: 1680, percentage: 59.0, icon: Monitor, engagement: '12.5分钟' },
-    { type: '移动端', count: 1167, percentage: 41.0, icon: Smartphone, engagement: '8.3分钟' }
+    { type: 'Desktop', count: 1680, percentage: 59.0, icon: Monitor, engagement: '12.5 min' },
+    { type: 'Mobile', count: 1167, percentage: 41.0, icon: Smartphone, engagement: '8.3 min' }
   ]
 
   // ROI分析数据
   const roiData = [
     {
-      campaign: '春季房源推广',
+      campaign: 'Spring Property Promotion',
       investment: 8500,
       revenue: 28600,
       roi: 236.5,
@@ -195,7 +195,7 @@ const Analytics = ({ setCurrentPage }) => {
       conversion: '12.8%'
     },
     {
-      campaign: '高端别墅营销',
+      campaign: 'Luxury Villa Marketing',
       investment: 12000,
       revenue: 35400,
       roi: 195.0,
@@ -204,7 +204,7 @@ const Analytics = ({ setCurrentPage }) => {
       conversion: '15.2%'
     },
     {
-      campaign: '学区房专题',
+      campaign: 'School District Properties',
       investment: 6800,
       revenue: 18200,
       roi: 167.6,
@@ -213,7 +213,7 @@ const Analytics = ({ setCurrentPage }) => {
       conversion: '9.6%'
     },
     {
-      campaign: '投资房产推介',
+      campaign: 'Investment Property Showcase',
       investment: 9200,
       revenue: 15800,
       roi: 71.7,
@@ -247,10 +247,10 @@ const Analytics = ({ setCurrentPage }) => {
   // 获取ROI状态文本
   const getRoiStatusText = (status) => {
     switch (status) {
-      case 'excellent': return '优秀'
-      case 'good': return '良好'
-      case 'average': return '一般'
-      default: return '待改进'
+      case 'excellent': return 'Excellent'
+      case 'good': return 'Good'
+      case 'average': return 'Average'
+      default: return 'Needs Improvement'
     }
   }
 
@@ -277,7 +277,7 @@ const Analytics = ({ setCurrentPage }) => {
                 <ArrowUp className="h-5 w-5 rotate-[-90deg]" />
               </button>
               <h1 className="text-2xl font-bold text-gray-900 flex items-center">
-                📊 数据分析中心
+                📊 Analytics Center
               </h1>
             </div>
             <div className="flex items-center space-x-4">
@@ -291,13 +291,13 @@ const Analytics = ({ setCurrentPage }) => {
                 ))}
               </select>
               <button className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                <RefreshCw className="h-4 w-4 mr-2" />
-                刷新数据
-              </button>
-              <button className="flex items-center px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
-                <Download className="h-4 w-4 mr-2" />
-                导出报告
-              </button>
+                 <RefreshCw className="h-4 w-4 mr-2" />
+                 Refresh Data
+               </button>
+               <button className="flex items-center px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+                 <Download className="h-4 w-4 mr-2" />
+                 Export Report
+               </button>
             </div>
           </div>
         </div>
@@ -333,7 +333,7 @@ const Analytics = ({ setCurrentPage }) => {
           <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
             <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center">
               <BarChart3 className="h-5 w-5 mr-2 text-blue-600" />
-              核心功能使用统计
+              Core Feature Usage Statistics
             </h3>
             <div className="space-y-6">
               {featureUsage.map((feature, index) => (
@@ -344,7 +344,7 @@ const Analytics = ({ setCurrentPage }) => {
                     </div>
                     <div>
                       <h4 className="font-medium text-gray-900">{feature.name}</h4>
-                      <p className="text-sm text-gray-500">{feature.usage} 次使用 ({feature.growth})</p>
+                      <p className="text-sm text-gray-500">{feature.usage} uses ({feature.growth})</p>
                     </div>
                   </div>
                   <div className="flex items-center space-x-3">
@@ -365,7 +365,7 @@ const Analytics = ({ setCurrentPage }) => {
           <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
             <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center">
               <Mail className="h-5 w-5 mr-2 text-green-600" />
-              邮件营销热力图
+              Email Marketing Heatmap
             </h3>
             <div className="space-y-6">
               {emailHeatmapData.map((metric, index) => (
@@ -378,7 +378,7 @@ const Analytics = ({ setCurrentPage }) => {
                     <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
                       metric.status === 'excellent' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'
                     }`}>
-                      {metric.status === 'excellent' ? '卓越' : '优于平均'}
+                      {metric.status === 'excellent' ? 'Excellent' : 'Above Average'}
                     </span>
                   </div>
                   <div className="flex items-center justify-between mb-2">
@@ -390,7 +390,7 @@ const Analytics = ({ setCurrentPage }) => {
                       <div
                         key={i}
                         className={`h-4 w-4 rounded ${getHeatmapIntensity(value)}`}
-                        title={`第${i+1}天: ${value}%`}
+                        title={`Day ${i+1}: ${value}%`}
                       ></div>
                     ))}
                   </div>
@@ -406,7 +406,7 @@ const Analytics = ({ setCurrentPage }) => {
           <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
             <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center">
               <MapPin className="h-5 w-5 mr-2 text-red-600" />
-              用户地理分布
+              User Geographic Distribution
             </h3>
             <div className="space-y-4">
               {geoData.map((location, index) => (
@@ -415,7 +415,7 @@ const Analytics = ({ setCurrentPage }) => {
                     <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
                     <div>
                       <span className="font-medium text-gray-900">{location.city}</span>
-                      <p className="text-sm text-gray-500">{location.users} 用户 • ¥{location.revenue.toLocaleString()}</p>
+                      <p className="text-sm text-gray-500">{location.users} users • ${location.revenue.toLocaleString()}</p>
                     </div>
                   </div>
                   <div className="flex items-center space-x-4">
@@ -436,7 +436,7 @@ const Analytics = ({ setCurrentPage }) => {
           <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
             <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center">
               <Monitor className="h-5 w-5 mr-2 text-purple-600" />
-              设备使用分析
+              Device Usage Analysis
             </h3>
             <div className="space-y-6">
               {deviceData.map((device, index) => (
@@ -447,7 +447,7 @@ const Analytics = ({ setCurrentPage }) => {
                     </div>
                     <div>
                       <h4 className="font-medium text-gray-900">{device.type}</h4>
-                      <p className="text-sm text-gray-500">{device.count} 用户 • 平均使用 {device.engagement}</p>
+                      <p className="text-sm text-gray-500">{device.count} users • Avg. {device.engagement}</p>
                     </div>
                   </div>
                   <div className="text-right">
@@ -469,19 +469,19 @@ const Analytics = ({ setCurrentPage }) => {
         <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 mb-8">
           <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center">
             <TrendingUp className="h-5 w-5 mr-2 text-green-600" />
-            营销活动ROI分析
+            Marketing Campaign ROI Analysis
           </h3>
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="border-b border-gray-200">
-                  <th className="text-left py-3 px-4 font-medium text-gray-900">营销活动</th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-900">投入成本</th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-900">产生收入</th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-900">获得线索</th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-900">转化率</th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-900">Campaign</th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-900">Investment</th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-900">Revenue</th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-900">Leads</th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-900">Conversion</th>
                   <th className="text-left py-3 px-4 font-medium text-gray-900">ROI</th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-900">表现</th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-900">Performance</th>
                 </tr>
               </thead>
               <tbody>
@@ -490,8 +490,8 @@ const Analytics = ({ setCurrentPage }) => {
                     <td className="py-4 px-4">
                       <div className="font-medium text-gray-900">{campaign.campaign}</div>
                     </td>
-                    <td className="py-4 px-4 text-gray-600">¥{campaign.investment.toLocaleString()}</td>
-                    <td className="py-4 px-4 text-gray-600">¥{campaign.revenue.toLocaleString()}</td>
+                    <td className="py-4 px-4 text-gray-600">${campaign.investment.toLocaleString()}</td>
+                    <td className="py-4 px-4 text-gray-600">${campaign.revenue.toLocaleString()}</td>
                     <td className="py-4 px-4 text-gray-600">{campaign.leads}</td>
                     <td className="py-4 px-4 text-gray-600">{campaign.conversion}</td>
                     <td className="py-4 px-4">
@@ -510,46 +510,46 @@ const Analytics = ({ setCurrentPage }) => {
         </div>
 
         {/* 实时活动监控 */}
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-          <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center">
-            <Activity className="h-5 w-5 mr-2 text-orange-600" />
-            实时活动监控
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="text-center p-6 border border-gray-200 rounded-lg">
-              <div className="inline-flex items-center justify-center w-12 h-12 bg-green-100 rounded-full mb-4">
-                <Zap className="h-6 w-6 text-green-600" />
-              </div>
-              <h4 className="font-medium text-gray-900 mb-2">当前在线用户</h4>
-              <p className="text-3xl font-bold text-gray-900 mb-1">{realTimeData.onlineUsers}</p>
-              <p className="text-sm text-gray-500">比昨天同时段 +15%</p>
-            </div>
-            <div className="text-center p-6 border border-gray-200 rounded-lg">
-              <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-100 rounded-full mb-4">
-                <Home className="h-6 w-6 text-blue-600" />
-              </div>
-              <h4 className="font-medium text-gray-900 mb-2">活跃房源</h4>
-              <p className="text-3xl font-bold text-gray-900 mb-1">{realTimeData.activeListings}</p>
-              <p className="text-sm text-gray-500">今日新增 8 个</p>
-            </div>
-            <div className="text-center p-6 border border-gray-200 rounded-lg">
-              <div className="inline-flex items-center justify-center w-12 h-12 bg-purple-100 rounded-full mb-4">
-                <Mail className="h-6 w-6 text-purple-600" />
-              </div>
-              <h4 className="font-medium text-gray-900 mb-2">今日邮件发送</h4>
-              <p className="text-3xl font-bold text-gray-900 mb-1">{realTimeData.emailsSentToday.toLocaleString()}</p>
-              <p className="text-sm text-gray-500">开启率 24.8%</p>
-            </div>
-            <div className="text-center p-6 border border-gray-200 rounded-lg">
-              <div className="inline-flex items-center justify-center w-12 h-12 bg-orange-100 rounded-full mb-4">
-                <Star className="h-6 w-6 text-orange-600" />
-              </div>
-              <h4 className="font-medium text-gray-900 mb-2">用户满意度</h4>
-              <p className="text-3xl font-bold text-gray-900 mb-1">{realTimeData.userSatisfaction}</p>
-              <p className="text-sm text-gray-500">基于 {realTimeData.totalFeedback} 条反馈</p>
-            </div>
-          </div>
-        </div>
+         <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+           <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center">
+             <Activity className="h-5 w-5 mr-2 text-orange-600" />
+             Real-time Activity Monitor
+           </h3>
+           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+             <div className="text-center p-6 border border-gray-200 rounded-lg">
+               <div className="inline-flex items-center justify-center w-12 h-12 bg-green-100 rounded-full mb-4">
+                 <Zap className="h-6 w-6 text-green-600" />
+               </div>
+               <h4 className="font-medium text-gray-900 mb-2">Current Online Users</h4>
+               <p className="text-3xl font-bold text-gray-900 mb-1">{realTimeData.onlineUsers}</p>
+               <p className="text-sm text-gray-500">+15% vs yesterday same time</p>
+             </div>
+             <div className="text-center p-6 border border-gray-200 rounded-lg">
+               <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-100 rounded-full mb-4">
+                 <Home className="h-6 w-6 text-blue-600" />
+               </div>
+               <h4 className="font-medium text-gray-900 mb-2">Active Listings</h4>
+               <p className="text-3xl font-bold text-gray-900 mb-1">{realTimeData.activeListings}</p>
+               <p className="text-sm text-gray-500">8 new today</p>
+             </div>
+             <div className="text-center p-6 border border-gray-200 rounded-lg">
+               <div className="inline-flex items-center justify-center w-12 h-12 bg-purple-100 rounded-full mb-4">
+                 <Mail className="h-6 w-6 text-purple-600" />
+               </div>
+               <h4 className="font-medium text-gray-900 mb-2">Emails Sent Today</h4>
+               <p className="text-3xl font-bold text-gray-900 mb-1">{realTimeData.emailsSentToday.toLocaleString()}</p>
+               <p className="text-sm text-gray-500">24.8% open rate</p>
+             </div>
+             <div className="text-center p-6 border border-gray-200 rounded-lg">
+               <div className="inline-flex items-center justify-center w-12 h-12 bg-orange-100 rounded-full mb-4">
+                 <Star className="h-6 w-6 text-orange-600" />
+               </div>
+               <h4 className="font-medium text-gray-900 mb-2">User Satisfaction</h4>
+               <p className="text-3xl font-bold text-gray-900 mb-1">{realTimeData.userSatisfaction}</p>
+               <p className="text-sm text-gray-500">Based on {realTimeData.totalFeedback} feedback</p>
+             </div>
+           </div>
+         </div>
       </div>
     </div>
   )

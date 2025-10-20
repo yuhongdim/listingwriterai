@@ -4,29 +4,29 @@ export async function POST(request) {
   try {
     const { recipients, subject, content, senderName = 'ListingWriterAI' } = await request.json()
 
-    // 验证必填字段
+    // Validate required fields
     if (!recipients || !Array.isArray(recipients) || recipients.length === 0) {
       return NextResponse.json(
-        { error: '收件人列表不能为空' },
+        { error: 'Recipients list cannot be empty' },
         { status: 400 }
       )
     }
 
     if (!subject || !content) {
       return NextResponse.json(
-        { error: '邮件主题和内容不能为空' },
+        { error: 'Email subject and content cannot be empty' },
         { status: 400 }
       )
     }
 
-    // 模拟邮件发送（实际项目中可以集成 Resend、SendGrid 等服务）
+    // Mock email sending (in real projects, integrate with Resend, SendGrid, etc.)
     const results = []
     
     for (const recipient of recipients) {
-      // 模拟发送延迟
+      // Mock sending delay
       await new Promise(resolve => setTimeout(resolve, 100))
       
-      // 模拟发送成功率（90%）
+      // Mock success rate (90%)
       const success = Math.random() > 0.1
       
       results.push({
@@ -34,7 +34,7 @@ export async function POST(request) {
         name: recipient.name,
         success,
         messageId: success ? `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}` : null,
-        error: success ? null : '发送失败'
+        error: success ? null : 'Send failed'
       })
     }
 
@@ -43,7 +43,7 @@ export async function POST(request) {
 
     return NextResponse.json({
       success: true,
-      message: `邮件发送完成：成功 ${successCount} 封，失败 ${failureCount} 封`,
+      message: `Email sending completed: ${successCount} successful, ${failureCount} failed`,
       results,
       summary: {
         total: results.length,
@@ -53,9 +53,9 @@ export async function POST(request) {
     })
 
   } catch (error) {
-    console.error('邮件发送错误:', error)
+    console.error('Email sending error:', error)
     return NextResponse.json(
-      { error: '邮件发送失败，请重试' },
+      { error: 'Email sending failed, please try again' },
       { status: 500 }
     )
   }

@@ -20,13 +20,13 @@ export default function ListingWriterAI() {
     setIsGenerating(true);
     
     try {
-      // 模拟数据生成
+      // Mock data generation
       const mockDescriptions = {
-        professional: `这座精心维护的${formData.propertyType}位于${formData.location}的核心地段，拥有${formData.bedrooms}间卧室和${formData.bathrooms}间卫生间。${formData.sqft}平方英尺的生活空间经过精心设计，满足现代家庭的需求。\n\n物业特色包括：${formData.features || '开放式布局、充足的自然采光和现代化的设施'}。地理位置优越，靠近学校、购物中心和主要交通枢纽。\n\n这是一个不容错过的机会，立即联系我们安排私人看房！`,
-
-        luxury: `✨ 奢华生活新定义 ✨\n\n坐落于${formData.location}最令人向往的地段，这座卓越的${formData.propertyType}重新定义了豪华生活的标准。${formData.bedrooms}间优雅的卧室套房，${formData.bathrooms}间设计精美的卫生间，以及${formData.sqft}平方英尺的精致生活空间。\n\n${formData.features ? '特色亮点：' + formData.features : '从进口建材到定制细节，每个元素都彰显卓越品质'}。\n\n为追求卓越的您量身打造，预约尊贵看房体验。`,
-
-        modern: `🏡 现代简约生活 🏡\n\n这处位于${formData.location}的${formData.propertyType}完美融合了现代设计与实用功能。${formData.bedrooms}卧${formData.bathrooms}卫的智能布局，${formData.sqft}平方英尺的开放空间。\n\n${formData.features || '简洁线条、智能家居集成和节能设计'}让日常生活更加舒适便捷。\n\n适合追求现代生活方式的您，欢迎预约参观！`
+        professional: `This well-maintained ${formData.propertyType} is located in the heart of ${formData.location}, featuring ${formData.bedrooms} bedrooms and ${formData.bathrooms} bathrooms. The ${formData.sqft} square feet of living space has been thoughtfully designed to meet the needs of modern families.\n\nProperty features include premium finishes, spacious layouts, and excellent natural light throughout. The location offers convenient access to shopping, dining, and transportation.\n\nThis is an exceptional opportunity for both investors and homeowners. Contact us today to schedule a private showing.`,
+        
+        luxury: `✨ Luxury Living Redefined ✨\n\nSituated in the most coveted area of ${formData.location}, this exceptional ${formData.propertyType} redefines the standard of luxury living. ${formData.bedrooms} elegant bedroom suites, ${formData.bathrooms} beautifully designed bathrooms, and ${formData.sqft} square feet of sophisticated living space.\n\n${formData.features || 'Premium amenities include gourmet kitchen, spa-like bathrooms, and high-end finishes throughout.'}\n\nExperience unparalleled luxury in this stunning property. Schedule your exclusive viewing today.`,
+        
+        modern: `🏡 Modern Minimalist Living 🏡\n\nThis ${formData.propertyType} in ${formData.location} perfectly combines modern design with practical functionality. ${formData.bedrooms} bedrooms and ${formData.bathrooms} bathrooms with smart layout, ${formData.sqft} square feet of open space.\n\n${formData.features || 'Clean lines, open floor plan, and contemporary finishes create the perfect modern living environment.'}\n\nDon't miss this opportunity to own a piece of modern architecture. Contact us for more information.`
       };
 
       await new Promise(resolve => setTimeout(resolve, 1500));
@@ -35,8 +35,8 @@ export default function ListingWriterAI() {
       setGeneratedContent(description);
       setStep('result');
     } catch (error) {
-      console.error('生成失败:', error);
-      const fallbackDescription = `这座${formData.bedrooms}卧室${formData.bathrooms}卫生间的${formData.propertyType}位于${formData.location}，面积${formData.sqft}平方英尺。${formData.features ? '特色包括：' + formData.features : ''}不要错过这个难得的机会！`;
+      console.error('Generation failed:', error);
+      const fallbackDescription = `This ${formData.bedrooms}-bedroom, ${formData.bathrooms}-bathroom ${formData.propertyType} is located in ${formData.location}, with ${formData.sqft} square feet. ${formData.features ? 'Features include: ' + formData.features : ''}Don't miss this great opportunity!`;
       setGeneratedContent(fallbackDescription);
       setStep('result');
     } finally {
@@ -46,7 +46,7 @@ export default function ListingWriterAI() {
 
   const handleGenerate = () => {
     if (!formData.propertyType || !formData.bedrooms || !formData.bathrooms || !formData.sqft || !formData.location) {
-      alert('请填写所有必填字段');
+      alert('Please fill in all required fields');
       return;
     }
     generateDescription();
@@ -54,7 +54,7 @@ export default function ListingWriterAI() {
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(generatedContent);
-    alert('已复制到剪贴板！');
+    alert('Copied to clipboard!');
   };
 
   // 首页

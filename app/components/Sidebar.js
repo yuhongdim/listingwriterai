@@ -35,11 +35,14 @@ const Sidebar = ({ currentPage, setCurrentPage, usageCount, collapsed, setCollap
   const remainingCount = usageTracker.getRemainingCount()
 
   const menuItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: Home },
+    { id: 'landing', label: 'Back to Home', icon: Home },
+    { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
     { id: 'create', label: 'Create Listing', icon: PenTool },
     { id: 'email', label: 'Email Center', icon: Mail },
     { id: 'video', label: 'Video Script', icon: Video },
     { id: 'social', label: 'Social Media', icon: Globe },
+    { id: 'blog', label: 'Blog Manager', icon: PenTool },
+    { id: 'blog-public', label: 'Blog', icon: Globe },
     { id: 'pricing', label: 'Pricing', icon: CreditCard },
     { id: 'analytics', label: 'Analytics', icon: BarChart3 },
     { id: 'settings', label: 'Settings', icon: Settings },
@@ -52,10 +55,21 @@ const Sidebar = ({ currentPage, setCurrentPage, usageCount, collapsed, setCollap
       {/* Header */}
       <div className="p-4 border-b border-gray-200 flex items-center justify-between">
         {!isCollapsed && (
-          <div>
+          <div 
+            onClick={(e) => {
+              e.preventDefault()
+              e.stopPropagation()
+              console.log('点击了ListingWriterAI标题，准备跳转到dashboard')
+              console.log('当前页面:', currentPage)
+              setCurrentPage('dashboard')
+              console.log('跳转命令已发送')
+            }}
+            className="cursor-pointer hover:opacity-80 transition-opacity select-none"
+          >
             <h1 className="text-xl font-bold gradient-text">ListingWriterAI</h1>
             <p className="text-sm text-gray-500">
-              {isAuthenticated ? user?.plan || 'Free' : 'Guest Mode'}
+              {isAuthenticated ? user?.plan || 'Free' : 'Guest Mode'} 
+              <span className="ml-2 text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded">Click to Navigate</span>
             </p>
           </div>
         )}

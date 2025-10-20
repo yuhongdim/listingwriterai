@@ -1,17 +1,17 @@
 import { NextResponse } from 'next/server'
 
-// 模拟数据存储（实际项目中应该使用数据库）
+// Mock data storage (should use database in actual project)
 const campaignData = new Map()
 const emailEvents = new Map()
 
-// GET方法 - 获取活动跟踪数据
+// GET method - Get campaign tracking data
 export async function GET(request) {
   try {
     const { searchParams, pathname } = new URL(request.url)
     const pathSegments = pathname.split('/')
     const campaignId = pathSegments[pathSegments.length - 1]
 
-    // 处理不同类型的跟踪请求
+    // Handle different types of tracking requests
     if (pathname.includes('/open')) {
       return handleOpenTracking(searchParams, campaignId)
     }
@@ -20,24 +20,24 @@ export async function GET(request) {
       return handleClickTracking(searchParams, campaignId)
     }
 
-    // 获取活动统计数据
+    // Get campaign statistics data
     if (campaignId && campaignId !== 'track-email') {
       return getCampaignStats(campaignId)
     }
 
-    // 获取所有活动列表
+    // Get all campaigns list
     return getAllCampaigns()
 
   } catch (error) {
-    console.error('邮件跟踪错误:', error)
+    console.error('Email tracking error:', error)
     return NextResponse.json(
-      { error: '获取跟踪数据失败' },
+      { error: 'Failed to get tracking data' },
       { status: 500 }
     )
   }
 }
 
-// POST方法 - 创建跟踪记录
+// POST method - Create tracking record
 export async function POST(request) {
   try {
     const { 
@@ -50,12 +50,12 @@ export async function POST(request) {
 
     if (!campaignId || !eventType || !email) {
       return NextResponse.json(
-        { error: '缺少必要的跟踪参数' },
+        { error: 'Missing required tracking parameters' },
         { status: 400 }
       )
     }
 
-    // 记录事件
+    // Record event
     await recordEmailEvent(campaignId, {
       eventType,
       email,
@@ -65,19 +65,19 @@ export async function POST(request) {
 
     return NextResponse.json({
       success: true,
-      message: '跟踪事件记录成功'
+      message: 'Tracking event recorded successfully'
     })
 
   } catch (error) {
-    console.error('记录跟踪事件错误:', error)
+    console.error('Record tracking event error:', error)
     return NextResponse.json(
-      { error: '记录跟踪事件失败' },
+      { error: 'Failed to record tracking event' },
       { status: 500 }
     )
   }
 }
 
-// 处理邮件打开跟踪
+// Handle email open tracking
 async function handleOpenTracking(searchParams, campaignId) {
   const email = searchParams.get('email')
   
@@ -85,7 +85,7 @@ async function handleOpenTracking(searchParams, campaignId) {
     return new NextResponse('Invalid parameters', { status: 400 })
   }
 
-  // 记录打开事件
+  // Record open event
   await recordEmailEvent(campaignId, {
     eventType: 'opened',
     email,
@@ -96,7 +96,7 @@ async function handleOpenTracking(searchParams, campaignId) {
     }
   })
 
-  // 返回1x1透明像素图片
+  // Return 1x1 transparent pixel image
   const pixel = Buffer.from(
     'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==',
     'base64'
@@ -112,7 +112,7 @@ async function handleOpenTracking(searchParams, campaignId) {
   })
 }
 
-// 处理邮件点击跟踪
+// Handle email click tracking
 async function handleClickTracking(searchParams, campaignId) {
   const email = searchParams.get('email')
   const url = searchParams.get('url')
@@ -121,7 +121,7 @@ async function handleClickTracking(searchParams, campaignId) {
     return NextResponse.redirect('/')
   }
 
-  // 记录点击事件
+  // Record click event
   await recordEmailEvent(campaignId, {
     eventType: 'clicked',
     email,
@@ -132,23 +132,23 @@ async function handleClickTracking(searchParams, campaignId) {
     }
   })
 
-  // 重定向到原始URL
+  // Redirect to original URL
   return NextResponse.redirect(url)
 }
 
-// 获取活动统计数据
+// Get campaign statistics data
 async function getCampaignStats(campaignId) {
   const campaign = campaignData.get(campaignId)
   const events = emailEvents.get(campaignId) || []
 
   if (!campaign) {
     return NextResponse.json(
-      { error: '活动不存在' },
+      { error: 'Campaign does not exist' },
       { status: 404 }
     )
   }
 
-  // 计算统计数据
+  // Calculate statistics data
   const stats = calculateCampaignStats(events, campaign)
 
   return NextResponse.json({
@@ -156,11 +156,11 @@ async function getCampaignStats(campaignId) {
     campaignId,
     campaign,
     stats,
-    events: events.slice(-100) // 返回最近100个事件
+    events: events.slice(-100) // Return latest 100 events
   })
 }
 
-// 获取所有活动列表
+// Get all campaigns list
 async function getAllCampaigns() {
   const campaigns = Array.from(campaignData.entries()).map(([id, data]) => {
     const events = emailEvents.get(id) || []
@@ -190,7 +190,7 @@ async function getAllCampaigns() {
   })
 }
 
-// 记录邮件事件
+// Record email event
 async function recordEmailEvent(campaignId, event) {
   if (!emailEvents.has(campaignId)) {
     emailEvents.set(campaignId, [])
@@ -203,7 +203,7 @@ async function recordEmailEvent(campaignId, event) {
     recordedAt: new Date().toISOString()
   })
 
-  // 保持事件数量在合理范围内
+  // Keep event count within reasonable range
   if (events.length > 10000) {
     events.splice(0, events.length - 10000)
   }
@@ -211,7 +211,7 @@ async function recordEmailEvent(campaignId, event) {
   emailEvents.set(campaignId, events)
 }
 
-// 计算活动统计数据
+// Calculate campaign statistics data
 function calculateCampaignStats(events, campaign) {
   const eventCounts = events.reduce((acc, event) => {
     acc[event.eventType] = (acc[event.eventType] || 0) + 1
@@ -219,13 +219,13 @@ function calculateCampaignStats(events, campaign) {
   }, {})
 
   const sent = eventCounts.sent || 0
-  const delivered = eventCounts.delivered || sent // 如果没有delivered事件，假设等于sent
+  const delivered = eventCounts.delivered || sent // If no delivered events, assume equal to sent
   const opened = eventCounts.opened || 0
   const clicked = eventCounts.clicked || 0
   const bounced = eventCounts.bounced || 0
   const unsubscribed = eventCounts.unsubscribed || 0
 
-  // 计算唯一事件（去重）
+  // Calculate unique events (deduplicated)
   const uniqueOpens = new Set(
     events.filter(e => e.eventType === 'opened').map(e => e.email)
   ).size
@@ -234,24 +234,24 @@ function calculateCampaignStats(events, campaign) {
     events.filter(e => e.eventType === 'clicked').map(e => e.email)
   ).size
 
-  // 计算率
+  // Calculate rates
   const deliveryRate = sent > 0 ? ((delivered / sent) * 100).toFixed(2) : '0.00'
   const openRate = delivered > 0 ? ((uniqueOpens / delivered) * 100).toFixed(2) : '0.00'
   const clickRate = delivered > 0 ? ((uniqueClicks / delivered) * 100).toFixed(2) : '0.00'
   const bounceRate = sent > 0 ? ((bounced / sent) * 100).toFixed(2) : '0.00'
   const unsubscribeRate = delivered > 0 ? ((unsubscribed / delivered) * 100).toFixed(2) : '0.00'
 
-  // 时间线数据（按小时分组）
+  // Timeline data (grouped by hour)
   const timeline = generateTimeline(events)
 
-  // 热门链接
+  // Top links
   const topLinks = getTopClickedLinks(events)
 
-  // 设备和客户端统计
+  // Device and client statistics
   const deviceStats = getDeviceStats(events)
 
   return {
-    // 基础数据
+    // Basic data
     sent,
     delivered,
     opened,
@@ -259,30 +259,30 @@ function calculateCampaignStats(events, campaign) {
     bounced,
     unsubscribed,
     
-    // 唯一数据
+    // Unique data
     uniqueOpens,
     uniqueClicks,
     
-    // 比率
+    // Ratios
     deliveryRate: parseFloat(deliveryRate),
     openRate: parseFloat(openRate),
     clickRate: parseFloat(clickRate),
     bounceRate: parseFloat(bounceRate),
     unsubscribeRate: parseFloat(unsubscribeRate),
     
-    // 详细分析
+    // Detailed analysis
     timeline,
     topLinks,
     deviceStats,
     
-    // 活动信息
+    // Campaign information
     totalRecipients: campaign?.totalRecipients || 0,
     campaignDuration: calculateCampaignDuration(events),
     lastActivity: events.length > 0 ? events[events.length - 1].timestamp : null
   }
 }
 
-// 生成时间线数据
+// Generate timeline data
 function generateTimeline(events) {
   const timeline = {}
   
@@ -303,7 +303,7 @@ function generateTimeline(events) {
     .sort((a, b) => new Date(a.time) - new Date(b.time))
 }
 
-// 获取热门点击链接
+// Get top clicked links
 function getTopClickedLinks(events) {
   const linkCounts = {}
   
@@ -320,7 +320,7 @@ function getTopClickedLinks(events) {
     .slice(0, 10)
 }
 
-// 获取设备统计
+// Get device statistics
 function getDeviceStats(events) {
   const devices = {}
   
@@ -328,7 +328,7 @@ function getDeviceStats(events) {
     .filter(e => e.metadata?.userAgent)
     .forEach(event => {
       const userAgent = event.metadata.userAgent
-      // 简化的设备检测
+      // Simplified device detection
       let device = 'Unknown'
       if (userAgent.includes('Mobile')) device = 'Mobile'
       else if (userAgent.includes('Tablet')) device = 'Tablet'
@@ -343,7 +343,7 @@ function getDeviceStats(events) {
     .sort((a, b) => b.count - a.count)
 }
 
-// 计算活动持续时间
+// Calculate campaign duration
 function calculateCampaignDuration(events) {
   if (events.length === 0) return 0
   
@@ -351,26 +351,26 @@ function calculateCampaignDuration(events) {
   const start = Math.min(...timestamps)
   const end = Math.max(...timestamps)
   
-  return end - start // 毫秒
+  return end - start // milliseconds
 }
 
-// 工具函数
+// Utility functions
 function generateEventId() {
   return `event_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
 }
 
-// 初始化一些示例数据（用于演示）
+// Initialize some sample data (for demonstration)
 function initializeSampleData() {
   const sampleCampaignId = 'campaign_sample_123'
   
   campaignData.set(sampleCampaignId, {
-    campaignName: '示例房产推广活动',
+    campaignName: 'Sample Property Promotion Campaign',
     createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
     status: 'completed',
     totalRecipients: 100
   })
   
-  // 生成一些示例事件
+  // Generate some sample events
   const sampleEvents = []
   for (let i = 0; i < 100; i++) {
     sampleEvents.push({
@@ -381,7 +381,7 @@ function initializeSampleData() {
       recordedAt: new Date().toISOString()
     })
     
-    // 模拟一些打开和点击
+    // Simulate some opens and clicks
     if (i % 3 === 0) {
       sampleEvents.push({
         id: `event_open_${i}`,
@@ -411,17 +411,17 @@ function initializeSampleData() {
   emailEvents.set(sampleCampaignId, sampleEvents)
 }
 
-// 初始化示例数据
+// Initialize sample data
 initializeSampleData()
 
-// PUT方法 - 更新活动信息
+// PUT method - Update campaign information
 export async function PUT(request) {
   try {
     const { campaignId, updates } = await request.json()
     
     if (!campaignId) {
       return NextResponse.json(
-        { error: '活动ID是必需的' },
+        { error: 'Campaign ID is required' },
         { status: 400 }
       )
     }
@@ -429,23 +429,23 @@ export async function PUT(request) {
     const campaign = campaignData.get(campaignId)
     if (!campaign) {
       return NextResponse.json(
-        { error: '活动不存在' },
+        { error: 'Campaign not found' },
         { status: 404 }
       )
     }
     
-    // 更新活动信息
+    // Update campaign information
     campaignData.set(campaignId, { ...campaign, ...updates })
     
     return NextResponse.json({
       success: true,
-      message: '活动信息更新成功'
+      message: 'Campaign information updated successfully'
     })
     
   } catch (error) {
-    console.error('更新活动信息错误:', error)
+    console.error('Update campaign information error:', error)
     return NextResponse.json(
-      { error: '更新活动信息失败' },
+      { error: 'Failed to update campaign information' },
       { status: 500 }
     )
   }

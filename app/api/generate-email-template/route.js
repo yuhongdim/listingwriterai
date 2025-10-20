@@ -15,15 +15,15 @@ export async function POST(request) {
       subject
     } = await request.json()
 
-    // 验证必填字段
+    // Validate required fields
     if (!templateType || !agentName) {
       return NextResponse.json(
-        { error: '模板类型和经纪人姓名是必填字段' },
+        { error: 'Template type and agent name are required fields' },
         { status: 400 }
       )
     }
 
-    // 生成邮件模板
+    // Generate email template
     const emailTemplate = await generateEmailTemplate({
       templateType,
       recipientName,
@@ -49,15 +49,15 @@ export async function POST(request) {
     })
 
   } catch (error) {
-    console.error('邮件模板生成错误:', error)
+    console.error('Email template generation error:', error)
     return NextResponse.json(
-      { error: '生成邮件模板时发生错误，请稍后重试' },
+      { error: 'An error occurred while generating email template, please try again later' },
       { status: 500 }
     )
   }
 }
 
-// 邮件模板生成函数
+// Email template generation function
 async function generateEmailTemplate(data) {
   const {
     templateType,
@@ -74,143 +74,143 @@ async function generateEmailTemplate(data) {
 
   const templates = {
     welcome: {
-      subject: subject || `欢迎选择${agencyName || '我们的'}房地产服务`,
+      subject: subject || `Welcome to ${agencyName || 'our'} real estate services`,
       body: `
-${recipientName ? `亲爱的${recipientName}，` : '您好，'}
+${recipientName ? `Dear ${recipientName},` : 'Hello,'}
 
-欢迎选择${agencyName || '我们'}的专业房地产服务！我是您的专属房产顾问${agentName}。
+Welcome to ${agencyName || 'our'} professional real estate services! I am ${agentName}, your dedicated property consultant.
 
-作为经验丰富的房地产专家，我致力于为您提供：
-• 专业的市场分析和房产评估
-• 个性化的房源推荐服务
-• 全程透明的交易流程
-• 贴心的售后跟进服务
+As an experienced real estate expert, I am committed to providing you with:
+• Professional market analysis and property evaluation
+• Personalized property recommendation services
+• Transparent transaction process throughout
+• Thoughtful after-sales follow-up services
 
-${customMessage || '我们深知买房/卖房是人生中的重要决定，因此我们承诺为您提供最专业、最贴心的服务。'}
+${customMessage || 'We understand that buying/selling a home is an important decision in life, so we promise to provide you with the most professional and caring service.'}
 
-${callToAction || '如有任何房产相关问题，请随时联系我。期待为您服务！'}
+${callToAction || 'If you have any property-related questions, please feel free to contact me. Looking forward to serving you!'}
 
-${tone === 'friendly' ? '祝您生活愉快！' : '此致敬礼！'}
+${tone === 'friendly' ? 'Wish you a pleasant life!' : 'Best regards!'}
       `
     },
     'follow-up': {
-      subject: subject || '房产咨询跟进 - 您的专属房产顾问',
+      subject: subject || 'Property Consultation Follow-up - Your Dedicated Property Consultant',
       body: `
-${recipientName ? `${recipientName}您好，` : '您好，'}
+${recipientName ? `Hello ${recipientName},` : 'Hello,'}
 
-感谢您对我们房产服务的关注！我是${agentName}，想跟进一下您的房产需求。
+Thank you for your interest in our property services! I am ${agentName}, and I would like to follow up on your property needs.
 
-${propertyInfo ? `关于您咨询的${propertyInfo}：` : '根据我们之前的沟通：'}
+${propertyInfo ? `Regarding the ${propertyInfo} you inquired about:` : 'Based on our previous communication:'}
 
-• 我已为您筛选了几套符合条件的优质房源
-• 市场分析报告已准备就绪
-• 可安排实地看房时间
+• I have screened several quality properties that meet your criteria
+• Market analysis report is ready
+• Property viewing appointments can be arranged
 
-${customMessage || '房地产市场变化较快，优质房源往往很快就会被预订。建议我们尽快安排看房，以免错过心仪的房产。'}
+${customMessage || 'The real estate market changes rapidly, and quality properties are often booked quickly. I suggest we arrange viewings as soon as possible to avoid missing your ideal property.'}
 
-${callToAction || '请告知您方便的时间，我将为您安排专业的看房服务。'}
+${callToAction || 'Please let me know your convenient time, and I will arrange professional property viewing services for you.'}
 
-期待您的回复！
+Looking forward to your reply!
       `
     },
     newsletter: {
-      subject: subject || '房地产市场月报 - 最新动态与投资机会',
+      subject: subject || 'Real Estate Market Monthly Report - Latest Trends & Investment Opportunities',
       body: `
-${recipientName ? `${recipientName}您好，` : '尊敬的客户，'}
+${recipientName ? `Hello ${recipientName},` : 'Dear valued client,'}
 
-欢迎阅读本月的房地产市场简报！我是${agentName}，为您带来最新的市场动态。
+Welcome to this month's real estate market newsletter! I am ${agentName}, bringing you the latest market trends.
 
-📊 **本月市场亮点**
-• 房价走势：稳中有升，优质地段涨幅明显
-• 成交量：环比上升15%，市场活跃度提高
-• 热门区域：${propertyInfo || '市中心、学区房、地铁沿线'}
+📊 **This Month's Market Highlights**
+• Price trends: Steady growth with significant increases in prime locations
+• Transaction volume: Up 15% month-over-month, increased market activity
+• Hot areas: ${propertyInfo || 'City center, school districts, subway lines'}
 
-🏡 **精选房源推荐**
-本月为您精选了几套高性价比房源，包括：
-• 学区房：教育资源优质，升值潜力大
-• 地铁房：交通便利，适合投资出租
-• 新盘：现代化设计，配套设施完善
+🏡 **Featured Property Recommendations**
+This month we've selected several high-value properties for you, including:
+• School district properties: Quality educational resources, high appreciation potential
+• Subway properties: Convenient transportation, suitable for rental investment
+• New developments: Modern design, complete facilities
 
-💡 **投资建议**
-${customMessage || '当前市场环境下，建议关注地段优越、配套完善的房产，长期投资价值较高。'}
+💡 **Investment Advice**
+${customMessage || 'In the current market environment, we recommend focusing on properties with superior locations and complete facilities, which have higher long-term investment value.'}
 
-${callToAction || '如需了解详细信息或预约看房，请随时联系我。'}
+${callToAction || 'For detailed information or to schedule viewings, please contact me anytime.'}
 
-祝您投资顺利！
+Wishing you successful investments!
       `
     },
     promotion: {
-      subject: subject || '限时优惠 - 专属房产投资机会',
+      subject: subject || 'Limited Time Offer - Exclusive Property Investment Opportunity',
       body: `
-${recipientName ? `${recipientName}您好，` : '尊敬的客户，'}
+${recipientName ? `Hello ${recipientName},` : 'Dear valued client,'}
 
-${agentName}为您带来一个难得的投资机会！
+${agentName} brings you a rare investment opportunity!
 
-🎯 **限时特惠房源**
-${propertyInfo || '精选优质房产现正优惠促销中：'}
+🎯 **Limited Time Special Properties**
+${propertyInfo || 'Selected quality properties now on promotional offer:'}
 
-• 💰 价格优势：低于市场价5-10%
-• 🏆 品质保证：精装修，即买即住
-• 📍 地段优越：核心区域，升值潜力大
-• ⏰ 限时优惠：仅限本月，机不可失
+• 💰 Price advantage: 5-10% below market price
+• 🏆 Quality guarantee: Fully renovated, move-in ready
+• 📍 Prime location: Core area, high appreciation potential
+• ⏰ Limited time offer: This month only, don't miss out
 
-🔥 **特别福利**
-• 免费市场评估服务
-• 专业投资建议咨询
-• VIP看房绿色通道
-• 贷款协助服务
+🔥 **Special Benefits**
+• Free market evaluation service
+• Professional investment consultation
+• VIP property viewing fast track
+• Loan assistance service
 
-${customMessage || '这样的机会不多见，建议您尽快行动。我们的专业团队随时为您服务。'}
+${customMessage || 'Such opportunities are rare, we recommend you act quickly. Our professional team is ready to serve you at any time.'}
 
-${callToAction || '立即联系我预约看房，抢占先机！'}
+${callToAction || 'Contact me immediately to schedule a viewing and seize the opportunity!'}
 
-机会有限，欲购从速！
+Limited opportunity, act fast!
       `
     },
     'thank-you': {
-      subject: subject || '感谢您的信任 - 期待继续为您服务',
+      subject: subject || 'Thank You for Your Trust - Looking Forward to Continuing to Serve You',
       body: `
-${recipientName ? `亲爱的${recipientName}，` : '尊敬的客户，'}
+${recipientName ? `Dear ${recipientName},` : 'Dear valued client,'}
 
-感谢您选择${agencyName || '我们'}的房地产服务！作为您的房产顾问${agentName}，能为您成功完成房产交易，我感到非常荣幸。
+Thank you for choosing ${agencyName || 'our'} real estate services! As your property consultant ${agentName}, I feel very honored to have successfully completed your property transaction.
 
-🎉 **交易完成**
-${propertyInfo ? `恭喜您成功${propertyInfo}！` : '恭喜您成功完成房产交易！'}
+🎉 **Transaction Completed**
+${propertyInfo ? `Congratulations on successfully ${propertyInfo}!` : 'Congratulations on successfully completing your property transaction!'}
 
-在整个服务过程中，您的信任和配合让我们深受感动。我们始终坚持：
-• 专业诚信的服务态度
-• 透明公开的交易流程  
-• 贴心周到的客户关怀
+Throughout the entire service process, your trust and cooperation have deeply moved us. We always adhere to:
+• Professional and honest service attitude
+• Transparent and open transaction process
+• Thoughtful and considerate customer care
 
-🤝 **持续服务**
-虽然交易已完成，但我们的服务并未结束：
-• 房产市场动态定期分享
-• 投资机会优先推荐
-• 房产相关问题随时咨询
+🤝 **Continued Service**
+Although the transaction is complete, our service doesn't end here:
+• Regular sharing of property market trends
+• Priority recommendations for investment opportunities
+• Property-related questions available for consultation anytime
 
-${customMessage || '您的满意是我们最大的动力。如果您身边有朋友需要房产服务，欢迎推荐给我们。'}
+${customMessage || 'Your satisfaction is our greatest motivation. If you have friends who need property services, we welcome your referrals.'}
 
-${callToAction || '再次感谢您的信任，期待未来继续为您和您的家人提供优质服务！'}
+${callToAction || 'Thank you again for your trust, and we look forward to continuing to provide quality services for you and your family in the future!'}
 
-祝您生活愉快，投资顺利！
+Wishing you a pleasant life and successful investments!
       `
     }
   }
 
   const template = templates[templateType] || templates.welcome
   
-  // 生成签名
+  // Generate signature
   const signature = includeSignature ? `
 
 ---
 ${agentName}
-${agencyName ? `${agencyName} ` : ''}专业房产顾问
-📱 电话：[您的电话号码]
-📧 邮箱：[您的邮箱地址]
-🌐 网站：[公司网站]
-📍 地址：[公司地址]
+${agencyName ? `${agencyName} ` : ''}Professional Property Consultant
+📱 Phone: [Your phone number]
+📧 Email: [Your email address]
+🌐 Website: [Company website]
+📍 Address: [Company address]
 
-💡 专业 | 诚信 | 高效 | 贴心
+💡 Professional | Honest | Efficient | Caring
 ` : ''
 
   return {
@@ -221,23 +221,23 @@ ${agencyName ? `${agencyName} ` : ''}专业房产顾问
   }
 }
 
-// GET方法用于获取可用的模板类型
+// GET method for retrieving available template types
 export async function GET() {
   return NextResponse.json({
-    name: '邮件模板生成API',
+    name: 'Email Template Generation API',
     version: '1.0.0',
-    description: '生成各种类型的房地产营销邮件模板',
+    description: 'Generate various types of real estate marketing email templates',
     templateTypes: {
-      welcome: '欢迎邮件 - 新客户欢迎信息',
-      'follow-up': '跟进邮件 - 客户咨询跟进',
-      newsletter: '通讯邮件 - 市场动态分享',
-      promotion: '促销邮件 - 特惠房源推广',
-      'thank-you': '感谢邮件 - 交易完成感谢'
+      welcome: 'Welcome Email - New customer welcome message',
+      'follow-up': 'Follow-up Email - Customer inquiry follow-up',
+      newsletter: 'Newsletter Email - Market trends sharing',
+      promotion: 'Promotional Email - Special property promotion',
+      'thank-you': 'Thank You Email - Transaction completion thanks'
     },
     tones: ['professional', 'friendly', 'formal', 'casual'],
     endpoints: {
       POST: {
-        description: '生成邮件模板',
+        description: 'Generate email template',
         parameters: {
           required: ['templateType', 'agentName'],
           optional: ['recipientName', 'agencyName', 'propertyInfo', 'customMessage', 'tone', 'includeSignature', 'callToAction', 'subject']

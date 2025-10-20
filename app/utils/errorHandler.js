@@ -1,14 +1,14 @@
-// 错误处理工具类
+// Error handling utility class
 class ErrorHandler {
   constructor() {
     this.errorLog = []
     this.maxLogSize = 100
   }
 
-  // 记录错误
+  // Log error
   logError(error, context = {}) {
     const errorEntry = {
-      id: Date.now(),
+      id: Date.now() + Math.random(),
       timestamp: new Date().toISOString(),
       message: error.message || error,
       stack: error.stack,
@@ -19,197 +19,214 @@ class ErrorHandler {
 
     this.errorLog.unshift(errorEntry)
     
-    // 保持日志大小限制
+    // Keep log size limit
     if (this.errorLog.length > this.maxLogSize) {
       this.errorLog = this.errorLog.slice(0, this.maxLogSize)
     }
 
-    // 在开发环境中打印错误
+    // Print error in development environment
     if (process.env.NODE_ENV === 'development') {
       console.error('Error logged:', errorEntry)
     }
 
-    return errorEntry
+    return errorEntry.id
   }
 
-  // 获取错误类型
+  // Get error type
   getErrorType(error) {
-    if (error.name === 'NetworkError' || error.message.includes('fetch')) {
-      return 'network'
+    if (error.name) {
+      switch (error.name) {
+        case 'TypeError':
+          return 'type_error'
+        case 'ReferenceError':
+          return 'reference_error'
+        case 'SyntaxError':
+          return 'syntax_error'
+        case 'NetworkError':
+          return 'network_error'
+        default:
+          return 'unknown_error'
+      }
     }
-    if (error.name === 'ValidationError') {
-      return 'validation'
-    }
-    if (error.name === 'AuthenticationError') {
-      return 'auth'
-    }
-    if (error.message.includes('API')) {
-      return 'api'
-    }
-    return 'general'
+    return 'unknown_error'
   }
 
-  // 获取错误严重程度
+  // Get error severity
   getErrorSeverity(error) {
-    const criticalKeywords = ['crash', 'fatal', 'critical', 'security']
-    const warningKeywords = ['deprecated', 'warning', 'timeout']
+    const criticalErrors = ['ReferenceError', 'SyntaxError']
+    const warningErrors = ['TypeError', 'NetworkError']
     
-    const message = (error.message || '').toLowerCase()
-    
-    if (criticalKeywords.some(keyword => message.includes(keyword))) {
+    if (criticalErrors.includes(error.name)) {
       return 'critical'
-    }
-    if (warningKeywords.some(keyword => message.includes(keyword))) {
+    } else if (warningErrors.includes(error.name)) {
       return 'warning'
+    } else if (error.message && error.message.includes('API')) {
+      return 'warning'
+    } else {
+      return 'info'
     }
-    return 'error'
   }
 
-  // 获取用户友好的错误消息
+  // Get user-friendly error message
   getUserFriendlyMessage(error) {
     const errorType = this.getErrorType(error)
     
     const messages = {
-      network: '网络连接出现问题，请检查您的网络连接后重试。',
-      validation: '输入的信息有误，请检查并重新填写。',
-      auth: '身份验证失败，请重新登录。',
-      api: '服务暂时不可用，请稍后重试。',
-      general: '出现了一个意外错误，请刷新页面后重试。'
+      network_error: 'Network connection issue, please check your internet connection',
+      type_error: 'Data processing error, please try again',
+      reference_error: 'System error, please refresh the page',
+      syntax_error: 'Configuration error, please contact support',
+      unknown_error: 'Unknown error occurred, please try again'
     }
 
-    return messages[errorType] || messages.general
+    return messages[errorType] || messages.unknown_error
   }
 
-  // 处理API错误
-  handleApiError(error, showToast = true) {
-    const errorEntry = this.logError(error, { source: 'api' })
-    const userMessage = this.getUserFriendlyMessage(error)
+  // Handle API errors
+  handleApiError(error, endpoint = '') {
+    const context = { endpoint, type: 'api_error' }
+    const errorId = this.logError(error, context)
     
-    if (showToast) {
-      this.showErrorToast(userMessage)
+    if (error.status) {
+      switch (error.status) {
+        case 400:
+          return { message: 'Request parameter error', code: 400, errorId }
+        case 401:
+          return { message: 'Authentication failed, please log in again', code: 401, errorId }
+        case 403:
+          return { message: 'Access denied', code: 403, errorId }
+        case 404:
+          return { message: 'Resource not found', code: 404, errorId }
+        case 500:
+          return { message: 'Server error, please try again later', code: 500, errorId }
+        default:
+          return { message: this.getUserFriendlyMessage(error), code: error.status, errorId }
+      }
     }
     
-    return {
-      error: errorEntry,
-      userMessage,
-      shouldRetry: this.shouldRetry(error)
-    }
+    return { message: this.getUserFriendlyMessage(error), code: 'unknown', errorId }
   }
 
-  // 处理表单验证错误
-  handleValidationError(errors, fieldName = null) {
-    const errorMessages = []
+  // Handle form validation errors
+  handleValidationError(errors) {
+    const validationErrors = {}
     
     if (Array.isArray(errors)) {
       errors.forEach(error => {
-        errorMessages.push(error.message || error)
+        if (error.field) {
+          validationErrors[error.field] = error.message
+        }
       })
     } else if (typeof errors === 'object') {
-      Object.keys(errors).forEach(key => {
-        errorMessages.push(`${key}: ${errors[key]}`)
+      Object.keys(errors).forEach(field => {
+        validationErrors[field] = errors[field]
       })
-    } else {
-      errorMessages.push(errors)
     }
     
-    return {
-      isValid: false,
-      errors: errorMessages,
-      fieldName
-    }
+    const context = { type: 'validation_error', fields: Object.keys(validationErrors) }
+    this.logError(new Error('Form validation failed'), context)
+    
+    return validationErrors
   }
 
-  // 判断是否应该重试
-  shouldRetry(error) {
-    const retryableErrors = ['network', 'timeout', 'server']
-    const errorType = this.getErrorType(error)
-    return retryableErrors.includes(errorType)
+  // Check if should retry
+  shouldRetry(error, retryCount = 0) {
+    const maxRetries = 3
+    const retryableErrors = ['NetworkError', 'TimeoutError']
+    
+    return retryCount < maxRetries && retryableErrors.includes(error.name)
   }
 
-  // 显示错误提示
+  // Show error notification
   showErrorToast(message, duration = 5000) {
-    // 创建toast元素
+    // Create toast element
     const toast = document.createElement('div')
-    toast.className = 'fixed top-4 right-4 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 max-w-sm'
-    toast.innerHTML = `
-      <div class="flex items-center">
-        <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-          <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
-        </svg>
-        <span>${message}</span>
-        <button class="ml-4 text-white hover:text-gray-200" onclick="this.parentElement.parentElement.remove()">
-          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
-          </svg>
-        </button>
-      </div>
+    toast.className = 'error-toast'
+    toast.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #f56565;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      z-index: 10000;
+      max-width: 400px;
+      font-size: 14px;
+      line-height: 1.4;
     `
+    toast.textContent = message
     
     document.body.appendChild(toast)
     
-    // 自动移除toast
+    // Auto remove toast
     setTimeout(() => {
-      if (toast.parentElement) {
-        toast.remove()
+      if (toast.parentNode) {
+        toast.parentNode.removeChild(toast)
       }
     }, duration)
   }
 
-  // 显示成功提示
+  // Show success notification
   showSuccessToast(message, duration = 3000) {
     const toast = document.createElement('div')
-    toast.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 max-w-sm'
-    toast.innerHTML = `
-      <div class="flex items-center">
-        <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-        </svg>
-        <span>${message}</span>
-        <button class="ml-4 text-white hover:text-gray-200" onclick="this.parentElement.parentElement.remove()">
-          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
-          </svg>
-        </button>
-      </div>
+    toast.className = 'success-toast'
+    toast.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #48bb78;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      z-index: 10000;
+      max-width: 400px;
+      font-size: 14px;
+      line-height: 1.4;
     `
+    toast.textContent = message
     
     document.body.appendChild(toast)
     
     setTimeout(() => {
-      if (toast.parentElement) {
-        toast.remove()
+      if (toast.parentNode) {
+        toast.parentNode.removeChild(toast)
       }
     }, duration)
   }
 
-  // 显示警告提示
+  // Show warning notification
   showWarningToast(message, duration = 4000) {
     const toast = document.createElement('div')
-    toast.className = 'fixed top-4 right-4 bg-yellow-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 max-w-sm'
-    toast.innerHTML = `
-      <div class="flex items-center">
-        <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-          <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
-        </svg>
-        <span>${message}</span>
-        <button class="ml-4 text-white hover:text-gray-200" onclick="this.parentElement.parentElement.remove()">
-          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
-          </svg>
-        </button>
-      </div>
+    toast.className = 'warning-toast'
+    toast.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #ed8936;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      z-index: 10000;
+      max-width: 400px;
+      font-size: 14px;
+      line-height: 1.4;
     `
+    toast.textContent = message
     
     document.body.appendChild(toast)
     
     setTimeout(() => {
-      if (toast.parentElement) {
-        toast.remove()
+      if (toast.parentNode) {
+        toast.parentNode.removeChild(toast)
       }
     }, duration)
   }
 
-  // 获取错误统计
+  // Get error statistics
   getErrorStats() {
     const stats = {
       total: this.errorLog.length,
@@ -226,25 +243,25 @@ class ErrorHandler {
     return stats
   }
 
-  // 清除错误日志
+  // Clear error log
   clearErrorLog() {
     this.errorLog = []
   }
 
-  // 导出错误日志
+  // Export error log
   exportErrorLog() {
     const data = {
       timestamp: new Date().toISOString(),
       errors: this.errorLog,
       stats: this.getErrorStats()
     }
-    
+
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
     const url = URL.createObjectURL(blob)
     
     const a = document.createElement('a')
     a.href = url
-    a.download = `error-log-${new Date().toISOString().split('T')[0]}.json`
+    a.download = `error-log-${Date.now()}.json`
     document.body.appendChild(a)
     a.click()
     document.body.removeChild(a)
@@ -253,10 +270,10 @@ class ErrorHandler {
   }
 }
 
-// 创建全局错误处理器实例
+// Create global error handler instance
 const errorHandler = new ErrorHandler()
 
-// 全局错误监听
+// Global error listener
 if (typeof window !== 'undefined') {
   window.addEventListener('error', (event) => {
     errorHandler.logError(event.error, {

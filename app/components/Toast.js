@@ -39,7 +39,7 @@ export const ToastProvider = ({ children }) => {
     setToasts([])
   }
 
-  // 便捷方法
+  // Convenience methods
   const success = (title, message, options = {}) => {
     return addToast({
       type: 'success',
@@ -54,7 +54,7 @@ export const ToastProvider = ({ children }) => {
       type: 'error',
       title,
       message,
-      persistent: true, // 错误消息默认持久显示
+      persistent: true, // Error messages are persistent by default
       ...options
     })
   }
@@ -77,21 +77,31 @@ export const ToastProvider = ({ children }) => {
     })
   }
 
-  const premium = (title, message, options = {}) => {
+  const loading = (title, message, options = {}) => {
     return addToast({
-      type: 'premium',
+      type: 'loading',
       title,
       message,
+      persistent: true,
       ...options
     })
   }
 
   const achievement = (title, message, options = {}) => {
     return addToast({
-      type: 'achievement',
+      type: 'success',
       title,
       message,
-      duration: 8000, // 成就消息显示更久
+      duration: 8000, // Achievement messages display longer
+      ...options
+    })
+  }
+
+  const premium = (title, message, options = {}) => {
+    return addToast({
+      type: 'premium',
+      title,
+      message,
       ...options
     })
   }

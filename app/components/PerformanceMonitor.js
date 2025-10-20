@@ -23,7 +23,7 @@ const PerformanceMonitor = () => {
   const [activeTab, setActiveTab] = useState('metrics')
   
   const { metrics } = usePerformance('PerformanceMonitor')
-  const memoryUsage = useMemoryMonitor(5000) // 每5秒更新一次
+  const memoryUsage = useMemoryMonitor(5000) // Update every 5 seconds
   const optimizationTips = useOptimizationTips()
 
   // 获取性能报告
@@ -36,7 +36,7 @@ const PerformanceMonitor = () => {
     }
 
     updateReport()
-    const interval = setInterval(updateReport, 10000) // 每10秒更新
+    const interval = setInterval(updateReport, 10000) // Update every 10 seconds
 
     return () => clearInterval(interval)
   }, [])
@@ -76,7 +76,7 @@ const PerformanceMonitor = () => {
       <button
         onClick={() => setIsVisible(true)}
         className="fixed bottom-4 right-4 p-3 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-colors z-50"
-        title="性能监控"
+        title="Performance Monitor"
       >
         <Activity className="h-5 w-5" />
       </button>
@@ -91,7 +91,7 @@ const PerformanceMonitor = () => {
       <div className="flex items-center justify-between p-4 border-b border-gray-200">
         <div className="flex items-center space-x-2">
           <Activity className="h-5 w-5 text-blue-600" />
-          <h3 className="font-semibold text-gray-900">性能监控</h3>
+          <h3 className="font-semibold text-gray-900">Performance Monitor</h3>
           <div className={`px-2 py-1 rounded text-xs font-medium ${
             performanceGrade.color === 'green' ? 'bg-green-100 text-green-800' :
             performanceGrade.color === 'yellow' ? 'bg-yellow-100 text-yellow-800' :
@@ -123,9 +123,9 @@ const PerformanceMonitor = () => {
           {/* Tabs */}
           <div className="flex border-b border-gray-200">
             {[
-              { id: 'metrics', label: '指标', icon: Activity },
-              { id: 'memory', label: '内存', icon: MemoryStick },
-              { id: 'tips', label: '建议', icon: TrendingUp }
+              { id: 'metrics', label: 'Metrics', icon: Activity },
+              { id: 'memory', label: 'Memory', icon: MemoryStick },
+              { id: 'tips', label: 'Tips', icon: TrendingUp }
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -146,21 +146,21 @@ const PerformanceMonitor = () => {
           <div className="p-4 h-64 overflow-y-auto">
             {activeTab === 'metrics' && (
               <div className="space-y-4">
-                {/* 页面加载时间 */}
+                {/* Page load time */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
                     <Clock className="h-4 w-4 text-blue-600" />
-                    <span className="text-sm text-gray-600">页面加载时间</span>
+                    <span className="text-sm text-gray-600">Page Load Time</span>
                   </div>
                   <span className="text-sm font-medium">
                     {performanceReport?.pageLoadTime ? `${performanceReport.pageLoadTime.toFixed(0)}ms` : 'N/A'}
                   </span>
                 </div>
 
-                {/* 组件渲染时间 */}
+                {/* Component render time */}
                 {performanceReport?.componentRenderTime && Object.keys(performanceReport.componentRenderTime).length > 0 && (
                   <div>
-                    <h4 className="text-sm font-medium text-gray-900 mb-2">组件渲染时间</h4>
+                    <h4 className="text-sm font-medium text-gray-900 mb-2">Component Render Time</h4>
                     <div className="space-y-1">
                       {Object.entries(performanceReport.componentRenderTime).map(([component, time]) => (
                         <div key={component} className="flex items-center justify-between text-xs">
@@ -174,10 +174,10 @@ const PerformanceMonitor = () => {
                   </div>
                 )}
 
-                {/* API响应时间 */}
+                {/* API response time */}
                 {performanceReport?.apiResponseTime && Object.keys(performanceReport.apiResponseTime).length > 0 && (
                   <div>
-                    <h4 className="text-sm font-medium text-gray-900 mb-2">API响应时间</h4>
+                    <h4 className="text-sm font-medium text-gray-900 mb-2">API Response Time</h4>
                     <div className="space-y-1">
                       {Object.entries(performanceReport.apiResponseTime).map(([api, time]) => (
                         <div key={api} className="flex items-center justify-between text-xs">
@@ -191,14 +191,14 @@ const PerformanceMonitor = () => {
                   </div>
                 )}
 
-                {/* 缓存统计 */}
+                {/* Cache statistics */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
                     <Zap className="h-4 w-4 text-green-600" />
-                    <span className="text-sm text-gray-600">缓存大小</span>
+                    <span className="text-sm text-gray-600">Cache Size</span>
                   </div>
                   <span className="text-sm font-medium">
-                    {performanceReport?.cacheSize || 0} 项
+                    {performanceReport?.cacheSize || 0} items
                   </span>
                 </div>
               </div>
@@ -209,22 +209,22 @@ const PerformanceMonitor = () => {
                 {memoryUsage ? (
                   <>
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-600">已使用内存</span>
+                      <span className="text-sm text-gray-600">Used Memory</span>
                       <span className="text-sm font-medium">{formatBytes(memoryUsage.used)}</span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-600">总内存</span>
+                      <span className="text-sm text-gray-600">Total Memory</span>
                       <span className="text-sm font-medium">{formatBytes(memoryUsage.total)}</span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-600">内存限制</span>
+                      <span className="text-sm text-gray-600">Memory Limit</span>
                       <span className="text-sm font-medium">{formatBytes(memoryUsage.limit)}</span>
                     </div>
                     
-                    {/* 内存使用率 */}
+                    {/* Memory usage rate */}
                     <div>
                       <div className="flex items-center justify-between mb-1">
-                        <span className="text-sm text-gray-600">使用率</span>
+                        <span className="text-sm text-gray-600">Usage Rate</span>
                         <span className="text-sm font-medium">
                           {((memoryUsage.used / memoryUsage.limit) * 100).toFixed(1)}%
                         </span>
@@ -243,7 +243,7 @@ const PerformanceMonitor = () => {
                   </>
                 ) : (
                   <div className="text-center text-gray-500 text-sm">
-                    内存信息不可用
+                    Memory information unavailable
                   </div>
                 )}
               </div>
@@ -261,18 +261,18 @@ const PerformanceMonitor = () => {
                 ) : (
                   <div className="flex items-center space-x-2 p-2 bg-green-50 rounded-lg">
                     <CheckCircle className="h-4 w-4 text-green-600" />
-                    <span className="text-sm text-green-800">性能表现良好，暂无优化建议</span>
+                    <span className="text-sm text-green-800">Performance is good, no optimization suggestions</span>
                   </div>
                 )}
                 
-                {/* 通用优化建议 */}
+                {/* General optimization suggestions */}
                 <div className="mt-4 pt-4 border-t border-gray-200">
-                  <h4 className="text-sm font-medium text-gray-900 mb-2">通用优化建议</h4>
+                  <h4 className="text-sm font-medium text-gray-900 mb-2">General Optimization Tips</h4>
                   <div className="space-y-2 text-xs text-gray-600">
-                    <div>• 使用图片懒加载减少初始加载时间</div>
-                    <div>• 启用缓存机制提高重复访问速度</div>
-                    <div>• 压缩静态资源减少传输时间</div>
-                    <div>• 使用CDN加速资源加载</div>
+                    <div>• Use image lazy loading to reduce initial load time</div>
+                    <div>• Enable caching mechanisms to improve repeat visit speed</div>
+                    <div>• Compress static resources to reduce transfer time</div>
+                    <div>• Use CDN to accelerate resource loading</div>
                   </div>
                 </div>
               </div>

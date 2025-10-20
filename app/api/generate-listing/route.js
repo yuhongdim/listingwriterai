@@ -17,16 +17,16 @@ export async function POST(request) {
       neighborhood = ''
     } = await request.json()
 
-    // 验证必填字段
+    // Validate required fields
     if (!propertyType || !location) {
       return NextResponse.json(
-        { error: '房产类型和位置为必填项' },
+        { error: 'Property type and location are required fields' },
         { status: 400 }
       )
     }
 
     try {
-      // 使用AI客户端生成房源描述
+      // Use AI client to generate listing description
       const result = await aiClient.generateListing({
         propertyType, 
         location, 
@@ -55,8 +55,8 @@ export async function POST(request) {
       })
 
     } catch (apiError) {
-      console.error('AI API调用失败:', apiError)
-      // API失败时返回模拟描述
+      console.error('AI API call failed:', apiError)
+      // Return mock description when API fails
       return generateMockListing({
         propertyType, location, bedrooms, bathrooms, squareFeet, 
         specialFeatures, style, targetAudience, keyFeatures, priceRange, neighborhood
@@ -64,27 +64,27 @@ export async function POST(request) {
     }
 
   } catch (error) {
-    console.error('房源描述生成错误:', error)
+    console.error('Listing description generation error:', error)
     return NextResponse.json(
-      { error: '描述生成失败，请重试' },
+      { error: 'Description generation failed, please try again' },
       { status: 500 }
     )
   }
 }
 
-// 生成模拟房源描述的函数
+// Generate mock listing description function
 function generateMockListing({
   propertyType, location, bedrooms, bathrooms, squareFeet, 
   specialFeatures, style, targetAudience, keyFeatures, priceRange, neighborhood
 }) {
   const mockDescriptions = {
-    apartment: `精美${bedrooms}室${bathrooms}卫公寓，位于${location}黄金地段。面积${squareFeet}平方米，${specialFeatures}。现代化装修，生活便利，交通便捷。`,
-    house: `独栋别墅，${bedrooms}室${bathrooms}卫，坐落于${location}优质社区。建筑面积${squareFeet}平方米，${specialFeatures}。私人花园，停车位充足。`,
-    condo: `豪华公寓，${bedrooms}室${bathrooms}卫，${location}核心位置。面积${squareFeet}平方米，${specialFeatures}。物业管理完善，配套设施齐全。`,
-    townhouse: `联排别墅，${bedrooms}室${bathrooms}卫，位于${location}宁静社区。面积${squareFeet}平方米，${specialFeatures}。独立入户，私密性佳。`
+    apartment: `Beautiful ${bedrooms}-bedroom ${bathrooms}-bathroom apartment located in the prime area of ${location}. ${squareFeet} square feet, featuring ${specialFeatures}. Modern renovation, convenient living, excellent transportation.`,
+    house: `Detached house with ${bedrooms} bedrooms and ${bathrooms} bathrooms, situated in a quality community in ${location}. Building area of ${squareFeet} square feet, featuring ${specialFeatures}. Private garden, ample parking.`,
+    condo: `Luxury condominium with ${bedrooms} bedrooms and ${bathrooms} bathrooms in the core location of ${location}. ${squareFeet} square feet, featuring ${specialFeatures}. Excellent property management, complete facilities.`,
+    townhouse: `Townhouse with ${bedrooms} bedrooms and ${bathrooms} bathrooms, located in a quiet community in ${location}. ${squareFeet} square feet, featuring ${specialFeatures}. Independent entrance, excellent privacy.`
   }
 
-  const description = mockDescriptions[propertyType] || `优质房产，${bedrooms}室${bathrooms}卫，位于${location}。面积${squareFeet}平方米，${specialFeatures}。`
+  const description = mockDescriptions[propertyType] || `Quality property with ${bedrooms} bedrooms and ${bathrooms} bathrooms, located in ${location}. ${squareFeet} square feet, featuring ${specialFeatures}.`
 
   return NextResponse.json({
     success: true,
@@ -99,50 +99,50 @@ function generateMockListing({
   })
 }
 
-// 模拟AI内容生成函数
+// Mock AI content generation function
 async function generateListingContent(prompt, propertyData) {
-  // 这里应该调用实际的AI API（如OpenAI、Claude等）
-  // 现在返回模拟内容
+  // This should call actual AI API (like OpenAI, Claude, etc.)
+  // Now returning mock content
   
   const { propertyType, location, bedrooms, bathrooms, squareFeet, specialFeatures, writingStyle, priceRange, listingType } = propertyData
   
   const templates = {
     'Professional': {
-      title: `精品${propertyType} | ${location}核心地段 | ${bedrooms}室${bathrooms}卫`,
+      title: `Premium ${propertyType} | ${location} Core Area | ${bedrooms}BR ${bathrooms}BA`,
       content: `
-🏡 **房产亮点**
-这套位于${location}的${propertyType}，建筑面积${squareFeet || '宽敞'}平方英尺，${bedrooms}室${bathrooms}卫的合理布局，为您提供舒适的居住体验。
+🏡 **Property Highlights**
+This ${propertyType} located in ${location}, with ${squareFeet || 'spacious'} square feet of living space, features a well-designed ${bedrooms}-bedroom ${bathrooms}-bathroom layout, providing you with a comfortable living experience.
 
-🌟 **核心特色**
-${specialFeatures ? `• ${specialFeatures.split(',').join('\n• ')}` : '• 精装修，拎包入住\n• 采光充足，通风良好\n• 交通便利，配套完善'}
+🌟 **Key Features**
+${specialFeatures ? `• ${specialFeatures.split(',').join('\n• ')}` : '• Premium finishes, move-in ready\n• Abundant natural light, excellent ventilation\n• Convenient transportation, complete amenities'}
 
-📍 **位置优势**
-${location}地段优越，周边配套设施完善，交通便利，是理想的${listingType === 'sale' ? '投资置业' : '租住'}选择。
+📍 **Location Advantages**
+${location} offers a prime location with comprehensive surrounding facilities, convenient transportation, making it an ideal choice for ${listingType === 'sale' ? 'investment and homeownership' : 'rental living'}.
 
-💰 **投资价值**
-${priceRange ? `价格：${priceRange}` : '价格面议'}，性价比极高，升值潜力巨大。
+💰 **Investment Value**
+${priceRange ? `Price: ${priceRange}` : 'Price negotiable'}, excellent value with great appreciation potential.
 
-📞 **联系我们**
-欢迎预约看房，更多详情请联系我们的专业顾问团队。
+📞 **Contact Us**
+Welcome to schedule a viewing. For more details, please contact our professional advisory team.
       `
     },
     'Luxury': {
-      title: `奢华${propertyType} | ${location}顶级社区 | 尊贵生活典范`,
+      title: `Luxury ${propertyType} | ${location} Premium Community | Prestigious Living Standard`,
       content: `
-✨ **奢华典范**
-坐落于${location}的这套顶级${propertyType}，${bedrooms}室${bathrooms}卫的宽敞格局，${squareFeet ? `${squareFeet}平方英尺` : '超大'}的奢华空间，诠释着品质生活的真谛。
+✨ **Luxury Standard**
+This top-tier ${propertyType} situated in ${location}, featuring a spacious ${bedrooms}-bedroom ${bathrooms}-bathroom layout with ${squareFeet ? `${squareFeet} square feet` : 'expansive'} luxury space, epitomizes the essence of quality living.
 
-🏆 **尊贵特色**
-${specialFeatures ? `• ${specialFeatures.split(',').join('\n• ')}` : '• 顶级装修材料，工艺精湛\n• 智能家居系统，科技便捷\n• 私人花园/阳台，景观优美'}
+🏆 **Premium Features**
+${specialFeatures ? `• ${specialFeatures.split(',').join('\n• ')}` : '• Top-grade finishing materials, exquisite craftsmanship\n• Smart home system, technological convenience\n• Private garden/balcony, beautiful views'}
 
-🌆 **黄金地段**
-${location}作为城市核心区域，汇聚了最优质的教育、医疗、购物资源，彰显居住者的尊贵身份。
+🌆 **Prime Location**
+${location} as the city's core area, brings together the finest educational, medical, and shopping resources, showcasing the prestigious status of residents.
 
-💎 **稀缺价值**
-${priceRange ? `售价：${priceRange}` : '价格私洽'}，限量珍藏，机不可失。
+💎 **Exclusive Value**
+${priceRange ? `Price: ${priceRange}` : 'Price upon inquiry'}, limited collection, opportunity not to be missed.
 
-🤝 **专属服务**
-提供VIP看房服务，专业置业顾问全程陪同，为您量身定制置业方案。
+🤝 **Exclusive Service**
+VIP viewing service provided, professional real estate consultants accompany throughout, customizing property solutions for you.
       `
     }
   }
@@ -152,15 +152,15 @@ ${priceRange ? `售价：${priceRange}` : '价格私洽'}，限量珍藏，机�
   return `${template.title}\n\n${template.content.trim()}`
 }
 
-// GET方法用于获取API信息
+// GET method for API information
 export async function GET() {
   return NextResponse.json({
-    name: '房源文案生成API',
+    name: 'Property Listing Generation API',
     version: '1.0.0',
-    description: '根据房产信息生成专业的营销文案',
+    description: 'Generate professional marketing copy based on property information',
     endpoints: {
       POST: {
-        description: '生成房源文案',
+        description: 'Generate property listing copy',
         parameters: {
           required: ['propertyType', 'location'],
           optional: ['bedrooms', 'bathrooms', 'squareFeet', 'specialFeatures', 'writingStyle', 'contentLength', 'targetKeywords', 'priceRange', 'yearBuilt', 'listingType']

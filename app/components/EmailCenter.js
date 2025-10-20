@@ -159,17 +159,22 @@ const EmailCenter = ({ usageCount, setUsageCount }) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          templateId,
-          propertyData,
-          recipientGroup: selectedGroup
+          templateType: templateId,
+          agentName: 'Real Estate Agent',
+          agencyName: 'Premium Properties',
+          propertyInfo: propertyData,
+          tone: 'professional',
+          includeSignature: true,
+          callToAction: 'Contact us for more details',
+          subject: `Email about ${templateId}`
         })
       })
 
       const data = await response.json()
 
       if (data.success) {
-        setEmailSubject(data.subject)
-        setEmailContent(data.content)
+        setEmailSubject(data.template.subject)
+        setEmailContent(data.template.body)
         
         // Update usage count
         const newCount = usageTracker.incrementUsage()
@@ -736,8 +741,8 @@ const EmailCenter = ({ usageCount, setUsageCount }) => {
         ) : (
           <div className="text-center py-8">
             <Users size={48} className="text-gray-300 mx-auto mb-4" />
-            <p className="text-gray-500">暂无联系人</p>
-            <p className="text-sm text-gray-400 mt-1">请导入CSV文件添加联系人</p>
+            <p className="text-gray-500">No contacts yet</p>
+            <p className="text-sm text-gray-400 mt-1">Please import CSV file to add contacts</p>
           </div>
         )}
       </div>
@@ -747,11 +752,11 @@ const EmailCenter = ({ usageCount, setUsageCount }) => {
   const renderCampaignsSection = () => (
     <div className="space-y-6">
       <div className="bg-white rounded-xl p-6 border border-gray-200">
-        <h3 className="text-lg font-semibold mb-4">邮件活动</h3>
+        <h3 className="text-lg font-semibold mb-4">Email Campaigns</h3>
         <div className="text-center py-8">
           <Mail size={48} className="text-gray-300 mx-auto mb-4" />
-          <p className="text-gray-500">暂无邮件活动</p>
-          <p className="text-sm text-gray-400 mt-1">发送邮件后，活动记录将显示在这里</p>
+          <p className="text-gray-500">No email campaigns yet</p>
+          <p className="text-sm text-gray-400 mt-1">Campaign records will appear here after sending emails</p>
         </div>
       </div>
     </div>
@@ -762,59 +767,59 @@ const EmailCenter = ({ usageCount, setUsageCount }) => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-white rounded-xl p-6 border border-gray-200">
           <div className="flex items-center justify-between mb-4">
-            <h4 className="font-semibold text-gray-900">发送总数</h4>
+            <h4 className="font-semibold text-gray-900">Total Sent</h4>
             <Send size={20} className="text-blue-500" />
           </div>
           <p className="text-2xl font-bold text-gray-900">{stats.emailsSent}</p>
-          <p className="text-sm text-gray-500">本月发送</p>
+          <p className="text-sm text-gray-500">Sent this month</p>
         </div>
         
         <div className="bg-white rounded-xl p-6 border border-gray-200">
           <div className="flex items-center justify-between mb-4">
-            <h4 className="font-semibold text-gray-900">打开率</h4>
+            <h4 className="font-semibold text-gray-900">Open Rate</h4>
             <Eye size={20} className="text-green-500" />
           </div>
           <p className="text-2xl font-bold text-gray-900">{stats.openRate}%</p>
-          <p className="text-sm text-gray-500">平均打开率</p>
+          <p className="text-sm text-gray-500">Average open rate</p>
         </div>
         
         <div className="bg-white rounded-xl p-6 border border-gray-200">
           <div className="flex items-center justify-between mb-4">
-            <h4 className="font-semibold text-gray-900">点击率</h4>
+            <h4 className="font-semibold text-gray-900">Click Rate</h4>
             <MousePointer size={20} className="text-purple-500" />
           </div>
           <p className="text-2xl font-bold text-gray-900">{stats.clickRate}%</p>
-          <p className="text-sm text-gray-500">平均点击率</p>
+          <p className="text-sm text-gray-500">Average click rate</p>
         </div>
       </div>
       
       <div className="bg-white rounded-xl p-6 border border-gray-200">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold">邮件追踪</h3>
+          <h3 className="text-lg font-semibold">Email Tracking</h3>
           {stats.emailsSent > 0 && (
             <div className="relative group">
               <button className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center space-x-2">
                 <Download size={16} />
-                <span>导出统计</span>
+                <span>Export Statistics</span>
               </button>
               <div className="absolute right-0 mt-2 w-32 bg-white border border-gray-200 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10">
                 <button 
                   onClick={() => exportStats('csv')}
                   className="w-full px-4 py-2 text-left hover:bg-gray-50 rounded-t-lg"
                 >
-                  导出CSV
+                  Export CSV
                 </button>
                 <button 
                   onClick={() => exportStats('pdf')}
                   className="w-full px-4 py-2 text-left hover:bg-gray-50"
                 >
-                  导出PDF
+                  Export PDF
                 </button>
                 <button 
                   onClick={() => exportStats('txt')}
                   className="w-full px-4 py-2 text-left hover:bg-gray-50 rounded-b-lg"
                 >
-                  导出TXT
+                  Export TXT
                 </button>
               </div>
             </div>
@@ -823,17 +828,17 @@ const EmailCenter = ({ usageCount, setUsageCount }) => {
         {stats.emailsSent > 0 ? (
           <div className="space-y-4">
             <div className="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
-              <span className="font-medium">总发送量</span>
+              <span className="font-medium">Total Sent</span>
               <span className="text-blue-600 font-semibold">{stats.emailsSent}</span>
             </div>
             <div className="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
-              <span className="font-medium">预估打开数</span>
+              <span className="font-medium">Estimated Opens</span>
               <span className="text-green-600 font-semibold">
                 {Math.floor(stats.emailsSent * stats.openRate / 100)}
               </span>
             </div>
             <div className="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
-              <span className="font-medium">预估点击数</span>
+              <span className="font-medium">Estimated Clicks</span>
               <span className="text-purple-600 font-semibold">
                 {Math.floor(stats.emailsSent * stats.clickRate / 100)}
               </span>
@@ -842,8 +847,8 @@ const EmailCenter = ({ usageCount, setUsageCount }) => {
         ) : (
           <div className="text-center py-8">
             <Eye size={48} className="text-gray-300 mx-auto mb-4" />
-            <p className="text-gray-500">暂无数据</p>
-            <p className="text-sm text-gray-400 mt-1">发送邮件后，数据将显示在这里</p>
+            <p className="text-gray-500">No data yet</p>
+            <p className="text-sm text-gray-400 mt-1">Data will appear here after sending emails</p>
           </div>
         )}
       </div>
@@ -854,8 +859,8 @@ const EmailCenter = ({ usageCount, setUsageCount }) => {
     <div className="p-6">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">邮件营销中心</h1>
-        <p className="text-gray-600">批量发送房源信息，追踪邮件效果</p>
+        <h1 className="text-2xl font-bold text-gray-900 mb-2">Email Marketing Center</h1>
+        <p className="text-gray-600">Send property information in bulk and track email performance</p>
       </div>
 
       {/* Navigation Tabs */}

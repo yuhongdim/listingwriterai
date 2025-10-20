@@ -19,14 +19,15 @@ import {
   Heart,
   MessageCircle,
   Repeat2,
-  BarChart3
+  BarChart3,
+  Home
 } from 'lucide-react'
 import usageTracker from '../utils/usageTracker'
 import errorHandler from '../utils/errorHandler'
 import LoadingSpinner, { ContentGeneratingLoader, ApiLoadingSpinner } from './LoadingSpinner'
 import { useToast } from './Toast'
 
-const SocialMediaGenerator = ({ usageCount, setUsageCount }) => {
+const SocialMediaGenerator = ({ usageCount, setUsageCount, setCurrentPage }) => {
   // Toast hook
   const { success, error, warning, info } = useToast()
   
@@ -125,22 +126,39 @@ const SocialMediaGenerator = ({ usageCount, setUsageCount }) => {
   }
 
   const validateForm = () => {
-    return formData.propertyType && formData.location && formData.keyFeatures && selectedPlatforms.length > 0
+    const isValid = formData.propertyType && 
+                   formData.location && 
+                   formData.keyFeatures && 
+                   selectedPlatforms.length > 0
+    
+    console.log('Form validation result:', {
+      propertyType: formData.propertyType,
+      location: formData.location,
+      keyFeatures: formData.keyFeatures,
+      selectedPlatforms: selectedPlatforms,
+      isValid: isValid
+    })
+    
+    return isValid
   }
 
   const generateContent = async () => {
     if (!validateForm()) {
-      warning('表单验证', '请填写所有必填字段并选择至少一个平台')
+      alert('Please fill in all required fields and select at least one platform')
       return
     }
 
-    if (!usageTracker.canUse()) {
-      const resetTime = usageTracker.formatTimeUntilReset()
-      warning('使用限制', `您已达到今日免费使用限制（3次）。${resetTime}`)
+    if (usageCount >= 3) {
+      alert('You have reached today\'s free usage limit (3 times)')
       return
     }
+
+    console.log('Generate button clicked')
+    console.log('Current form data:', formData)
+    console.log('Selected platforms:', selectedPlatforms)
 
     setIsLoading(true)
+    console.log('Starting content generation...')
 
     try {
       // 调用真实的API端点
@@ -183,28 +201,28 @@ const SocialMediaGenerator = ({ usageCount, setUsageCount }) => {
           }
         })
         
-        setGeneratedContent(platformContent)
+        setGeneratedContent({ platforms: platformContent, metadata: { targetAudience: formData.targetAudience, contentGoal: formData.contentGoal, tone: formData.tone } })
         const newCount = usageTracker.incrementUsage()
         setUsageCount(newCount)
         
-        success('内容生成成功', '社交媒体内容已成功生成！')
+        success('Content generated successfully', 'Social media content has been successfully generated!')
       } else {
-        throw new Error('API返回空内容')
+        throw new Error('API returned empty content')
       }
 
     } catch (err) {
       console.error('Generation Error:', err)
       
       // 如果API失败，使用模拟内容作为后备
-      warning('API调用失败', '使用模拟内容作为后备')
+      warning('API call failed', 'Using mock content as fallback')
       const mockContent = generateMockContent(formData, selectedPlatforms)
-      setGeneratedContent(mockContent)
+      setGeneratedContent({ platforms: mockContent, metadata: { targetAudience: formData.targetAudience, contentGoal: formData.contentGoal, tone: formData.tone } })
       const newCount = usageTracker.incrementUsage()
       setUsageCount(newCount)
       
       // 使用错误处理器
       const { userMessage } = errorHandler.handleApiError(err, false)
-      error('生成失败', userMessage)
+      error('Generation failed', userMessage)
     } finally {
       setIsLoading(false)
     }
@@ -221,7 +239,7 @@ const SocialMediaGenerator = ({ usageCount, setUsageCount }) => {
 
     const platformContent = {}
 
-    platforms.forEach(platformId => {
+    selectedPlatforms.forEach(platformId => {
       const platform = platforms.find(p => p.id === platformId)
       
       switch (platformId) {
@@ -260,15 +278,7 @@ const SocialMediaGenerator = ({ usageCount, setUsageCount }) => {
       }
     })
 
-    return {
-      platforms: platformContent,
-      metadata: {
-        generatedAt: new Date().toISOString(),
-        targetAudience: baseContent.audience,
-        contentGoal: baseContent.goal,
-        tone: baseContent.tone
-      }
-    }
+    return platformContent
   }
 
   const generateFacebookContent = (base, data) => {
@@ -430,7 +440,7 @@ Perfect for ${base.audience.toLowerCase()}!
   // 调度发布
   const schedulePost = (platform, content) => {
     if (!postSchedule.date || !postSchedule.time) {
-      warning('调度设置', '请设置发布日期和时间')
+      warning('Schedule settings', 'Please set publish date and time')
       return
     }
 
@@ -442,16 +452,16 @@ Perfect for ${base.audience.toLowerCase()}!
       status: 'scheduled'
     }
     setScheduledPosts(prev => [...prev, newScheduledPost])
-    info('调度成功', '帖子已成功添加到发布计划')
+    info('Schedule successful', 'Post has been successfully added to publish schedule')
   }
 
   const copyToClipboard = async (text, platform) => {
     try {
       await navigator.clipboard.writeText(text)
-      success('复制成功', `${platform} 内容已复制到剪贴板`)
+      success('Copy successful', `${platform} content has been copied to clipboard`)
     } catch (err) {
       console.error('Failed to copy text: ', err)
-      error('复制失败', '无法复制到剪贴板，请手动复制')
+      error('Copy failed', 'Unable to copy to clipboard, please copy manually')
     }
   }
 
@@ -633,8 +643,22 @@ Perfect for ${base.audience.toLowerCase()}!
   return (
     <div className="p-6 max-w-4xl mx-auto">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Social Media Content Generator</h1>
-        <p className="text-gray-600">Create platform-optimized content for Facebook, Instagram, LinkedIn, and Twitter</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Social Media Content Generator</h1>
+            <p className="text-gray-600">Create platform-optimized content for Facebook, Instagram, LinkedIn, and Twitter</p>
+          </div>
+          <button
+            onClick={() => {
+              console.log('Clicked return button, navigating to dashboard')
+              setCurrentPage('dashboard')
+            }}
+            className="flex items-center space-x-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+          >
+            <Home size={20} />
+            <span>Back to Home</span>
+          </button>
+        </div>
       </div>
 
       <div className="bg-white rounded-2xl shadow-lg p-8">
@@ -892,19 +916,33 @@ Perfect for ${base.audience.toLowerCase()}!
 
           {/* Generate Button */}
           <button
-            onClick={generateContent}
+            onClick={(e) => {
+              e.preventDefault()
+              console.log('Button was clicked')
+              console.log('Button status check:', {
+                validateForm: validateForm(),
+                isLoading: isLoading,
+                usageCount: usageCount,
+                disabled: !validateForm() || isLoading || usageCount >= 3
+              })
+              generateContent()
+            }}
             disabled={!validateForm() || isLoading || usageCount >= 3}
-            className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-4 px-6 rounded-xl font-semibold text-lg hover:shadow-lg transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center space-x-2"
+            className={`w-full py-4 px-6 rounded-xl font-semibold text-lg transition-all duration-200 flex items-center justify-center space-x-2 ${
+              (!validateForm() || isLoading || usageCount >= 3) 
+                ? 'bg-gray-400 text-gray-600 cursor-not-allowed opacity-50' 
+                : 'bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:shadow-lg transform hover:scale-105 cursor-pointer'
+            }`}
           >
             {isLoading ? (
               <>
                 <ApiLoadingSpinner />
-                <span>正在生成内容...</span>
+                <span>Generating content...</span>
               </>
             ) : (
               <>
                 <Sparkles className="h-5 w-5" />
-                <span>生成社交媒体内容</span>
+                <span>Generate Social Media Content</span>
               </>
             )}
           </button>

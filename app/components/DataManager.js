@@ -110,13 +110,13 @@ const DataManager = ({ isOpen, onClose, onContentSelect }) => {
 
   const handleSaveTemplate = async () => {
     if (!newTemplate.name || !newTemplate.content) {
-      warning('请填写模板名称和内容')
+      warning('Please fill in template name and content')
       return
     }
 
     const result = await saveTemplate(newTemplate)
     if (result) {
-      success('模板保存成功')
+      success('Template saved successfully')
       setNewTemplate({
         name: '',
         description: '',
@@ -124,38 +124,38 @@ const DataManager = ({ isOpen, onClose, onContentSelect }) => {
         category: 'listing'
       })
     } else {
-      error('模板保存失败')
+      error('Template save failed')
     }
   }
 
   const handleDeleteTemplate = async (templateId) => {
-    if (!confirm('确定要删除这个模板吗？')) return
+    if (!confirm('Are you sure you want to delete this template?')) return
 
     const result = await deleteTemplate(templateId)
     if (result) {
-      success('模板删除成功')
+      success('Template deleted successfully')
     } else {
-      error('模板删除失败')
+      error('Failed to delete template')
     }
   }
 
   const handleCopyContent = async (content) => {
     try {
       await navigator.clipboard.writeText(content)
-      success('内容已复制到剪贴板')
+      success('Content copied to clipboard')
     } catch (err) {
-      error('复制失败')
+      error('Failed to copy')
     }
   }
 
   const handleSync = async () => {
     await syncData()
-    success('数据同步完成')
+    success('Data sync completed')
   }
 
   const handleCleanup = () => {
     cleanup()
-    success('过期数据清理完成')
+    success('Expired data cleanup completed')
   }
 
   const filteredHistory = history.filter(item =>
@@ -173,8 +173,8 @@ const DataManager = ({ isOpen, onClose, onContentSelect }) => {
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">数据管理中心</h2>
-            <p className="text-gray-500 mt-1">管理您的内容历史、模板和数据同步</p>
+            <h2 className="text-2xl font-bold text-gray-900">Data Management Center</h2>
+            <p className="text-gray-500 mt-1">Manage your content history, templates and data sync</p>
           </div>
           <button
             onClick={onClose}
@@ -358,7 +358,7 @@ const DataManager = ({ isOpen, onClose, onContentSelect }) => {
               <div className="w-1/2 flex flex-col">
                 <div className="p-6 border-b border-gray-200">
                   <h3 className="text-lg font-semibold">
-                    {editingTemplate ? '编辑模板' : '新建模板'}
+                    {editingTemplate ? 'Edit Template' : 'New Template'}
                   </h3>
                 </div>
 
@@ -366,7 +366,7 @@ const DataManager = ({ isOpen, onClose, onContentSelect }) => {
                   <div className="space-y-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        模板名称
+                        Template Name
                       </label>
                       <input
                         type="text"
@@ -446,7 +446,7 @@ const DataManager = ({ isOpen, onClose, onContentSelect }) => {
                     <div className="flex items-center space-x-3">
                       <button
                         onClick={editingTemplate ? () => {
-                          // 更新现有模板的逻辑
+                          // Update existing template logic
                           handleSaveTemplate()
                           setEditingTemplate(null)
                         } : handleSaveTemplate}
@@ -477,9 +477,9 @@ const DataManager = ({ isOpen, onClose, onContentSelect }) => {
               <div className="max-w-2xl mx-auto">
                 <div className="text-center mb-8">
                   <Cloud className="h-16 w-16 text-blue-500 mx-auto mb-4" />
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">数据同步</h3>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">Data Sync</h3>
                   <p className="text-gray-500">
-                    在多个设备间同步您的数据，确保数据安全和一致性
+                    Sync your data across multiple devices to ensure data security and consistency
                   </p>
                 </div>
 
@@ -487,26 +487,26 @@ const DataManager = ({ isOpen, onClose, onContentSelect }) => {
                   {/* Sync Status */}
                   <div className="bg-gray-50 rounded-lg p-6">
                     <div className="flex items-center justify-between mb-4">
-                      <h4 className="text-lg font-semibold">同步状态</h4>
+                      <h4 className="text-lg font-semibold">Sync Status</h4>
                       <div className={`px-3 py-1 rounded-full text-sm ${
                         navigator.onLine 
                           ? 'bg-green-100 text-green-800' 
                           : 'bg-red-100 text-red-800'
                       }`}>
-                        {navigator.onLine ? '在线' : '离线'}
+                        {navigator.onLine ? 'Online' : 'Offline'}
                       </div>
                     </div>
                     
                     <div className="space-y-3">
                       <div className="flex justify-between">
-                        <span className="text-gray-600">上次同步时间</span>
+                        <span className="text-gray-600">Last Sync Time</span>
                         <span className="text-gray-900">
-                          {lastSync ? lastSync.toLocaleString() : '从未同步'}
+                          {lastSync ? lastSync.toLocaleString() : 'Never synced'}
                         </span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-600">待同步项目</span>
-                        <span className="text-gray-900">{stats.syncQueueLength} 项</span>
+                        <span className="text-gray-600">Pending Sync Items</span>
+                        <span className="text-gray-900">{stats.syncQueueLength} items</span>
                       </div>
                     </div>
                   </div>
@@ -519,7 +519,7 @@ const DataManager = ({ isOpen, onClose, onContentSelect }) => {
                       className="w-full flex items-center justify-center space-x-2 px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     >
                       <RefreshCw className={`h-5 w-5 ${syncing ? 'animate-spin' : ''}`} />
-                      <span>{syncing ? '同步中...' : '立即同步'}</span>
+                      <span>{syncing ? 'Syncing...' : 'Sync Now'}</span>
                     </button>
 
                     <div className="grid grid-cols-2 gap-4">
@@ -529,7 +529,7 @@ const DataManager = ({ isOpen, onClose, onContentSelect }) => {
                         className="flex items-center justify-center space-x-2 px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                       >
                         <Download className="h-5 w-5" />
-                        <span>{exporting ? '导出中...' : '导出数据'}</span>
+                        <span>{exporting ? 'Exporting...' : 'Export Data'}</span>
                       </button>
 
                       <button
@@ -538,7 +538,7 @@ const DataManager = ({ isOpen, onClose, onContentSelect }) => {
                         className="flex items-center justify-center space-x-2 px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                       >
                         <Upload className="h-5 w-5" />
-                        <span>{importing ? '导入中...' : '导入数据'}</span>
+                        <span>{importing ? 'Importing...' : 'Import Data'}</span>
                       </button>
                     </div>
 
@@ -561,28 +561,28 @@ const DataManager = ({ isOpen, onClose, onContentSelect }) => {
               <div className="max-w-2xl mx-auto">
                 <div className="text-center mb-8">
                   <Database className="h-16 w-16 text-purple-500 mx-auto mb-4" />
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">存储管理</h3>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">Storage Management</h3>
                   <p className="text-gray-500">
-                    查看和管理您的本地存储使用情况
+                    View and manage your local storage usage
                   </p>
                 </div>
 
                 <div className="space-y-6">
                   {/* Storage Stats */}
                   <div className="bg-gray-50 rounded-lg p-6">
-                    <h4 className="text-lg font-semibold mb-4">存储统计</h4>
+                    <h4 className="text-lg font-semibold mb-4">Storage Statistics</h4>
                     <div className="grid grid-cols-2 gap-4">
                       <div className="text-center">
                         <div className="text-2xl font-bold text-blue-600">
                           {stats.itemCount}
                         </div>
-                        <div className="text-sm text-gray-500">存储项目</div>
+                        <div className="text-sm text-gray-500">Stored Items</div>
                       </div>
                       <div className="text-center">
                         <div className="text-2xl font-bold text-purple-600">
                           {stats.formattedSize}
                         </div>
-                        <div className="text-sm text-gray-500">占用空间</div>
+                        <div className="text-sm text-gray-500">Space Used</div>
                       </div>
                     </div>
                   </div>
@@ -594,12 +594,12 @@ const DataManager = ({ isOpen, onClose, onContentSelect }) => {
                       className="w-full flex items-center justify-center space-x-2 px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
                     >
                       <Trash2 className="h-5 w-5" />
-                      <span>清理过期数据</span>
+                      <span>Clean Expired Data</span>
                     </button>
 
                     <div className="text-center text-sm text-gray-500">
-                      <p>清理操作将删除30天前的过期数据</p>
-                      <p>重要数据请及时导出备份</p>
+                      <p>Cleanup will delete expired data older than 30 days</p>
+                      <p>Please export important data for backup</p>
                     </div>
                   </div>
                 </div>

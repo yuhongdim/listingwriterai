@@ -22,9 +22,14 @@ import Dashboard from './Dashboard'
 import EmailCenter from './EmailCenter'
 import VideoScript from './VideoScript'
 import SocialMediaGenerator from './SocialMediaGenerator'
+import BlogManager from './BlogManager'
+import BlogPublic from './BlogPublic'
 import Pricing from './Pricing'
 import LandingPage from './LandingPage'
 import Analytics from './Analytics'
+import UpgradePrompt from './UpgradePrompt'
+import UserProfile from './UserProfile'
+import Settings from './Settings'
 import usageTracker from '../utils/usageTracker'
 import { ToastContainer, useToast } from './Toast'
 import errorHandler from '../utils/errorHandler'
@@ -32,16 +37,31 @@ import PerformanceMonitor from './PerformanceMonitor'
 import { useAuth } from '../hooks/useAuth'
 import DataManager from './DataManager'
 
-export default function AppContent() {
+export default function AppContent({ initialPage = 'dashboard' }) {
   // Auth hook
-  const { user, isAuthenticated, updateUsage } = useAuth()
+  const { 
+    user, 
+    isAuthenticated, 
+    isTrialMode, 
+    updateUsage, 
+    getTrialUsage, 
+    updateTrialUsage, 
+    isTrialExpired 
+  } = useAuth()
   
   // Toast hook - now can be used inside ToastProvider
   const { success, error, warning, info } = useToast()
   
-  const [currentPage, setCurrentPage] = useState('create')
+  const [currentPage, setCurrentPage] = useState(initialPage || 'landing')
+  
+  // 添加调试信息的setCurrentPage函数
+  const handleSetCurrentPage = (page) => {
+    console.log(`页面跳转: ${currentPage} -> ${page}`)
+    setCurrentPage(page)
+  }
   const [isLoading, setIsLoading] = useState(false)
   const [formData, setFormData] = useState({
+    title: '',
     propertyType: '',
     bedrooms: '',
     bathrooms: '',
@@ -59,11 +79,16 @@ export default function AppContent() {
   const [usageCount, setUsageCount] = useState(0)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [showDataManager, setShowDataManager] = useState(false)
+  const [showUpgradePrompt, setShowUpgradePrompt] = useState(false)
 
   // Initialize usage count with useEffect
   useEffect(() => {
-    setUsageCount(usageTracker.getCurrentCount())
-  }, [])
+    if (isTrialMode) {
+      setUsageCount(getTrialUsage())
+    } else {
+      setUsageCount(usageTracker.getCurrentCount())
+    }
+  }, [isTrialMode, getTrialUsage])
 
   const handleInputChange = (field, value) => {
     setFormData(prev => ({
@@ -73,13 +98,19 @@ export default function AppContent() {
   }
 
   const validateForm = () => {
-    const required = ['propertyType', 'bedrooms', 'bathrooms', 'squareFeet', 'location']
-    return required.every(field => formData[field].trim() !== '')
+    const required = ['title', 'propertyType', 'squareFeet', 'location']
+    return required.every(field => formData[field] && formData[field].trim() !== '')
   }
 
   const handleGenerate = async () => {
     if (!validateForm()) {
       error('Please fill in all required fields')
+      return
+    }
+
+    // Check if trial mode has expired
+    if (isTrialMode && isTrialExpired()) {
+      setShowUpgradePrompt(true)
       return
     }
 
@@ -103,12 +134,24 @@ export default function AppContent() {
       
       if (data.content) {
         setGeneratedContent(data.content)
-        const newCount = usageTracker.incrementUsage()
-        setUsageCount(newCount)
         
-        // 更新用户使用量（如果已登录）
-        if (isAuthenticated) {
-          updateUsage()
+        // Update usage count
+        if (isTrialMode) {
+          const newTrialUsage = updateTrialUsage()
+          setUsageCount(newTrialUsage)
+          
+          // Check if approaching limit
+          if (newTrialUsage >= 2) { // Remind after 2nd use
+            info('Trial Reminder', `You have ${3 - newTrialUsage} free uses remaining`)
+          }
+        } else {
+          const newCount = usageTracker.incrementUsage()
+          setUsageCount(newCount)
+          
+          // Update user usage (if logged in)
+          if (isAuthenticated) {
+            updateUsage()
+          }
         }
         
         success('Content generated successfully!')
@@ -193,9 +236,18 @@ export default function AppContent() {
   const renderCurrentPage = () => {
     switch (currentPage) {
       case 'landing':
-        return <LandingPage onGetStarted={() => setCurrentPage('dashboard')} />
+        return <LandingPage onGetStarted={() => handleSetCurrentPage('dashboard')} setCurrentPage={handleSetCurrentPage} />
       case 'dashboard':
-        return <Dashboard usageCount={usageCount} setCurrentPage={setCurrentPage} />
+        return (
+          <Dashboard 
+            usageCount={usageCount} 
+            setCurrentPage={handleSetCurrentPage}
+            handleGenerate={handleGenerate}
+            isLoading={isLoading}
+            formData={formData}
+            handleInputChange={handleInputChange}
+          />
+        )
       case 'create':
         return (
           <CreateListing 
@@ -218,13 +270,21 @@ export default function AppContent() {
       case 'video':
         return <VideoScript usageCount={usageCount} setUsageCount={setUsageCount} />
       case 'social':
-        return <SocialMediaGenerator usageCount={usageCount} setUsageCount={setUsageCount} />
+        return <SocialMediaGenerator usageCount={usageCount} setUsageCount={setUsageCount} setCurrentPage={handleSetCurrentPage} />
+      case 'blog':
+        return <BlogManager usageCount={usageCount} setUsageCount={setUsageCount} />
+      case 'blog-public':
+        return <BlogPublic />
       case 'analytics':
-        return <Analytics setCurrentPage={setCurrentPage} />
+        return <Analytics setCurrentPage={handleSetCurrentPage} />
       case 'pricing':
         return <Pricing />
+      case 'profile':
+        return <UserProfile isOpen={true} onClose={() => handleSetCurrentPage('dashboard')} />
+      case 'settings':
+        return <Settings />
       default:
-        return <LandingPage onGetStarted={() => setCurrentPage('dashboard')} />
+        return <LandingPage onGetStarted={() => handleSetCurrentPage('dashboard')} setCurrentPage={handleSetCurrentPage} />
     }
   }
 
@@ -235,7 +295,7 @@ export default function AppContent() {
         {currentPage !== 'landing' && (
           <Sidebar 
             currentPage={currentPage}
-            setCurrentPage={setCurrentPage}
+            setCurrentPage={handleSetCurrentPage}
             usageCount={usageCount}
             collapsed={sidebarCollapsed}
             setCollapsed={setSidebarCollapsed}
@@ -264,6 +324,18 @@ export default function AppContent() {
           success('Content loaded')
         }}
       />
+      
+      {/* Upgrade Prompt */}
+      {showUpgradePrompt && (
+        <UpgradePrompt
+          onClose={() => setShowUpgradePrompt(false)}
+          onUpgrade={(plan) => {
+            setShowUpgradePrompt(false)
+            setCurrentPage('pricing')
+            success('升级成功', `欢迎使用${plan}版本！`)
+          }}
+        />
+      )}
     </>
   )
 }

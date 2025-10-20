@@ -1,4 +1,4 @@
-// 性能优化工具类
+// Performance optimization utility class
 class PerformanceOptimizer {
   constructor() {
     this.metrics = {
@@ -14,7 +14,7 @@ class PerformanceOptimizer {
     this.throttleTimers = new Map()
   }
 
-  // 测量页面加载时间
+  // Measure page load time
   measurePageLoad() {
     if (typeof window !== 'undefined' && window.performance) {
       const navigation = performance.getEntriesByType('navigation')[0]
@@ -25,7 +25,7 @@ class PerformanceOptimizer {
     }
   }
 
-  // 测量组件渲染时间
+  // Measure component render time
   measureComponentRender(componentName, renderFunction) {
     const startTime = performance.now()
     const result = renderFunction()
@@ -40,7 +40,7 @@ class PerformanceOptimizer {
     return result
   }
 
-  // 测量API响应时间
+  // Measure API response time
   async measureApiCall(apiName, apiFunction) {
     const startTime = performance.now()
     
@@ -62,9 +62,9 @@ class PerformanceOptimizer {
     }
   }
 
-  // 缓存管理
-  setCache(key, value, ttl = 300000) { // 默认5分钟TTL
-    // 如果缓存已满，删除最旧的条目
+  // Cache management
+  setCache(key, value, ttl = 300000) { // Default 5 minutes TTL
+    // If cache is full, delete oldest entry
     if (this.cache.size >= this.maxCacheSize) {
       const firstKey = this.cache.keys().next().value
       this.cache.delete(firstKey)
@@ -84,7 +84,7 @@ class PerformanceOptimizer {
       return null
     }
 
-    // 检查是否过期
+    // Check if expired
     if (Date.now() - cached.timestamp > cached.ttl) {
       this.cache.delete(key)
       return null
@@ -97,15 +97,15 @@ class PerformanceOptimizer {
     this.cache.clear()
   }
 
-  // 防抖函数
+  // Debounce function
   debounce(key, func, delay = 300) {
     return (...args) => {
-      // 清除之前的定时器
+      // Clear previous timer
       if (this.debounceTimers.has(key)) {
         clearTimeout(this.debounceTimers.get(key))
       }
 
-      // 设置新的定时器
+      // Set new timer
       const timer = setTimeout(() => {
         func.apply(this, args)
         this.debounceTimers.delete(key)
@@ -115,7 +115,7 @@ class PerformanceOptimizer {
     }
   }
 
-  // 节流函数
+  // Throttle function
   throttle(key, func, delay = 300) {
     return (...args) => {
       if (this.throttleTimers.has(key)) {
@@ -132,7 +132,7 @@ class PerformanceOptimizer {
     }
   }
 
-  // 懒加载图片
+  // Lazy load images
   lazyLoadImage(img, src) {
     if ('IntersectionObserver' in window) {
       const observer = new IntersectionObserver((entries) => {
@@ -148,12 +148,12 @@ class PerformanceOptimizer {
 
       observer.observe(img)
     } else {
-      // 降级处理
+      // Fallback handling
       img.src = src
     }
   }
 
-  // 预加载关键资源
+  // Preload critical resources
   preloadResource(url, type = 'fetch') {
     if (typeof window !== 'undefined') {
       const link = document.createElement('link')
@@ -179,7 +179,7 @@ class PerformanceOptimizer {
     }
   }
 
-  // 内存使用监控
+  // Memory usage monitoring
   monitorMemoryUsage() {
     if (typeof window !== 'undefined' && window.performance && window.performance.memory) {
       const memory = window.performance.memory
@@ -189,7 +189,7 @@ class PerformanceOptimizer {
         limit: memory.jsHeapSizeLimit
       }
 
-      // 如果内存使用超过80%，发出警告
+      // Warn if memory usage exceeds 80%
       const usagePercent = (memory.usedJSHeapSize / memory.jsHeapSizeLimit) * 100
       if (usagePercent > 80) {
         console.warn(`High memory usage: ${usagePercent.toFixed(2)}%`)
@@ -200,7 +200,7 @@ class PerformanceOptimizer {
     return null
   }
 
-  // 批量处理
+  // Batch processing
   batchProcess(items, batchSize = 10, processFn, delay = 0) {
     return new Promise((resolve) => {
       const results = []
@@ -230,7 +230,7 @@ class PerformanceOptimizer {
     })
   }
 
-  // 虚拟滚动优化
+  // Virtual scrolling optimization
   createVirtualScroller(container, items, itemHeight, renderItem) {
     const containerHeight = container.clientHeight
     const visibleCount = Math.ceil(containerHeight / itemHeight) + 2
@@ -240,21 +240,21 @@ class PerformanceOptimizer {
       const startIndex = Math.floor(scrollTop / itemHeight)
       const endIndex = Math.min(startIndex + visibleCount, items.length)
       
-      // 清空容器
+      // Clear container
       container.innerHTML = ''
       
-      // 创建占位符
+      // Create top spacer
       const spacerTop = document.createElement('div')
       spacerTop.style.height = `${startIndex * itemHeight}px`
       container.appendChild(spacerTop)
       
-      // 渲染可见项目
+      // Render visible items
       for (let i = startIndex; i < endIndex; i++) {
         const element = renderItem(items[i], i)
         container.appendChild(element)
       }
       
-      // 创建底部占位符
+      // Create bottom spacer
       const spacerBottom = document.createElement('div')
       spacerBottom.style.height = `${(items.length - endIndex) * itemHeight}px`
       container.appendChild(spacerBottom)
@@ -268,7 +268,7 @@ class PerformanceOptimizer {
     updateVisibleItems()
   }
 
-  // 代码分割和动态导入 - 暂时禁用以避免构建错误
+  // Code splitting and dynamic imports - temporarily disabled to avoid build errors
   async loadComponent(componentPath) {
     const cacheKey = `component_${componentPath}`
     const cached = this.getCache(cacheKey)
@@ -277,12 +277,12 @@ class PerformanceOptimizer {
       return cached
     }
 
-    // 暂时返回 null，避免动态导入导致的构建错误
+    // Temporarily return null to avoid dynamic import build errors
     console.warn(`Dynamic import disabled for: ${componentPath}`)
     return null
   }
 
-  // 获取性能报告
+  // Get performance report
   getPerformanceReport() {
     return {
       ...this.metrics,
@@ -292,47 +292,47 @@ class PerformanceOptimizer {
     }
   }
 
-  // 计算缓存命中率
+  // Calculate cache hit rate
   calculateCacheHitRate() {
-    // 这里需要实际的统计数据
-    return Math.random() * 100 // 模拟数据
+    // This needs actual statistics data
+    return Math.random() * 100 // Mock data
   }
 
-  // 获取优化建议
+  // Get optimization recommendations
   getOptimizationRecommendations() {
     const recommendations = []
 
-    // 检查页面加载时间
+    // Check page load time
     if (this.metrics.pageLoadTime > 3000) {
-      recommendations.push('页面加载时间过长，考虑优化资源加载')
+      recommendations.push('Page load time is too long, consider optimizing resource loading')
     }
 
-    // 检查组件渲染时间
+    // Check component render time
     Object.entries(this.metrics.componentRenderTime).forEach(([component, time]) => {
       if (time > 100) {
-        recommendations.push(`组件 ${component} 渲染时间过长，考虑优化渲染逻辑`)
+        recommendations.push(`Component ${component} render time is too long, consider optimizing render logic`)
       }
     })
 
-    // 检查API响应时间
+    // Check API response time
     Object.entries(this.metrics.apiResponseTime).forEach(([api, time]) => {
       if (time > 2000) {
-        recommendations.push(`API ${api} 响应时间过长，考虑优化后端性能`)
+        recommendations.push(`API ${api} response time is too long, consider optimizing backend performance`)
       }
     })
 
-    // 检查内存使用
+    // Check memory usage
     if (this.metrics.memoryUsage && this.metrics.memoryUsage.used) {
       const usagePercent = (this.metrics.memoryUsage.used / this.metrics.memoryUsage.limit) * 100
       if (usagePercent > 70) {
-        recommendations.push('内存使用率较高，考虑优化内存管理')
+        recommendations.push('Memory usage is high, consider optimizing memory management')
       }
     }
 
     return recommendations
   }
 
-  // 清理资源
+  // Cleanup resources
   cleanup() {
     this.debounceTimers.forEach(timer => clearTimeout(timer))
     this.throttleTimers.forEach(timer => clearTimeout(timer))
@@ -342,19 +342,19 @@ class PerformanceOptimizer {
   }
 }
 
-// 创建全局性能优化器实例
+// Create global performance optimizer instance
 const performanceOptimizer = new PerformanceOptimizer()
 
-// 页面加载完成后测量性能
+// Measure performance after page load
 if (typeof window !== 'undefined') {
   window.addEventListener('load', () => {
     performanceOptimizer.measurePageLoad()
   })
 
-  // 定期监控内存使用
+  // Monitor memory usage periodically
   setInterval(() => {
     performanceOptimizer.monitorMemoryUsage()
-  }, 30000) // 每30秒检查一次
+  }, 30000) // Check every 30 seconds
 }
 
 export default performanceOptimizer

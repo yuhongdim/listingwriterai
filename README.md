@@ -126,42 +126,42 @@ npm run dev
 
 Visit [http://localhost:3000](http://localhost:3000) to view the application.
 
-## 项目结构
+## Project Structure
 
 ```
 listingwriterai/
 ├── app/
 │   ├── api/generate/
-│   │   └── route.js          # API 路由
-│   ├── globals.css           # 全局样式
-│   ├── layout.js            # 应用布局
-│   └── page.js              # 主页面组件
-├── .env.local               # 环境变量
-├── next.config.js           # Next.js 配置
-├── package.json             # 项目依赖
-├── postcss.config.js        # PostCSS 配置
-└── tailwind.config.js       # Tailwind 配置
+│   │   └── route.js          # API routes
+│   ├── globals.css           # Global styles
+│   ├── layout.js            # Application layout
+│   └── page.js              # Main page component
+├── .env.local               # Environment variables
+├── next.config.js           # Next.js configuration
+├── package.json             # Project dependencies
+├── postcss.config.js        # PostCSS configuration
+└── tailwind.config.js       # Tailwind configuration
 ```
 
-## 部署到 Vercel
+## Deploy to Vercel
 
-1. 将代码推送到 GitHub 仓库
-2. 在 [Vercel](https://vercel.com) 导入项目
-3. 添加环境变量 `ANTHROPIC_API_KEY`
-4. 部署完成
+1. Push your code to GitHub repository
+2. Import project on [Vercel](https://vercel.com)
+3. Add environment variable `ANTHROPIC_API_KEY`
+4. Deploy complete
 
-## 使用说明
+## Usage Instructions
 
-1. **首页**: 展示产品特性和定价
-2. **生成器**: 填写房产信息并选择写作风格
-3. **结果页**: 查看生成的描述并一键复制
+1. **Homepage**: Display product features and pricing
+2. **Generator**: Fill in property information and select writing style
+3. **Results Page**: View generated descriptions and copy with one click
 
-## 注意事项
+## Important Notes
 
-- 确保 Anthropic API 密钥有效
-- 生成的内容符合 Fair Housing Act 规定
-- 支持离线模拟内容（API 失败时）
+- Ensure Anthropic API key is valid
+- Generated content complies with Fair Housing Act regulations
+- Supports offline simulation content (when API fails)
 
-## 许可证
+## License
 
 MIT License

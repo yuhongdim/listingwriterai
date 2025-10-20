@@ -77,7 +77,7 @@ const LoadingSpinner = ({
             <p className="text-gray-600 font-medium">{message}</p>
             {type === 'ai' && (
               <p className="text-sm text-gray-500 mt-1">
-                AI正在为您生成内容...
+                AI is generating content for you...
               </p>
             )}
           </div>
@@ -104,7 +104,7 @@ const LoadingSpinner = ({
 }
 
 // 预定义的加载状态组件
-export const ContentGeneratingLoader = ({ message = "正在生成内容..." }) => (
+export const ContentGeneratingLoader = ({ message = "Generating content..." }) => (
   <LoadingSpinner 
     type="ai" 
     size="large" 
@@ -114,7 +114,7 @@ export const ContentGeneratingLoader = ({ message = "正在生成内容..." }) =
   />
 )
 
-export const ApiLoadingSpinner = ({ message = "处理中..." }) => (
+export const ApiLoadingSpinner = ({ message = "Processing..." }) => (
   <LoadingSpinner 
     type="refresh" 
     size="medium" 
@@ -126,7 +126,7 @@ export const PageLoadingSpinner = () => (
   <LoadingSpinner 
     type="pulse" 
     size="large" 
-    message="加载中..."
+    message="Loading..."
     fullScreen={true}
     overlay={true}
   />

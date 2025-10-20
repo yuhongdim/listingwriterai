@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { 
   FileText, 
   Mail, 
@@ -47,61 +47,75 @@ import {
 } from 'lucide-react'
 import PricingModal from './PricingModal'
 
-const Dashboard = ({ usageCount = 0, setCurrentPage }) => {
+const Dashboard = ({ usageCount = 0, setCurrentPage, handleGenerate, isLoading, formData, handleInputChange }) => {
   const [activeTab, setActiveTab] = useState('listing-generator')
   const [listingStyle, setListingStyle] = useState('professional')
   const [listingLength, setListingLength] = useState('medium')
   const [listingLanguage, setListingLanguage] = useState('chinese')
   const [showPricingModal, setShowPricingModal] = useState(false)
-  const [currentPlan, setCurrentPlan] = useState('free') // 模拟当前套餐
+  const [currentPlan, setCurrentPlan] = useState('free') // Simulate current plan
   
-  // 模拟使用限制
+  // Simulate usage limits
   const planLimits = {
     free: { daily: 3, monthly: 90 },
     starter: { daily: 50, monthly: 1500 },
     pro: { daily: 200, monthly: 6000 },
-    agency: { daily: -1, monthly: -1 } // -1 表示无限制
+    agency: { daily: -1, monthly: -1 } // -1 means unlimited
   }
   
   const currentLimit = planLimits[currentPlan]
-  const dailyUsage = 2 // 模拟今日使用次数
-  const monthlyUsage = 45 // 模拟本月使用次数
+  const dailyUsage = 2 // Simulate today's usage count
+  const monthlyUsage = 45 // Simulate this month's usage count
   
   const isNearLimit = currentLimit.daily > 0 && dailyUsage >= currentLimit.daily * 0.8
   const isAtLimit = currentLimit.daily > 0 && dailyUsage >= currentLimit.daily
 
-  // 工作台标签配置
+  // Workbench tabs configuration
   const workbenchTabs = [
     { 
       id: 'listing-generator', 
-      label: '智能房源文案生成器', 
+      label: 'Smart Property Listing Generator', 
       icon: FileText,
-      description: '3种风格 × 3种长度，SEO优化，多语言支持'
+      description: '3 styles × 3 lengths, SEO optimized, multi-language support'
     },
     { 
       id: 'email-marketing', 
-      label: '批量邮件营销系统', 
+      label: 'Bulk Email Marketing System', 
       icon: Mail,
-      description: '联系人管理，CSV导入，A/B测试优化'
+      description: 'Contact management, CSV import, A/B testing optimization'
     },
     { 
       id: 'social-media', 
-      label: '社交媒体内容生成', 
+      label: 'Social Media Content Generator', 
       icon: Share2,
-      description: '多平台一键生成，视频脚本创作'
+      description: 'Multi-platform one-click generation, video script creation'
     },
     { 
       id: 'ai-image', 
-      label: 'AI图片增强套件', 
+      label: 'AI Image Enhancement Suite', 
       icon: Camera,
-      description: '虚拟家具布置，照片增强，全景图生成'
+      description: 'Virtual furniture staging, photo enhancement, panoramic generation'
     }
   ]
 
-  // 统计数据
+  // Listen for tab activation events from LandingPage
+  useEffect(() => {
+    const handleActivateTab = (event) => {
+      if (event.detail === 'listing') {
+        setActiveTab('listing-generator');
+      }
+    };
+
+    window.addEventListener('activateTab', handleActivateTab);
+    return () => {
+      window.removeEventListener('activateTab', handleActivateTab);
+    };
+  }, []);
+
+  // Statistics data
   const stats = [
     {
-      title: '房源文案生成',
+      title: 'Property Listings Generated',
       value: '1,247',
       change: '+23%',
       icon: FileText,
@@ -109,7 +123,7 @@ const Dashboard = ({ usageCount = 0, setCurrentPage }) => {
       bgColor: 'bg-blue-100'
     },
     {
-      title: '邮件发送量',
+      title: 'Emails Sent',
       value: '15,680',
       change: '+18%',
       icon: Mail,
@@ -117,7 +131,7 @@ const Dashboard = ({ usageCount = 0, setCurrentPage }) => {
       bgColor: 'bg-green-100'
     },
     {
-      title: '社媒内容',
+      title: 'Social Media Content',
       value: '892',
       change: '+35%',
       icon: Share2,
@@ -125,7 +139,7 @@ const Dashboard = ({ usageCount = 0, setCurrentPage }) => {
       bgColor: 'bg-purple-100'
     },
     {
-      title: '图片处理',
+      title: 'Images Processed',
       value: '456',
       change: '+42%',
       icon: Camera,
@@ -134,88 +148,102 @@ const Dashboard = ({ usageCount = 0, setCurrentPage }) => {
     }
   ]
 
-  // 房源文案生成器配置
+  // Property listing generator configuration
   const listingStyles = [
-    { id: 'professional', name: '专业风格', description: '正式、权威、突出专业性' },
-    { id: 'luxury', name: '奢华风格', description: '高端、精致、强调品质' },
-    { id: 'storytelling', name: '讲故事风格', description: '温馨、生动、情感化表达' }
+    { id: 'professional', name: 'Professional Style', description: 'Formal, authoritative, highlighting expertise' },
+    { id: 'luxury', name: 'Luxury Style', description: 'High-end, refined, emphasizing quality' },
+    { id: 'storytelling', name: 'Storytelling Style', description: 'Warm, vivid, emotional expression' }
   ]
 
   const listingLengths = [
-    { id: 'short', name: '短文案', description: '100字以内，简洁明了' },
-    { id: 'medium', name: '中等文案', description: '200字左右，详细介绍' },
-    { id: 'long', name: '长文案', description: '300字以上，全面描述' }
+    { id: 'short', name: 'Short Copy', description: 'Under 100 words, concise and clear' },
+    { id: 'medium', name: 'Medium Copy', description: 'Around 200 words, detailed introduction' },
+    { id: 'long', name: 'Long Copy', description: 'Over 300 words, comprehensive description' }
   ]
 
   const languages = [
-    { id: 'chinese', name: '中文', flag: '🇨🇳' },
+    { id: 'chinese', name: 'Chinese', flag: '🇨🇳' },
     { id: 'english', name: 'English', flag: '🇺🇸' },
     { id: 'spanish', name: 'Español', flag: '🇪🇸' }
   ]
 
-  // 渲染标签内容
+  // Render tab content
   const renderTabContent = () => {
     switch (activeTab) {
       case 'listing-generator':
         return (
           <div className="space-y-8">
-            {/* 房源信息输入 */}
+            {/* Property Information Input */}
             <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
               <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center">
                 <Home className="h-5 w-5 mr-2 text-blue-600" />
-                房源基本信息
+                Property Basic Information
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">房源标题</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Property Title</label>
                   <input
                     type="text"
-                    placeholder="例：CBD核心区精装三居室"
+                    name="title"
+                    value={formData?.title || ''}
+                    onChange={(e) => handleInputChange('title', e.target.value)}
+                    placeholder="e.g., Luxury 3BR in CBD Core Area"
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">房源位置</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Property Location</label>
                   <input
                     type="text"
-                    placeholder="例：朝阳区国贸CBD"
+                    name="location"
+                    value={formData?.location || ''}
+                    onChange={(e) => handleInputChange('location', e.target.value)}
+                    placeholder="e.g., Downtown Financial District"
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">房源面积</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Property Size</label>
                   <input
                     type="text"
-                    placeholder="例：120平米"
+                    name="squareFeet"
+                    value={formData?.squareFeet || ''}
+                    onChange={(e) => handleInputChange('squareFeet', e.target.value)}
+                    placeholder="e.g., 1,200 sq ft"
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">房源户型</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Property Type</label>
                   <input
                     type="text"
-                    placeholder="例：3室2厅2卫"
+                    name="propertyType"
+                    value={formData?.propertyType || ''}
+                    onChange={(e) => handleInputChange('propertyType', e.target.value)}
+                    placeholder="e.g., 3BR/2BA Condo"
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">房源特色</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Special Features</label>
                   <textarea
                     rows="3"
-                    placeholder="例：南北通透，精装修，地铁直达，学区房"
+                    name="specialFeatures"
+                    value={formData?.specialFeatures || ''}
+                    onChange={(e) => handleInputChange('specialFeatures', e.target.value)}
+                    placeholder="e.g., Panoramic views, modern finishes, near transit, top schools"
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
               </div>
             </div>
 
-            {/* 生成设置 */}
+            {/* Copy Style */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* 文案风格 */}
               <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
                 <h4 className="text-md font-semibold text-gray-900 mb-4 flex items-center">
                   <Palette className="h-4 w-4 mr-2 text-purple-600" />
-                  文案风格
+                  Copy Style
                 </h4>
                 <div className="space-y-3">
                   {listingStyles.map((style) => (
@@ -237,11 +265,11 @@ const Dashboard = ({ usageCount = 0, setCurrentPage }) => {
                 </div>
               </div>
 
-              {/* 文案长度 */}
+              {/* Copy Length */}
               <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
                 <h4 className="text-md font-semibold text-gray-900 mb-4 flex items-center">
                   <FileText className="h-4 w-4 mr-2 text-green-600" />
-                  文案长度
+                  Copy Length
                 </h4>
                 <div className="space-y-3">
                   {listingLengths.map((length) => (
@@ -263,11 +291,11 @@ const Dashboard = ({ usageCount = 0, setCurrentPage }) => {
                 </div>
               </div>
 
-              {/* 语言选择 */}
+              {/* Language Selection */}
               <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
                 <h4 className="text-md font-semibold text-gray-900 mb-4 flex items-center">
                   <Languages className="h-4 w-4 mr-2 text-orange-600" />
-                  输出语言
+                  Output Language
                 </h4>
                 <div className="space-y-3">
                   {languages.map((lang) => (
@@ -288,42 +316,46 @@ const Dashboard = ({ usageCount = 0, setCurrentPage }) => {
               </div>
             </div>
 
-            {/* 生成按钮 */}
+            {/* Generate Button */}
             <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
               <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="text-md font-semibold text-gray-900">智能生成房源文案</h4>
-                  <p className="text-sm text-gray-500 mt-1">AI将根据您的设置生成专业的房源描述</p>
+                  <h4 className="text-md font-semibold text-gray-900">Smart Property Listing Generator</h4>
+                  <p className="text-sm text-gray-500 mt-1">AI will generate professional property descriptions based on your settings</p>
                 </div>
-                <button className="flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all transform hover:scale-105">
+                <button 
+                  onClick={handleGenerate}
+                  disabled={isLoading}
+                  className="flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
                   <Sparkles className="h-5 w-5 mr-2" />
-                  生成文案
+                  {isLoading ? 'Generating...' : 'Generate Copy'}
                 </button>
               </div>
             </div>
 
-            {/* SEO优化选项 */}
+            {/* SEO Optimization Options */}
             <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
               <h4 className="text-md font-semibold text-gray-900 mb-4 flex items-center">
                 <Target className="h-4 w-4 mr-2 text-red-600" />
-                SEO优化设置
+                SEO Optimization Settings
               </h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <label className="flex items-center space-x-3">
                   <input type="checkbox" className="text-blue-600 focus:ring-blue-500" defaultChecked />
-                  <span className="text-gray-700">自动添加本地关键词</span>
+                  <span className="text-gray-700">Auto-add local keywords</span>
                 </label>
                 <label className="flex items-center space-x-3">
                   <input type="checkbox" className="text-blue-600 focus:ring-blue-500" defaultChecked />
-                  <span className="text-gray-700">情感分析优化</span>
+                  <span className="text-gray-700">Sentiment analysis optimization</span>
                 </label>
                 <label className="flex items-center space-x-3">
                   <input type="checkbox" className="text-blue-600 focus:ring-blue-500" defaultChecked />
-                  <span className="text-gray-700">FHA合规检查</span>
+                  <span className="text-gray-700">FHA compliance check</span>
                 </label>
                 <label className="flex items-center space-x-3">
                   <input type="checkbox" className="text-blue-600 focus:ring-blue-500" />
-                  <span className="text-gray-700">包含市场热词</span>
+                  <span className="text-gray-700">Include trending keywords</span>
                 </label>
               </div>
             </div>
@@ -333,62 +365,62 @@ const Dashboard = ({ usageCount = 0, setCurrentPage }) => {
       case 'email-marketing':
         return (
           <div className="space-y-8">
-            {/* 联系人管理 */}
+            {/* Contact Management */}
             <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
               <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center">
                 <Database className="h-5 w-5 mr-2 text-green-600" />
-                联系人管理
+                Contact Management
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="text-center p-6 border-2 border-dashed border-gray-300 rounded-lg hover:border-green-400 transition-colors cursor-pointer">
                   <Upload className="h-8 w-8 text-gray-400 mx-auto mb-3" />
-                  <h4 className="font-medium text-gray-900 mb-2">CSV批量导入</h4>
-                  <p className="text-sm text-gray-500">支持Excel、CSV格式文件</p>
+                  <h4 className="font-medium text-gray-900 mb-2">CSV Bulk Import</h4>
+                  <p className="text-sm text-gray-500">Supports Excel and CSV file formats</p>
                 </div>
                 <div className="text-center p-6 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-400 transition-colors cursor-pointer">
                   <UserPlus className="h-8 w-8 text-gray-400 mx-auto mb-3" />
-                  <h4 className="font-medium text-gray-900 mb-2">手动添加联系人</h4>
-                  <p className="text-sm text-gray-500">逐个添加客户信息</p>
+                  <h4 className="font-medium text-gray-900 mb-2">Add Contacts Manually</h4>
+                  <p className="text-sm text-gray-500">Add client information one by one</p>
                 </div>
                 <div className="text-center p-6 border-2 border-dashed border-gray-300 rounded-lg hover:border-purple-400 transition-colors cursor-pointer">
                   <Filter className="h-8 w-8 text-gray-400 mx-auto mb-3" />
-                  <h4 className="font-medium text-gray-900 mb-2">智能分组</h4>
-                  <p className="text-sm text-gray-500">买家/卖家/投资者标签</p>
+                  <h4 className="font-medium text-gray-900 mb-2">Smart Grouping</h4>
+                  <p className="text-sm text-gray-500">Buyer/Seller/Investor tags</p>
                 </div>
               </div>
             </div>
 
-            {/* 邮件模板生成 */}
+            {/* Email Template Generation */}
             <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
               <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center">
                 <Mail className="h-5 w-5 mr-2 text-blue-600" />
-                邮件模板生成
+                Email Template Generation
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">邮件类型</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Email Type</label>
                   <select className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                    <option>开发信</option>
-                    <option>跟进邮件</option>
-                    <option>房源推荐</option>
-                    <option>市场报告</option>
-                    <option>节日问候</option>
+                    <option>Cold Outreach</option>
+                    <option>Follow-up Email</option>
+                    <option>Property Recommendation</option>
+                    <option>Market Report</option>
+                    <option>Holiday Greetings</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">目标客户</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Target Audience</label>
                   <select className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                    <option>潜在买家</option>
-                    <option>潜在卖家</option>
-                    <option>投资客户</option>
-                    <option>老客户</option>
+                    <option>Potential Buyers</option>
+                    <option>Potential Sellers</option>
+                    <option>Investment Clients</option>
+                    <option>Existing Clients</option>
                   </select>
                 </div>
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">个性化信息</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Personalized Information</label>
                   <textarea
                     rows="3"
-                    placeholder="输入您想要包含的个性化内容..."
+                    placeholder="Enter personalized content you want to include..."
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
@@ -396,32 +428,32 @@ const Dashboard = ({ usageCount = 0, setCurrentPage }) => {
               <div className="mt-6 flex justify-end">
                 <button className="flex items-center px-6 py-3 bg-gradient-to-r from-green-600 to-blue-600 text-white rounded-lg hover:from-green-700 hover:to-blue-700 transition-all">
                   <Wand2 className="h-5 w-5 mr-2" />
-                  生成邮件模板
+                  Generate Email Template
                 </button>
               </div>
             </div>
 
-            {/* A/B测试 */}
+            {/* A/B Testing */}
             <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
               <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center">
                 <TestTube className="h-5 w-5 mr-2 text-purple-600" />
-                A/B测试优化
+                A/B Testing Optimization
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="p-4 border border-gray-200 rounded-lg">
-                  <h4 className="font-medium text-gray-900 mb-2">版本A - 直接型</h4>
-                  <p className="text-sm text-gray-600 mb-3">主题：您的理想家园等着您</p>
+                  <h4 className="font-medium text-gray-900 mb-2">Version A - Direct Approach</h4>
+                  <p className="text-sm text-gray-600 mb-3">Subject: Your Dream Home Awaits</p>
                   <div className="text-xs text-gray-500">
-                    <span className="inline-block bg-green-100 text-green-800 px-2 py-1 rounded">开启率: 24%</span>
-                    <span className="inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded ml-2">点击率: 8%</span>
+                    <span className="inline-block bg-green-100 text-green-800 px-2 py-1 rounded">Open Rate: 24%</span>
+                    <span className="inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded ml-2">Click Rate: 8%</span>
                   </div>
                 </div>
                 <div className="p-4 border border-gray-200 rounded-lg">
-                  <h4 className="font-medium text-gray-900 mb-2">版本B - 情感型</h4>
-                  <p className="text-sm text-gray-600 mb-3">主题：找到属于您的温馨港湾</p>
+                  <h4 className="font-medium text-gray-900 mb-2">Version B - Emotional Approach</h4>
+                  <p className="text-sm text-gray-600 mb-3">Subject: Find Your Perfect Haven</p>
                   <div className="text-xs text-gray-500">
-                    <span className="inline-block bg-green-100 text-green-800 px-2 py-1 rounded">开启率: 31%</span>
-                    <span className="inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded ml-2">点击率: 12%</span>
+                    <span className="inline-block bg-green-100 text-green-800 px-2 py-1 rounded">Open Rate: 31%</span>
+                    <span className="inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded ml-2">Click Rate: 12%</span>
                   </div>
                 </div>
               </div>
@@ -436,13 +468,13 @@ const Dashboard = ({ usageCount = 0, setCurrentPage }) => {
             <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
               <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center">
                 <Share2 className="h-5 w-5 mr-2 text-pink-600" />
-                多平台内容生成
+                Multi-Platform Content Generation
               </h3>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {[
-                  { name: '微信朋友圈', icon: '💬', color: 'bg-green-100 text-green-800' },
-                  { name: '抖音', icon: '🎵', color: 'bg-black text-white' },
-                  { name: '小红书', icon: '📖', color: 'bg-red-100 text-red-800' },
+                  { name: 'WeChat Moments', icon: '💬', color: 'bg-green-100 text-green-800' },
+                  { name: 'TikTok', icon: '🎵', color: 'bg-black text-white' },
+                  { name: 'Xiaohongshu', icon: '📖', color: 'bg-red-100 text-red-800' },
                   { name: 'Instagram', icon: '📷', color: 'bg-pink-100 text-pink-800' }
                 ].map((platform, index) => (
                   <label key={index} className="flex items-center p-4 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50">
@@ -458,58 +490,58 @@ const Dashboard = ({ usageCount = 0, setCurrentPage }) => {
             <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
               <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center">
                 <Layers className="h-5 w-5 mr-2 text-blue-600" />
-                内容类型选择
+                Content Type Selection
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="p-6 border border-gray-200 rounded-lg hover:border-blue-400 transition-colors cursor-pointer">
                   <FileText className="h-8 w-8 text-blue-600 mb-3" />
-                  <h4 className="font-medium text-gray-900 mb-2">房源推广文案</h4>
-                  <p className="text-sm text-gray-500">专业的房源介绍和卖点描述</p>
+                  <h4 className="font-medium text-gray-900 mb-2">Property Listing Copy</h4>
+                  <p className="text-sm text-gray-500">Professional property descriptions and selling points</p>
                 </div>
                 <div className="p-6 border border-gray-200 rounded-lg hover:border-purple-400 transition-colors cursor-pointer">
                   <Video className="h-8 w-8 text-purple-600 mb-3" />
-                  <h4 className="font-medium text-gray-900 mb-2">视频脚本</h4>
-                  <p className="text-sm text-gray-500">短视频拍摄脚本和解说词</p>
+                  <h4 className="font-medium text-gray-900 mb-2">Video Scripts</h4>
+                  <p className="text-sm text-gray-500">Short video shooting scripts and narration</p>
                 </div>
                 <div className="p-6 border border-gray-200 rounded-lg hover:border-green-400 transition-colors cursor-pointer">
                   <MessageSquare className="h-8 w-8 text-green-600 mb-3" />
-                  <h4 className="font-medium text-gray-900 mb-2">互动内容</h4>
-                  <p className="text-sm text-gray-500">问答、投票、话题讨论</p>
+                  <h4 className="font-medium text-gray-900 mb-2">Interactive Content</h4>
+                  <p className="text-sm text-gray-500">Q&A, polls, and topic discussions</p>
                 </div>
               </div>
             </div>
 
-            {/* 视频脚本生成器 */}
+            {/* Video Script Generator */}
             <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
               <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center">
                 <Video className="h-5 w-5 mr-2 text-red-600" />
-                视频脚本生成器
+                Video Script Generator
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">视频时长</label>
-                  <select className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
-                    <option>15秒 (抖音快手)</option>
-                    <option>30秒 (朋友圈)</option>
-                    <option>60秒 (小红书)</option>
-                    <option>3分钟 (详细介绍)</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">视频风格</label>
-                  <select className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
-                    <option>专业介绍</option>
-                    <option>生活化展示</option>
-                    <option>故事叙述</option>
-                    <option>对比分析</option>
-                  </select>
-                </div>
+                   <label className="block text-sm font-medium text-gray-700 mb-2">Video Duration</label>
+                   <select className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                     <option>15 seconds (TikTok/Shorts)</option>
+                     <option>30 seconds (Social Media)</option>
+                     <option>60 seconds (Xiaohongshu)</option>
+                     <option>3 minutes (Detailed Tour)</option>
+                   </select>
+                 </div>
+                 <div>
+                   <label className="block text-sm font-medium text-gray-700 mb-2">Video Style</label>
+                   <select className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                     <option>Professional Introduction</option>
+                     <option>Lifestyle Showcase</option>
+                     <option>Story Narrative</option>
+                     <option>Comparison Analysis</option>
+                   </select>
+                 </div>
               </div>
               <div className="mt-6 flex justify-end">
                 <button className="flex items-center px-6 py-3 bg-gradient-to-r from-red-600 to-pink-600 text-white rounded-lg hover:from-red-700 hover:to-pink-700 transition-all">
-                  <Video className="h-5 w-5 mr-2" />
-                  生成视频脚本
-                </button>
+                   <Video className="h-5 w-5 mr-2" />
+                   Generate Video Script
+                 </button>
               </div>
             </div>
           </div>
@@ -518,92 +550,92 @@ const Dashboard = ({ usageCount = 0, setCurrentPage }) => {
       case 'ai-image':
         return (
           <div className="space-y-8">
-            {/* 图片上传 */}
+            {/* Image Upload */}
             <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
               <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center">
                 <Upload className="h-5 w-5 mr-2 text-blue-600" />
-                图片上传与管理
+                Image Upload & Management
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-400 transition-colors cursor-pointer">
                   <Image className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <h4 className="font-medium text-gray-900 mb-2">上传房源照片</h4>
-                  <p className="text-sm text-gray-500">支持JPG、PNG格式，最大10MB</p>
+                  <h4 className="font-medium text-gray-900 mb-2">Upload Property Photos</h4>
+                  <p className="text-sm text-gray-500">Supports JPG, PNG formats, max 10MB</p>
                 </div>
                 <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-green-400 transition-colors cursor-pointer">
                   <Layers className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <h4 className="font-medium text-gray-900 mb-2">批量处理</h4>
-                  <p className="text-sm text-gray-500">一次上传多张图片进行批量处理</p>
+                  <h4 className="font-medium text-gray-900 mb-2">Batch Processing</h4>
+                  <p className="text-sm text-gray-500">Upload multiple images for batch processing</p>
                 </div>
               </div>
             </div>
 
-            {/* AI增强功能 */}
+            {/* AI Enhancement Features */}
             <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
               <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center">
                 <Wand2 className="h-5 w-5 mr-2 text-purple-600" />
-                AI图片增强功能
+                AI Image Enhancement Suite
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="p-6 border border-gray-200 rounded-lg hover:border-purple-400 transition-colors cursor-pointer">
                   <Home className="h-8 w-8 text-purple-600 mb-3" />
-                  <h4 className="font-medium text-gray-900 mb-2">虚拟家具布置</h4>
-                  <p className="text-sm text-gray-500 mb-3">为空房间添加虚拟家具</p>
+                  <h4 className="font-medium text-gray-900 mb-2">Virtual Furniture Staging</h4>
+                  <p className="text-sm text-gray-500 mb-3">Add virtual furniture to empty rooms</p>
                   <div className="flex flex-wrap gap-2">
-                    <span className="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded">现代风格</span>
-                    <span className="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded">传统风格</span>
-                    <span className="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded">豪华风格</span>
+                    <span className="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded">Modern Style</span>
+                    <span className="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded">Traditional Style</span>
+                    <span className="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded">Luxury Style</span>
                   </div>
                 </div>
                 <div className="p-6 border border-gray-200 rounded-lg hover:border-green-400 transition-colors cursor-pointer">
                   <Sparkles className="h-8 w-8 text-green-600 mb-3" />
-                  <h4 className="font-medium text-gray-900 mb-2">照片智能增强</h4>
-                  <p className="text-sm text-gray-500 mb-3">自动调节亮度、对比度</p>
+                  <h4 className="font-medium text-gray-900 mb-2">Smart Photo Enhancement</h4>
+                  <p className="text-sm text-gray-500 mb-3">Auto-adjust brightness and contrast</p>
                   <div className="flex flex-wrap gap-2">
-                    <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">去除杂物</span>
-                    <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">蓝天替换</span>
+                    <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Remove Clutter</span>
+                    <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Sky Replacement</span>
                   </div>
                 </div>
                 <div className="p-6 border border-gray-200 rounded-lg hover:border-orange-400 transition-colors cursor-pointer">
                   <Maximize className="h-8 w-8 text-orange-600 mb-3" />
-                  <h4 className="font-medium text-gray-900 mb-2">全景图生成</h4>
-                  <p className="text-sm text-gray-500 mb-3">拼接多张照片成360°全景</p>
+                  <h4 className="font-medium text-gray-900 mb-2">Panoramic Generation</h4>
+                  <p className="text-sm text-gray-500 mb-3">Stitch multiple photos into 360° panorama</p>
                   <div className="flex flex-wrap gap-2">
-                    <span className="text-xs bg-orange-100 text-orange-800 px-2 py-1 rounded">自动拼接</span>
-                    <span className="text-xs bg-orange-100 text-orange-800 px-2 py-1 rounded">VR展示</span>
+                    <span className="text-xs bg-orange-100 text-orange-800 px-2 py-1 rounded">Auto Stitch</span>
+                    <span className="text-xs bg-orange-100 text-orange-800 px-2 py-1 rounded">VR Display</span>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* 处理设置 */}
+            {/* Processing Settings */}
             <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
               <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center">
                 <Settings className="h-5 w-5 mr-2 text-gray-600" />
-                处理设置
+                Processing Settings
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">输出质量</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Output Quality</label>
                   <select className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                    <option>高质量 (适合打印)</option>
-                    <option>标准质量 (适合网络)</option>
-                    <option>压缩质量 (快速分享)</option>
+                    <option>High Quality (Print Ready)</option>
+                    <option>Standard Quality (Web Ready)</option>
+                    <option>Compressed Quality (Quick Share)</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">输出格式</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Output Format</label>
                   <select className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                    <option>JPG (通用格式)</option>
-                    <option>PNG (透明背景)</option>
-                    <option>WebP (网络优化)</option>
+                    <option>JPG (Universal Format)</option>
+                    <option>PNG (Transparent Background)</option>
+                    <option>WebP (Web Optimized)</option>
                   </select>
                 </div>
               </div>
               <div className="mt-6 flex justify-end">
                 <button className="flex items-center px-6 py-3 bg-gradient-to-r from-orange-600 to-red-600 text-white rounded-lg hover:from-orange-700 hover:to-red-700 transition-all">
                   <Camera className="h-5 w-5 mr-2" />
-                  开始处理
+                  Start Processing
                 </button>
               </div>
             </div>
@@ -617,7 +649,7 @@ const Dashboard = ({ usageCount = 0, setCurrentPage }) => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* 使用限制提醒条 */}
+      {/* Usage Limit Reminder Bar */}
       {(isNearLimit || isAtLimit) && (
         <div className={`${isAtLimit ? 'bg-red-50 border-red-200' : 'bg-yellow-50 border-yellow-200'} border-b px-4 py-3`}>
           <div className="max-w-7xl mx-auto flex items-center justify-between">
@@ -625,8 +657,8 @@ const Dashboard = ({ usageCount = 0, setCurrentPage }) => {
               <AlertCircle className={`w-5 h-5 mr-2 ${isAtLimit ? 'text-red-500' : 'text-yellow-500'}`} />
               <span className={`text-sm font-medium ${isAtLimit ? 'text-red-800' : 'text-yellow-800'}`}>
                 {isAtLimit 
-                  ? `您今日的使用次数已达上限 (${dailyUsage}/${currentLimit.daily})` 
-                  : `您今日已使用 ${dailyUsage}/${currentLimit.daily} 次，即将达到限制`
+                  ? `You have reached your daily usage limit (${dailyUsage}/${currentLimit.daily})` 
+                  : `You have used ${dailyUsage}/${currentLimit.daily} times today, approaching the limit`
                 }
               </span>
             </div>
@@ -635,36 +667,37 @@ const Dashboard = ({ usageCount = 0, setCurrentPage }) => {
               className="flex items-center px-3 py-1.5 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
             >
               <Crown className="w-4 h-4 mr-1" />
-              升级套餐
+              Upgrade Plan
             </button>
           </div>
         </div>
       )}
 
-      {/* 工作台头部 */}
+      {/* Workbench Header */}
       <div className="bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center">
-              <h1 className="text-2xl font-bold text-gray-900 flex items-center">
-                🏠 房产营销自动化工作台
+              <h1 className="text-2xl font-bold text-gray-900 flex items-center cursor-pointer hover:text-purple-600 transition-colors" 
+                  onClick={() => setCurrentPage('landing')}>
+                🏠 Real Estate Marketing Automation Platform
               </h1>
             </div>
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2">
-                <span className="text-sm text-gray-600">今日使用:</span>
+                <span className="text-sm text-gray-600">Daily Usage:</span>
                 <span className={`text-sm font-medium ${isAtLimit ? 'text-red-600' : isNearLimit ? 'text-yellow-600' : 'text-green-600'}`}>
                   {dailyUsage}/{currentLimit.daily > 0 ? currentLimit.daily : '∞'}
                 </span>
               </div>
               <div className="flex items-center space-x-2">
-                <span className="text-sm text-gray-600">套餐:</span>
+                <span className="text-sm text-gray-600">Plan:</span>
                 <span className="text-sm font-medium text-blue-600 capitalize">{currentPlan}</span>
                 <button
                   onClick={() => setShowPricingModal(true)}
                   className="text-xs text-blue-600 hover:text-blue-700 underline"
                 >
-                  升级
+                  Upgrade
                 </button>
               </div>
               <button
@@ -678,7 +711,7 @@ const Dashboard = ({ usageCount = 0, setCurrentPage }) => {
         </div>
       </div>
 
-      {/* 统计数据 */}
+      {/* Statistics data */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {stats.map((stat, index) => (
@@ -687,7 +720,7 @@ const Dashboard = ({ usageCount = 0, setCurrentPage }) => {
                 <div>
                   <p className="text-sm font-medium text-gray-600">{stat.title}</p>
                   <p className="text-2xl font-bold text-gray-900 mt-1">{stat.value}</p>
-                  <p className="text-sm text-green-600 mt-1">{stat.change} 本月增长</p>
+                  <p className="text-sm text-green-600 mt-1">{stat.change} monthly growth</p>
                 </div>
                 <div className={`p-3 rounded-lg ${stat.bgColor}`}>
                   <stat.icon className={`h-6 w-6 ${stat.color}`} />
@@ -697,7 +730,7 @@ const Dashboard = ({ usageCount = 0, setCurrentPage }) => {
           ))}
         </div>
 
-        {/* 工作台标签 */}
+        {/* Workbench tabs */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
           <div className="border-b border-gray-200">
             <nav className="flex space-x-8 px-6" aria-label="Tabs">
@@ -721,14 +754,14 @@ const Dashboard = ({ usageCount = 0, setCurrentPage }) => {
             </nav>
           </div>
 
-          {/* 标签内容 */}
+          {/* Tab content */}
           <div className="p-6">
             {renderTabContent()}
           </div>
         </div>
       </div>
 
-      {/* 定价模态框 */}
+      {/* Pricing Modal */}
       <PricingModal 
         isOpen={showPricingModal}
         onClose={() => setShowPricingModal(false)}

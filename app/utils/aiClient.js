@@ -1,7 +1,7 @@
-// AI API客户端配置
+// AI API client configuration
 class AIClient {
   constructor() {
-    // 优先使用星狐云API配置
+    // Prioritize Xinghu Cloud API configuration
     this.apiKey = process.env.XINGHU_API_KEY || process.env.AI_API_KEY
     this.baseURL = process.env.XINGHU_API_URL || process.env.AI_API_BASE_URL || 'https://xinghuapi.com/v1'
     this.defaultModel = 'gpt-3.5-turbo'
@@ -63,7 +63,7 @@ class AIClient {
     }
   }
 
-  // 生成房产描述
+  // Generate property listing
   async generateListing(propertyData) {
     const { 
       propertyType, 
@@ -79,20 +79,20 @@ class AIClient {
       yearBuilt 
     } = propertyData
 
-    const prompt = `请为以下房产生成专业的营销描述，风格为${writingStyle}，长度为${contentLength}：
+    const prompt = `Please generate a professional marketing description for the following property in ${writingStyle} style with ${contentLength} length:
 
-房产信息：
-- 类型：${propertyType}
-- 卧室：${bedrooms}室
-- 卫生间：${bathrooms}卫
-- 面积：${squareFeet}平方英尺
-- 位置：${location}
-- 特色：${specialFeatures}
-- 建造年份：${yearBuilt}
-- 价格范围：${priceRange}
-- 目标关键词：${targetKeywords}
+Property Information:
+- Type: ${propertyType}
+- Bedrooms: ${bedrooms}
+- Bathrooms: ${bathrooms}
+- Square Feet: ${squareFeet}
+- Location: ${location}
+- Special Features: ${specialFeatures}
+- Year Built: ${yearBuilt}
+- Price Range: ${priceRange}
+- Target Keywords: ${targetKeywords}
 
-请生成吸引人的房产描述，突出卖点和优势，符合房地产营销标准。`
+Please generate an attractive property description that highlights selling points and advantages, meeting real estate marketing standards.`
 
     return await this.generateContent(prompt, {
       temperature: 0.8,
@@ -100,7 +100,7 @@ class AIClient {
     })
   }
 
-  // 生成邮件模板
+  // Generate email template
   async generateEmailTemplate(emailData) {
     const { 
       purpose, 
@@ -111,22 +111,22 @@ class AIClient {
       includeProperty 
     } = emailData
 
-    const prompt = `请生成一个${purpose}的房地产邮件模板，语调为${tone}，目标受众为${targetAudience}：
+    const prompt = `Please generate a real estate email template for ${purpose} with ${tone} tone, targeting ${targetAudience}:
 
 ${includeProperty ? `
-房产信息：
-- 类型：${propertyType}
-- 位置：${location}
+Property Information:
+- Type: ${propertyType}
+- Location: ${location}
 ` : ''}
 
-请包含：
-1. 吸引人的主题行
-2. 个性化的开头
-3. 核心内容
-4. 明确的行动号召
-5. 专业的结尾
+Please include:
+1. Compelling subject line
+2. Personalized opening
+3. Core content
+4. Clear call to action
+5. Professional closing
 
-格式要求：邮件内容应该专业、有说服力，符合房地产行业标准。`
+Format requirements: Email content should be professional, persuasive, and meet real estate industry standards.`
 
     return await this.generateContent(prompt, {
       temperature: 0.7,
@@ -134,7 +134,7 @@ ${includeProperty ? `
     })
   }
 
-  // 生成视频脚本
+  // Generate video script
   async generateVideoScript(videoData) {
     const { 
       propertyType, 
@@ -150,30 +150,30 @@ ${includeProperty ? `
       callToAction 
     } = videoData
 
-    const prompt = `请为以下房产生成一个${duration}秒的${platform}平台视频脚本，风格为${style}：
+    const prompt = `Please generate a ${duration}-second video script for ${platform} platform in ${style} style for the following property:
 
-房产信息：
-- 类型：${propertyType}
-- 位置：${location}
-- 卧室：${bedrooms}室
-- 卫生间：${bathrooms}卫
-- 面积：${squareFeet}平方英尺
-- 特色：${specialFeatures}
-- 重点特征：${keyFeatures?.join('、') || ''}
+Property Information:
+- Type: ${propertyType}
+- Location: ${location}
+- Bedrooms: ${bedrooms}
+- Bathrooms: ${bathrooms}
+- Square Feet: ${squareFeet}
+- Special Features: ${specialFeatures}
+- Key Features: ${keyFeatures?.join(', ') || ''}
 
-请按以下格式生成分段式脚本：
-1. 开场（0-5秒）：吸引注意力的开场白
-2. 房产介绍（5-20秒）：基本信息和位置优势
-3. 特色展示（20-45秒）：重点特征和亮点
-4. 结尾呼吁（45-${duration}秒）：${callToAction}
+Please generate a segmented script in the following format:
+1. Opening (0-5 seconds): Attention-grabbing opening
+2. Property Introduction (5-20 seconds): Basic information and location advantages
+3. Feature Showcase (20-45 seconds): Key features and highlights
+4. Closing Call-to-Action (45-${duration} seconds): ${callToAction}
 
-每段请包含：
-- 时间轴
-- 画面描述
-- 旁白文案
-- 拍摄建议
+Each segment should include:
+- Timeline
+- Visual description
+- Voiceover script
+- Filming suggestions
 
-请用中文回复，格式清晰。`
+Please respond in clear format.`
 
     return await this.generateContent(prompt, {
       temperature: 0.8,
@@ -182,7 +182,7 @@ ${includeProperty ? `
   }
 }
 
-// 创建单例实例
+// Create singleton instance
 const aiClient = new AIClient()
 
 export default aiClient

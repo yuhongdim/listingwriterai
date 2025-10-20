@@ -88,12 +88,12 @@ const VideoScript = ({ usageCount, setUsageCount }) => {
   const generateScript = async () => {
     if (!usageTracker.canUse()) {
       const resetTime = usageTracker.formatTimeUntilReset()
-      alert(`您已达到今日免费使用限制（3次），${resetTime}`)
+      alert(`You've reached today's free usage limit (3 times), ${resetTime}`)
       return
     }
 
     if (!formData.propertyType || !formData.location || !formData.keyFeatures) {
-      alert('请填写房产类型、位置和主要特色')
+      alert('Please fill in property type, location, and key features')
       return
     }
 
@@ -107,13 +107,13 @@ const VideoScript = ({ usageCount, setUsageCount }) => {
         },
         body: JSON.stringify({
           ...formData,
-          location: formData.location || '优质地段',
+          location: formData.location || 'Prime location',
           bedrooms: formData.bedrooms || '3',
           bathrooms: formData.bathrooms || '2',
           squareFeet: formData.squareFeet || '120',
           specialFeatures: formData.keyFeatures,
           keyFeatures: formData.keyFeatures.split('，').filter(f => f.trim()),
-          callToAction: formData.callToAction || '联系我们了解更多详情'
+          callToAction: formData.callToAction || 'Contact us for more details'
         })
       })
 
@@ -124,7 +124,7 @@ const VideoScript = ({ usageCount, setUsageCount }) => {
         const newCount = usageTracker.incrementUsage()
         setUsageCount(newCount)
       } else {
-        alert('生成失败：' + data.error)
+        alert('Generation failed: ' + data.error)
         const mockScript = generateMockScript(formData)
         setGeneratedScript(mockScript)
         const newCount = usageTracker.incrementUsage()
@@ -228,12 +228,12 @@ const VideoScript = ({ usageCount, setUsageCount }) => {
 
       if (data.success) {
         if (format === 'pdf') {
-          // 对于PDF，创建一个新窗口显示HTML内容，用户可以打印为PDF
+          // For PDF, create a new window to display HTML content, user can print as PDF
           const newWindow = window.open('', '_blank')
           newWindow.document.write(data.content)
           newWindow.document.close()
         } else {
-          // 对于TXT和CSV，直接下载
+          // For TXT and CSV, download directly
           const blob = new Blob([data.content], { type: data.mimeType })
           const url = URL.createObjectURL(blob)
           const a = document.createElement('a')
@@ -283,7 +283,7 @@ const VideoScript = ({ usageCount, setUsageCount }) => {
       platform: 'youtube',
       style: 'professional',
       keyFeatures: '',
-      callToAction: '联系我们了解更多详情'
+      callToAction: 'Contact us for more details'
     })
     setGeneratedScript(null)
   }
