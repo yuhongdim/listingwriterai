@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import aiClient from '../../utils/aiClient'
+import aiClient from '@/app/utils/aiClient'
 
 export async function POST(request) {
   try {
