@@ -1,6 +1,5 @@
 {
   "version": 2,
-  "name": "listingwriterai",
   "functions": {
     "app/api/**/*.js": {
       "maxDuration": 30

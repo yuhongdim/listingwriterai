@@ -40,6 +40,8 @@ const BlogManager = ({ usageCount, setUsageCount }) => {
   const [showEditor, setShowEditor] = useState(false)
   const [editingArticle, setEditingArticle] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
   const [formData, setFormData] = useState({
     title: '',
     excerpt: '',
@@ -153,50 +155,92 @@ const BlogManager = ({ usageCount, setUsageCount }) => {
   }, [])
 
   const handleSaveArticle = async () => {
+    // Validate required fields
+    if (!formData.title.trim()) {
+      setError('请输入文章标题')
+      return
+    }
+    
+    if (!formData.content.trim()) {
+      setError('请输入文章内容')
+      return
+    }
+
+    setIsLoading(true)
+    setError('')
+    setSuccess('')
+    
     try {
-      setIsLoading(true)
-      
       const articleData = {
         ...formData,
-        tags: formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag)
+        title: formData.title.trim(),
+        content: formData.content.trim(),
+        excerpt: formData.excerpt.trim(),
+        tags: formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag),
+        publishDate: formData.publishDate || new Date().toISOString().split('T')[0]
       }
+
+      console.log('Sending article data:', articleData)
 
       let response
       if (editingArticle) {
         // Update existing article
-      const response = await fetch('/api/articles', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ ...articleData, id: editingArticle.id })
-      })
-    } else {
-      // Create new article
-      const response = await fetch('/api/articles', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(articleData)
-      })
-    }
+        response = await fetch('/api/blog', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ ...articleData, id: editingArticle.id })
+        })
+      } else {
+        // Create new article
+        response = await fetch('/api/blog', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(articleData)
+        })
+      }
 
-    const data = await response.json()
+      console.log('Response status:', response.status)
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
 
-    if (data.success) {
-      await fetchArticles() // Refresh article list
-      resetForm()
-      setEditingArticle(null)
-      setShowForm(false)
-      // Success notification can be added here
-    } else {
-      console.error('Save failed:', data.error)
-      // Error notification can be added here
-    }
+      const data = await response.json()
+      console.log('Response data:', data)
+
+      if (data.success) {
+        setSuccess(editingArticle ? '文章更新成功！' : '文章发布成功！')
+        await fetchArticles() // Refresh article list
+        
+        // Reset form after successful save
+        setTimeout(() => {
+          setFormData({
+            title: '',
+            excerpt: '',
+            content: '',
+            tags: '',
+            category: '',
+            status: 'draft',
+            publishDate: new Date().toISOString().split('T')[0],
+            metaTitle: '',
+            metaDescription: '',
+            keywords: '',
+            featuredImage: ''
+          })
+          setEditingArticle(null)
+          setShowEditor(false)
+          setSuccess('')
+        }, 2000)
+      } else {
+        setError(data.error || '保存失败，请重试')
+      }
   } catch (error) {
     console.error('Error saving article:', error)
-    // Error notification can be added here
+    setError('网络错误或服务器错误，请检查网络连接后重试')
     } finally {
       setIsLoading(false)
     }
@@ -422,6 +466,65 @@ const BlogManager = ({ usageCount, setUsageCount }) => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Featured Image
+                  </label>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-center w-full">
+                      <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
+                        <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                          <Image className="w-8 h-8 mb-2 text-gray-400" />
+                          <p className="mb-2 text-sm text-gray-500">
+                            <span className="font-semibold">Click to upload</span> or drag and drop
+                          </p>
+                          <p className="text-xs text-gray-500">PNG, JPG or GIF (MAX. 800x400px)</p>
+                        </div>
+                        <input 
+                          type="file" 
+                          className="hidden" 
+                          accept="image/*"
+                          onChange={(e) => {
+                            const file = e.target.files[0]
+                            if (file) {
+                              // For now, we'll just store the file name
+                              // In a real app, you'd upload to a server and get a URL
+                              const reader = new FileReader()
+                              reader.onload = (e) => {
+                                handleInputChange('featuredImage', e.target.result)
+                              }
+                              reader.readAsDataURL(file)
+                            }
+                          }}
+                        />
+                      </label>
+                    </div>
+                    {formData.featuredImage && (
+                      <div className="relative">
+                        <img 
+                          src={formData.featuredImage} 
+                          alt="Featured" 
+                          className="w-full h-32 object-cover rounded-lg"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => handleInputChange('featuredImage', '')}
+                          className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600"
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Category and Tags */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+              <h3 className="text-lg font-semibold mb-4">Category and Tags</h3>
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     Category
                   </label>
                   <select
@@ -456,10 +559,25 @@ const BlogManager = ({ usageCount, setUsageCount }) => {
 
             {/* Action buttons */}
             <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+              {/* Error and Success Messages */}
+              {error && (
+                <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg flex items-center">
+                  <AlertCircle className="h-4 w-4 text-red-500 mr-2" />
+                  <span className="text-red-700 text-sm">{error}</span>
+                </div>
+              )}
+              
+              {success && (
+                <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg flex items-center">
+                  <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
+                  <span className="text-green-700 text-sm">{success}</span>
+                </div>
+              )}
+              
               <div className="space-y-3">
                 <button
                   onClick={handleSaveArticle}
-                  disabled={isLoading || !formData.title || !formData.content}
+                  disabled={isLoading || !formData.title.trim() || !formData.content.trim()}
                   className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
                 >
                   {isLoading ? (
@@ -647,7 +765,10 @@ const BlogManager = ({ usageCount, setUsageCount }) => {
                           >
                             <Edit className="h-4 w-4" />
                           </button>
-                          <button className="text-gray-600 hover:text-gray-900 p-1 hover:bg-gray-50 rounded">
+                          <button 
+                            onClick={() => window.open(`/blog/${article.id}`, '_blank')}
+                            className="text-gray-600 hover:text-gray-900 p-1 hover:bg-gray-50 rounded"
+                          >
                             <Eye className="h-4 w-4" />
                           </button>
                           <button
