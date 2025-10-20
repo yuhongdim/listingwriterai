@@ -1,6 +1,6 @@
 /**
- * 数据管理组件
- * 提供数据导入导出、历史记录和模板管理功能
+ * Data Management Component
+ * Provides data import/export, history, and template management features
  */
 
 'use client'
@@ -53,7 +53,7 @@ const DataManager = ({ isOpen, onClose, onContentSelect }) => {
     category: 'listing'
   })
 
-  // 钩子
+  // Hooks
   const { history, saveContent, loading: historyLoading } = useContentHistory()
   const { 
     templates, 
@@ -68,23 +68,23 @@ const DataManager = ({ isOpen, onClose, onContentSelect }) => {
   if (!isOpen) return null
 
   const tabs = [
-    { id: 'history', label: '历史记录', icon: History },
-    { id: 'templates', label: '模板管理', icon: BookOpen },
-    { id: 'sync', label: '数据同步', icon: Cloud },
-    { id: 'storage', label: '存储管理', icon: Database }
+    { id: 'history', label: 'History', icon: History },
+    { id: 'templates', label: 'Templates', icon: BookOpen },
+    { id: 'sync', label: 'Data Sync', icon: Cloud },
+    { id: 'storage', label: 'Storage', icon: Database }
   ]
 
   const handleExport = async () => {
     if (!isAuthenticated) {
-      warning('请先登录以导出数据')
+      warning('Please login first to export data')
       return
     }
 
     const result = await exportData()
     if (result) {
-      success('数据导出成功')
+      success('Data exported successfully')
     } else {
-      error('数据导出失败')
+      error('Data export failed')
     }
   }
 
@@ -93,18 +93,18 @@ const DataManager = ({ isOpen, onClose, onContentSelect }) => {
     if (!file) return
 
     if (!isAuthenticated) {
-      warning('请先登录以导入数据')
+      warning('Please login first to import data')
       return
     }
 
     const result = await importData(file)
     if (result) {
-      success('数据导入成功')
+      success('Data imported successfully')
     } else {
-      error('数据导入失败')
+      error('Data import failed')
     }
     
-    // 清空文件输入
+    // Clear file input
     event.target.value = ''
   }
 
@@ -379,13 +379,13 @@ const DataManager = ({ isOpen, onClose, onContentSelect }) => {
                           }
                         }}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="输入模板名称"
+                        placeholder="Enter template name"
                       />
                     </div>
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        模板描述
+                        Template Description
                       </label>
                       <input
                         type="text"
@@ -398,13 +398,13 @@ const DataManager = ({ isOpen, onClose, onContentSelect }) => {
                           }
                         }}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="输入模板描述"
+                        placeholder="Enter template description"
                       />
                     </div>
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        分类
+                        Category
                       </label>
                       <select
                         value={editingTemplate ? editingTemplate.category : newTemplate.category}
@@ -417,16 +417,16 @@ const DataManager = ({ isOpen, onClose, onContentSelect }) => {
                         }}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       >
-                        <option value="listing">房产文案</option>
-                        <option value="email">邮件模板</option>
-                        <option value="social">社交媒体</option>
-                        <option value="video">视频脚本</option>
+                        <option value="listing">Property Listing</option>
+                        <option value="email">Email Template</option>
+                        <option value="social">Social Media</option>
+                        <option value="video">Video Script</option>
                       </select>
                     </div>
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        模板内容
+                        Template Content
                       </label>
                       <textarea
                         value={editingTemplate ? editingTemplate.content : newTemplate.content}
@@ -439,7 +439,7 @@ const DataManager = ({ isOpen, onClose, onContentSelect }) => {
                         }}
                         rows={12}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="输入模板内容..."
+                        placeholder="Enter template content..."
                       />
                     </div>
 
@@ -453,7 +453,7 @@ const DataManager = ({ isOpen, onClose, onContentSelect }) => {
                         className="flex items-center space-x-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
                       >
                         <Save className="h-4 w-4" />
-                        <span>{editingTemplate ? '更新模板' : '保存模板'}</span>
+                        <span>{editingTemplate ? 'Update Template' : 'Save Template'}</span>
                       </button>
                       
                       {editingTemplate && (
@@ -461,7 +461,7 @@ const DataManager = ({ isOpen, onClose, onContentSelect }) => {
                           onClick={() => setEditingTemplate(null)}
                           className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
                         >
-                          取消编辑
+                          Cancel Edit
                         </button>
                       )}
                     </div>

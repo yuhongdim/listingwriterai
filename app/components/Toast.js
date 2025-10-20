@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, createContext, useContext } from 'react'
 import { 
   CheckCircle, 
   AlertCircle, 
@@ -12,6 +12,109 @@ import {
   Star,
   Gift
 } from 'lucide-react'
+
+// Toast Context
+const ToastContext = createContext()
+
+// Toast Provider
+export const ToastProvider = ({ children }) => {
+  const [toasts, setToasts] = useState([])
+
+  const addToast = (toastData) => {
+    const id = Date.now() + Math.random()
+    const toast = {
+      id,
+      ...toastData
+    }
+
+    setToasts(prev => [...prev, toast])
+    return id
+  }
+
+  const removeToast = (id) => {
+    setToasts(prev => prev.filter(toast => toast.id !== id))
+  }
+
+  const clearAllToasts = () => {
+    setToasts([])
+  }
+
+  // 便捷方法
+  const success = (title, message, options = {}) => {
+    return addToast({
+      type: 'success',
+      title,
+      message,
+      ...options
+    })
+  }
+
+  const error = (title, message, options = {}) => {
+    return addToast({
+      type: 'error',
+      title,
+      message,
+      persistent: true, // 错误消息默认持久显示
+      ...options
+    })
+  }
+
+  const warning = (title, message, options = {}) => {
+    return addToast({
+      type: 'warning',
+      title,
+      message,
+      ...options
+    })
+  }
+
+  const info = (title, message, options = {}) => {
+    return addToast({
+      type: 'info',
+      title,
+      message,
+      ...options
+    })
+  }
+
+  const premium = (title, message, options = {}) => {
+    return addToast({
+      type: 'premium',
+      title,
+      message,
+      ...options
+    })
+  }
+
+  const achievement = (title, message, options = {}) => {
+    return addToast({
+      type: 'achievement',
+      title,
+      message,
+      duration: 8000, // 成就消息显示更久
+      ...options
+    })
+  }
+
+  const value = {
+    toasts,
+    addToast,
+    removeToast,
+    clearAllToasts,
+    success,
+    error,
+    warning,
+    info,
+    premium,
+    achievement
+  }
+
+  return (
+    <ToastContext.Provider value={value}>
+      {children}
+    </ToastContext.Provider>
+  )
+}
 
 const Toast = ({ 
   id,
@@ -201,14 +304,16 @@ const Toast = ({
 }
 
 // Toast容器组件
-export const ToastContainer = ({ toasts = [], onRemove }) => {
+export const ToastContainer = () => {
+  const { toasts, removeToast } = useToast()
+  
   return (
     <div className="fixed inset-0 pointer-events-none z-50">
       {toasts.map((toast) => (
         <Toast
           key={toast.id}
           {...toast}
-          onClose={onRemove}
+          onClose={removeToast}
         />
       ))}
     </div>
@@ -217,96 +322,13 @@ export const ToastContainer = ({ toasts = [], onRemove }) => {
 
 // Toast Hook
 export const useToast = () => {
-  const [toasts, setToasts] = useState([])
-
-  const addToast = (toastData) => {
-    const id = Date.now() + Math.random()
-    const toast = {
-      id,
-      ...toastData
-    }
-
-    setToasts(prev => [...prev, toast])
-    return id
+  const context = useContext(ToastContext)
+  
+  if (!context) {
+    throw new Error('useToast must be used within a ToastProvider')
   }
-
-  const removeToast = (id) => {
-    setToasts(prev => prev.filter(toast => toast.id !== id))
-  }
-
-  const clearAllToasts = () => {
-    setToasts([])
-  }
-
-  // 便捷方法
-  const success = (title, message, options = {}) => {
-    return addToast({
-      type: 'success',
-      title,
-      message,
-      ...options
-    })
-  }
-
-  const error = (title, message, options = {}) => {
-    return addToast({
-      type: 'error',
-      title,
-      message,
-      persistent: true, // 错误消息默认持久显示
-      ...options
-    })
-  }
-
-  const warning = (title, message, options = {}) => {
-    return addToast({
-      type: 'warning',
-      title,
-      message,
-      ...options
-    })
-  }
-
-  const info = (title, message, options = {}) => {
-    return addToast({
-      type: 'info',
-      title,
-      message,
-      ...options
-    })
-  }
-
-  const premium = (title, message, options = {}) => {
-    return addToast({
-      type: 'premium',
-      title,
-      message,
-      ...options
-    })
-  }
-
-  const achievement = (title, message, options = {}) => {
-    return addToast({
-      type: 'achievement',
-      title,
-      message,
-      duration: 8000, // 成就消息显示更久
-      ...options
-    })
-  }
-
-  return {
-    toasts,
-    addToast,
-    removeToast,
-    clearAllToasts,
-    success,
-    error,
-    warning,
-    info,
-    premium,
-    achievement
-  }
+  
+  return context
 }
 
 // 预定义的Toast消息

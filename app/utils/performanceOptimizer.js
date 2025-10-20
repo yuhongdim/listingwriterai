@@ -268,7 +268,7 @@ class PerformanceOptimizer {
     updateVisibleItems()
   }
 
-  // 代码分割和动态导入
+  // 代码分割和动态导入 - 暂时禁用以避免构建错误
   async loadComponent(componentPath) {
     const cacheKey = `component_${componentPath}`
     const cached = this.getCache(cacheKey)
@@ -277,15 +277,9 @@ class PerformanceOptimizer {
       return cached
     }
 
-    try {
-      // 使用 webpackIgnore 注释来避免 webpack 警告
-      const module = await import(/* webpackIgnore: true */ componentPath)
-      this.setCache(cacheKey, module.default)
-      return module.default
-    } catch (error) {
-      console.error(`Failed to load component: ${componentPath}`, error)
-      throw error
-    }
+    // 暂时返回 null，避免动态导入导致的构建错误
+    console.warn(`Dynamic import disabled for: ${componentPath}`)
+    return null
   }
 
   // 获取性能报告

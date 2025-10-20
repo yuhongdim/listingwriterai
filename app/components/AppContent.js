@@ -1,56 +1,274 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useAuth } from './hooks/useAuth'
-import LandingPage from './components/LandingPage'
-import ToastWrapper from './components/ToastWrapper'
-import AppContent from './components/AppContent'
+import { 
+  Home, 
+  Sparkles, 
+  Clock, 
+  DollarSign, 
+  Zap, 
+  Check, 
+  ChevronRight,
+  Star,
+  Copy,
+  CheckCircle,
+  Target,
+  Globe,
+  FileText,
+  Wand2
+} from 'lucide-react'
+import Sidebar from './Sidebar'
+import Dashboard from './Dashboard'
+import EmailCenter from './EmailCenter'
+import VideoScript from './VideoScript'
+import SocialMediaGenerator from './SocialMediaGenerator'
+import Pricing from './Pricing'
+import LandingPage from './LandingPage'
+import Analytics from './Analytics'
+import usageTracker from '../utils/usageTracker'
+import { ToastContainer, useToast } from './Toast'
+import errorHandler from '../utils/errorHandler'
+import PerformanceMonitor from './PerformanceMonitor'
+import { useAuth } from '../hooks/useAuth'
+import DataManager from './DataManager'
 
-export default function Home() {
-  const [showApp, setShowApp] = useState(false)
-  const { isAuthenticated, isLoading } = useAuth()
+export default function AppContent() {
+  // Auth hook
+  const { user, isAuthenticated, updateUsage } = useAuth()
+  
+  // Toast hook - now can be used inside ToastProvider
+  const { success, error, warning, info } = useToast()
+  
+  const [currentPage, setCurrentPage] = useState('create')
+  const [isLoading, setIsLoading] = useState(false)
+  const [formData, setFormData] = useState({
+    propertyType: '',
+    bedrooms: '',
+    bathrooms: '',
+    squareFeet: '',
+    location: '',
+    specialFeatures: '',
+    writingStyle: 'Professional',
+    contentLength: 'Medium',
+    targetKeywords: '',
+    priceRange: '',
+    yearBuilt: ''
+  })
+  const [generatedContent, setGeneratedContent] = useState('')
+  const [copySuccess, setCopySuccess] = useState(false)
+  const [usageCount, setUsageCount] = useState(0)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  const [showDataManager, setShowDataManager] = useState(false)
 
-  // 监听认证状态变化，自动跳转到应用
+  // Initialize usage count with useEffect
   useEffect(() => {
-    if (isAuthenticated && !isLoading) {
-      setShowApp(true)
+    setUsageCount(usageTracker.getCurrentCount())
+  }, [])
+
+  const handleInputChange = (field, value) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }))
+  }
+
+  const validateForm = () => {
+    const required = ['propertyType', 'bedrooms', 'bathrooms', 'squareFeet', 'location']
+    return required.every(field => formData[field].trim() !== '')
+  }
+
+  const handleGenerate = async () => {
+    if (!validateForm()) {
+      error('Please fill in all required fields')
+      return
     }
-  }, [isAuthenticated, isLoading])
 
-  const handleGetStarted = () => {
-    setShowApp(true)
+    setIsLoading(true)
+    
+    try {
+      const response = await fetch('/api/generate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData)
+      })
+
+      if (!response.ok) {
+        throw new Error(`Generation failed: ${response.status}`)
+      }
+
+      const data = await response.json()
+      console.log('API Response:', data)
+      
+      if (data.content) {
+        setGeneratedContent(data.content)
+        const newCount = usageTracker.incrementUsage()
+        setUsageCount(newCount)
+        
+        // 更新用户使用量（如果已登录）
+        if (isAuthenticated) {
+          updateUsage()
+        }
+        
+        success('Content generated successfully!')
+      } else {
+        throw new Error('API returned empty content')
+      }
+    } catch (err) {
+      console.error('Generation Error:', err)
+      error(`Generation failed: ${err.message}`)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
-  const handleLogin = () => {
-    setShowApp(true)
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(generatedContent)
+      success('Content copied to clipboard')
+    } catch (err) {
+      error('Copy failed')
+    }
   }
 
-  // 如果正在加载认证状态，显示加载状态
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
-      </div>
-    )
+  const handleExport = async (format) => {
+    if (!generatedContent) return
+
+    try {
+      const response = await fetch('/api/export-content', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          content: generatedContent,
+          format: format,
+          type: 'listing',
+          filename: `property_listing_${Date.now()}.${format}`
+        })
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        if (format === 'pdf') {
+          // For PDF, create a new window to display HTML content, user can print as PDF
+          const newWindow = window.open('', '_blank')
+          newWindow.document.write(data.content)
+          newWindow.document.close()
+        } else {
+          // For TXT and CSV, download directly
+          const blob = new Blob([data.content], { type: data.mimeType })
+          const url = URL.createObjectURL(blob)
+          const a = document.createElement('a')
+          a.href = url
+          a.download = data.filename
+          a.click()
+          URL.revokeObjectURL(url)
+        }
+      } else {
+        error('Export failed: ' + data.error)
+      }
+    } catch (err) {
+      console.error('Export error:', err)
+      error('Export failed, please try again')
+    }
   }
 
-  if (showApp || isAuthenticated) {
-    return (
-      <ToastWrapper>
-        <AppContent />
-      </ToastWrapper>
-    )
+  const resetForm = () => {
+    setFormData({
+      propertyType: '',
+      bedrooms: '',
+      bathrooms: '',
+      squareFeet: '',
+      location: '',
+      specialFeatures: '',
+      writingStyle: 'Professional'
+    })
+    setGeneratedContent('')
+  }
+
+  // 渲染当前页面内容
+  const renderCurrentPage = () => {
+    switch (currentPage) {
+      case 'landing':
+        return <LandingPage onGetStarted={() => setCurrentPage('dashboard')} />
+      case 'dashboard':
+        return <Dashboard usageCount={usageCount} setCurrentPage={setCurrentPage} />
+      case 'create':
+        return (
+          <CreateListing 
+            formData={formData}
+            handleInputChange={handleInputChange}
+            handleGenerate={handleGenerate}
+            isLoading={isLoading}
+            validateForm={validateForm}
+            generatedContent={generatedContent}
+            handleCopy={handleCopy}
+            copySuccess={copySuccess}
+            resetForm={resetForm}
+            usageCount={usageCount}
+            handleExport={handleExport}
+            setShowDataManager={setShowDataManager}
+          />
+        )
+      case 'email':
+        return <EmailCenter usageCount={usageCount} setUsageCount={setUsageCount} />
+      case 'video':
+        return <VideoScript usageCount={usageCount} setUsageCount={setUsageCount} />
+      case 'social':
+        return <SocialMediaGenerator usageCount={usageCount} setUsageCount={setUsageCount} />
+      case 'analytics':
+        return <Analytics setCurrentPage={setCurrentPage} />
+      case 'pricing':
+        return <Pricing />
+      default:
+        return <LandingPage onGetStarted={() => setCurrentPage('dashboard')} />
+    }
   }
 
   return (
-    <LandingPage 
-      onGetStarted={handleGetStarted}
-      onLogin={handleLogin}
-    />
+    <>
+      <div className={currentPage === 'landing' ? '' : 'flex h-screen bg-gray-50'}>
+        {/* 侧边栏 - 只在非Landing页面显示 */}
+        {currentPage !== 'landing' && (
+          <Sidebar 
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+            usageCount={usageCount}
+            collapsed={sidebarCollapsed}
+            setCollapsed={setSidebarCollapsed}
+          />
+        )}
+        
+        {/* 主内容区域 */}
+        <div className={currentPage === 'landing' ? '' : `flex-1 transition-all duration-300 ${sidebarCollapsed ? 'ml-16' : 'ml-64'}`}>
+          {renderCurrentPage()}
+        </div>
+      </div>
+      
+      {/* Toast Container */}
+      <ToastContainer />
+      
+      {/* Performance Monitor */}
+      <PerformanceMonitor />
+      
+      {/* Data Manager */}
+      <DataManager 
+        isOpen={showDataManager}
+        onClose={() => setShowDataManager(false)}
+        onContentSelect={(content) => {
+          setGeneratedContent(content)
+          setShowDataManager(false)
+          success('Content loaded')
+        }}
+      />
+    </>
   )
 }
 
-// Create listing component
+// Create property listing component
 function CreateListing({ 
   formData, 
   handleInputChange, 
@@ -62,7 +280,8 @@ function CreateListing({
   copySuccess, 
   resetForm,
   usageCount,
-  handleExport
+  handleExport,
+  setShowDataManager
 }) {
   const writingStyles = [
     {
@@ -391,7 +610,7 @@ function CreateListing({
                   onClick={() => setShowDataManager(true)}
                   className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
                 >
-                  数据管理
+                  Data Management
                 </button>
                 <button
                   onClick={handleExport}

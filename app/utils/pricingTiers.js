@@ -23,9 +23,10 @@ const pricingTiers = {
     pro: {
       id: 'pro',
       name: 'Professional',
-      price: 29,
+      price: 9.9,
       period: 'month',
-      dailyLimit: 100, // Increased from 50
+      dailyLimit: 100,
+      emailLimit: 500, // 每日可发送500封邮件
       features: {
         basicGeneration: true,
         emailCenter: true,
@@ -36,14 +37,15 @@ const pricingTiers = {
         priority: 'normal'
       },
       description: 'Ideal for professionals and small teams',
-      highlights: ['100 generations daily', 'All features included', 'Email marketing', 'Video scripts', 'Social media content']
+      highlights: ['100 generations daily', '500 emails daily', 'All basic features', 'Email marketing', 'Video scripts', 'Social media content']
     },
     team: {
       id: 'team',
       name: 'Team',
-      price: 69,
+      price: 59,
       period: 'month',
-      dailyLimit: 500, // New team tier with higher limits
+      dailyLimit: 500,
+      emailLimit: 5000, // 每日可发送5000封邮件
       features: {
         basicGeneration: true,
         emailCenter: true,
@@ -56,7 +58,7 @@ const pricingTiers = {
         bulkGeneration: true
       },
       description: 'Perfect for growing teams and agencies',
-      highlights: ['500 generations daily', 'Advanced analytics', 'Team collaboration', 'Bulk generation', 'Priority support']
+      highlights: ['500 generations daily', '5000 emails daily', 'Advanced analytics', 'Team collaboration', 'Bulk generation', 'Priority support']
     },
     enterprise: {
       id: 'enterprise',
@@ -64,6 +66,7 @@ const pricingTiers = {
       price: 199,
       period: 'month',
       dailyLimit: -1, // Unlimited
+      emailLimit: -1, // 无限制邮件
       features: {
         basicGeneration: true,
         emailCenter: true,
@@ -76,10 +79,12 @@ const pricingTiers = {
         bulkGeneration: true,
         apiAccess: true,
         customBranding: true,
-        dedicatedSupport: true
+        dedicatedSupport: true,
+        whiteLabel: true,
+        customIntegrations: true
       },
       description: 'For large organizations with custom needs',
-      highlights: ['Unlimited generations', 'API access', 'Custom branding', 'Dedicated support', 'White-label solution']
+      highlights: ['Unlimited generations', 'Unlimited emails', 'API access', 'Custom branding', 'White-label solution', 'Custom integrations', 'Dedicated support']
     }
   },
 
@@ -124,6 +129,12 @@ const pricingTiers = {
   // Get daily limit
   getDailyLimit() {
     return this.getCurrentTier().dailyLimit
+  },
+
+  // Get email limit
+  getEmailLimit() {
+    const currentTier = this.getCurrentTier()
+    return currentTier.emailLimit || 30 // 默认30封邮件
   },
 
   // Check feature permission

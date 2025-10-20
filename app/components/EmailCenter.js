@@ -23,11 +23,15 @@ import {
   Sparkles
 } from 'lucide-react'
 import usageTracker from '../utils/usageTracker'
+import pricingTiers from '../utils/pricingTiers'
 
 const EmailCenter = ({ usageCount, setUsageCount }) => {
   const [activeSection, setActiveSection] = useState('compose')
   const [contacts, setContacts] = useState([])
   const [emailContent, setEmailContent] = useState('')
+  
+  // 获取当前用户的邮件限制
+  const emailLimit = pricingTiers.getEmailLimit()
   const [emailSubject, setEmailSubject] = useState('')
   const [selectedContacts, setSelectedContacts] = useState([])
   const [sending, setSending] = useState(false)
@@ -392,15 +396,15 @@ const EmailCenter = ({ usageCount, setUsageCount }) => {
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
           <div className="flex items-center justify-between text-sm">
             <span className="text-blue-700">
-              Remaining uses today: <span className="font-semibold">{3 - usageCount}</span>/3
+              Remaining uses today: <span className="font-semibold">{emailLimit - usageCount}</span>/{emailLimit}
             </span>
-            {usageCount >= 3 && (
+            {usageCount >= emailLimit && (
               <span className="text-blue-600 text-xs">
                 {typeof window !== 'undefined' && usageTracker.formatTimeUntilReset()}
               </span>
             )}
           </div>
-          {usageCount >= 3 && (
+          {usageCount >= emailLimit && (
             <div className="mt-1 text-xs text-blue-600">
               Free quota exhausted, automatically resets at midnight
             </div>
@@ -419,7 +423,7 @@ const EmailCenter = ({ usageCount, setUsageCount }) => {
                     <p className="text-sm text-gray-600 mb-3">{template.description}</p>
                     <button
                       onClick={() => generateEmailTemplate(template.id)}
-                      disabled={usageCount >= 3}
+                      disabled={usageCount >= emailLimit}
                       className="w-full px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm flex items-center justify-center space-x-2"
                     >
                       <Wand2 size={16} />
@@ -464,7 +468,7 @@ const EmailCenter = ({ usageCount, setUsageCount }) => {
               </select>
             </div>
             <button
-              disabled={usageCount >= 3}
+              disabled={usageCount >= emailLimit}
               className="w-full gradient-button disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Wand2 size={20} />
@@ -612,16 +616,16 @@ const EmailCenter = ({ usageCount, setUsageCount }) => {
               <div className="flex items-center space-x-2">
                 <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
                 <span className="text-blue-700 font-medium">
-                  Daily Usage: <span className="font-bold">{usageCount}</span>/3 emails sent
+                  Daily Usage: <span className="font-bold">{usageCount}</span>/{emailLimit} emails sent
                 </span>
               </div>
-              {usageCount >= 3 && (
+              {usageCount >= emailLimit && (
                 <span className="text-blue-600 text-xs bg-blue-100 px-2 py-1 rounded">
                   {typeof window !== 'undefined' && usageTracker.formatTimeUntilReset()}
                 </span>
               )}
             </div>
-            {usageCount >= 3 && (
+            {usageCount >= emailLimit && (
               <div className="mt-2 text-xs text-blue-600 flex items-center space-x-1">
                 <span>⏰</span>
                 <span>Free quota exhausted - resets at midnight</span>
@@ -631,12 +635,12 @@ const EmailCenter = ({ usageCount, setUsageCount }) => {
           
           <button
             onClick={sendEmail}
-            disabled={usageCount >= 3 || sending}
+            disabled={usageCount >= emailLimit || sending}
             className="w-full gradient-button disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 py-3"
           >
             <Send size={20} />
             <span>
-              {sending ? 'Sending...' : usageCount >= 3 ? 'Daily Limit Reached' : 'Send Email Campaign'}
+              {sending ? 'Sending...' : usageCount >= emailLimit ? 'Daily Limit Reached' : 'Send Email Campaign'}
             </span>
           </button>
         </div>
@@ -648,11 +652,11 @@ const EmailCenter = ({ usageCount, setUsageCount }) => {
     <div className="space-y-6">
       <div className="bg-white rounded-xl p-6 border border-gray-200">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold">联系人管理</h3>
+          <h3 className="text-lg font-semibold">Contact Management</h3>
           <div className="flex space-x-2">
             <label className="gradient-button cursor-pointer">
               <Upload size={20} />
-              导入CSV
+              Import CSV
               <input
                 type="file"
                 accept=".csv"
@@ -666,26 +670,26 @@ const EmailCenter = ({ usageCount, setUsageCount }) => {
                 className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center space-x-2"
               >
                 <Download size={20} />
-                <span>导出CSV</span>
+                <span>Export CSV</span>
               </button>
             </div>
             <div className="relative group">
               <button className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center space-x-2">
                 <Download size={20} />
-                <span>更多格式</span>
+                <span>More Formats</span>
               </button>
               <div className="absolute right-0 mt-2 w-32 bg-white border border-gray-200 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10">
                 <button 
                   onClick={() => exportContacts('pdf')}
                   className="w-full px-4 py-2 text-left hover:bg-gray-50 rounded-t-lg"
                 >
-                  导出PDF
+                  Export PDF
                 </button>
                 <button 
                   onClick={() => exportContacts('txt')}
                   className="w-full px-4 py-2 text-left hover:bg-gray-50 rounded-b-lg"
                 >
-                  导出TXT
+                  Export TXT
                 </button>
               </div>
             </div>
@@ -693,9 +697,9 @@ const EmailCenter = ({ usageCount, setUsageCount }) => {
         </div>
         
         <div className="mb-4 p-4 bg-blue-50 rounded-lg">
-          <h4 className="font-medium text-blue-900 mb-2">CSV格式要求</h4>
+          <h4 className="font-medium text-blue-900 mb-2">CSV Format Requirements</h4>
           <p className="text-sm text-blue-700">
-            请确保CSV文件包含以下列：name（姓名）, email（邮箱）, phone（电话）
+            Please ensure your CSV file contains the following columns: name, email, phone
           </p>
         </div>
         
@@ -704,10 +708,10 @@ const EmailCenter = ({ usageCount, setUsageCount }) => {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-gray-200">
-                  <th className="text-left py-2">姓名</th>
-                  <th className="text-left py-2">邮箱</th>
-                  <th className="text-left py-2">电话</th>
-                  <th className="text-left py-2">操作</th>
+                  <th className="text-left py-2">Name</th>
+                  <th className="text-left py-2">Email</th>
+                  <th className="text-left py-2">Phone</th>
+                  <th className="text-left py-2">Actions</th>
                 </tr>
               </thead>
               <tbody>

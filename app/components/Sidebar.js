@@ -30,9 +30,9 @@ const Sidebar = ({ currentPage, setCurrentPage, usageCount, collapsed, setCollap
   const [showUserProfile, setShowUserProfile] = useState(false)
 
   // 获取当前用户层级信息
-  const currentTier = pricingTiers.getCurrentTierInfo()
+  const currentTier = pricingTiers.getCurrentTier()
   const dailyLimit = pricingTiers.getDailyLimit()
-  const remainingCount = pricingTiers.getRemainingUsage(usageCount)
+  const remainingCount = usageTracker.getRemainingCount()
 
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: Home },
@@ -92,7 +92,7 @@ const Sidebar = ({ currentPage, setCurrentPage, usageCount, collapsed, setCollap
               className="w-full flex items-center justify-center space-x-2 p-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg hover:shadow-lg transition-all"
             >
               <LogIn className="h-4 w-4" />
-              <span>登录/注册</span>
+              <span>Login/Register</span>
             </button>
           )}
         </div>

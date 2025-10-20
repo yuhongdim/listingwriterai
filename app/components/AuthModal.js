@@ -69,11 +69,15 @@ export default function AuthModal({ isOpen, onClose, defaultMode = 'login' }) {
       }
 
       if (result.success) {
-        success(mode === 'login' ? '登录成功！' : '注册成功！')
-        onClose()
-        // 重置表单
-        setFormData({ email: '', password: '', name: '', company: '' })
-        setErrors({})
+        success(mode === 'login' ? '登录成功！' : '注册成功！', '欢迎使用 ListingWriter AI')
+        
+        // 延迟关闭模态框，让用户看到成功消息
+        setTimeout(() => {
+          onClose()
+          // 重置表单
+          setFormData({ email: '', password: '', name: '', company: '' })
+          setErrors({})
+        }, 1500)
       } else {
         showError(result.error)
       }

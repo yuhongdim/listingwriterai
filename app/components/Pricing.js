@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Check, X, Star, Crown, Zap, Building } from 'lucide-react'
+import pricingTiers from '../utils/pricingTiers'
 
 const Pricing = () => {
   const [billingCycle, setBillingCycle] = useState('monthly')
@@ -9,25 +10,25 @@ const Pricing = () => {
   const plans = [
     {
       id: 'free',
-      name: '免费版',
+      name: 'Free',
       icon: Star,
       price: { monthly: 0, yearly: 0 },
-      description: '适合个人用户试用',
+      description: 'Perfect for individual users to try',
       features: [
-        '每日3次AI生成',
-        '基础房源描述',
-        '标准邮件模板',
-        '基础视频脚本',
-        '社交媒体内容（限制）',
-        '基础导出功能'
+        '3 daily AI generations',
+        'Basic property descriptions',
+        'Standard email templates',
+        'Basic video scripts',
+        'Social media content (limited)',
+        'Basic export functionality'
       ],
       limitations: [
-        '无客户管理',
-        '无高级模板',
-        '无批量操作',
-        '无优先支持'
+        'No client management',
+        'No premium templates',
+        'No bulk operations',
+        'No priority support'
       ],
-      buttonText: '免费开始',
+      buttonText: 'Get Started Free',
       popular: false,
       color: 'gray'
     },
@@ -35,24 +36,25 @@ const Pricing = () => {
       id: 'starter',
       name: 'Starter',
       icon: Zap,
-      price: { monthly: 29, yearly: 290 },
-      description: '适合个人经纪人',
+      price: { monthly: 9.9, yearly: 99 },
+      description: 'Perfect for individual agents',
       features: [
-        '每日50次AI生成',
-        '高级房源描述模板',
-        '个性化邮件营销',
-        '专业视频脚本',
-        '完整社交媒体套件',
-        'PDF/Word导出',
-        '基础客户管理',
-        '邮件自动化'
+        '100 daily AI generations',
+        '500 emails per month',
+        'Premium property description templates',
+        'Personalized email marketing',
+        'Professional video scripts',
+        'Complete social media suite',
+        'PDF/Word export',
+        'Basic client management',
+        'Email automation'
       ],
       limitations: [
-        '无团队协作',
-        '无白标功能',
-        '无API访问'
+        'No team collaboration',
+        'No white-label features',
+        'No API access'
       ],
-      buttonText: '选择Starter',
+      buttonText: 'Choose Starter',
       popular: true,
       color: 'blue'
     },
@@ -60,10 +62,11 @@ const Pricing = () => {
       id: 'pro',
       name: 'Pro',
       icon: Crown,
-      price: { monthly: 79, yearly: 790 },
+      price: { monthly: 59, yearly: 590 },
       description: 'Perfect for professional teams',
       features: [
-        '200 daily AI generations',
+        '500 daily AI generations',
+        '5000 emails per month',
         'All premium templates',
         'Bulk content generation',
         'Advanced client management',
@@ -74,11 +77,8 @@ const Pricing = () => {
         'CRM system integration',
         'API access'
       ],
-      limitations: [
-        'Team members limited to 5',
-        '10GB storage space'
-      ],
-      buttonText: '选择Pro',
+      limitations: [],
+      buttonText: 'Choose Pro',
       popular: false,
       color: 'purple'
     },
@@ -87,22 +87,23 @@ const Pricing = () => {
       name: 'Agency',
       icon: Building,
       price: { monthly: 199, yearly: 1990 },
-      description: '适合大型机构',
+      description: 'Perfect for large agencies',
       features: [
-        '无限AI生成',
-        '白标解决方案',
-        '无限团队成员',
-        '无限存储空间',
-        '专属客户经理',
-        '24/7优先支持',
-        '自定义集成',
-        '高级分析报告',
-        '多品牌管理',
-        '企业级安全',
-        '培训和入职支持'
+        'Unlimited AI generations',
+        'Unlimited emails',
+        'White-label solution',
+        'Unlimited team members',
+        'Unlimited storage space',
+        'Dedicated account manager',
+        '24/7 priority support',
+        'Custom integrations',
+        'Advanced analytics reports',
+        'Multi-brand management',
+        'Enterprise-grade security',
+        'Training and onboarding support'
       ],
       limitations: [],
-      buttonText: '联系销售',
+      buttonText: 'Contact Sales',
       popular: false,
       color: 'gold'
     }
@@ -144,16 +145,16 @@ const Pricing = () => {
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            选择适合您的方案
+            Choose the Perfect Plan for You
           </h1>
           <p className="text-xl text-gray-600 mb-8">
-            从个人用户到大型机构，我们为每个规模的业务提供完美解决方案
+            From individual users to large agencies, we provide perfect solutions for every business scale
           </p>
           
           {/* Billing Toggle */}
           <div className="flex items-center justify-center mb-8">
             <span className={`mr-3 ${billingCycle === 'monthly' ? 'text-gray-900 font-medium' : 'text-gray-500'}`}>
-              月付
+              Monthly
             </span>
             <button
               onClick={() => setBillingCycle(billingCycle === 'monthly' ? 'yearly' : 'monthly')}
@@ -168,11 +169,11 @@ const Pricing = () => {
               />
             </button>
             <span className={`ml-3 ${billingCycle === 'yearly' ? 'text-gray-900 font-medium' : 'text-gray-500'}`}>
-              年付
+              Yearly
             </span>
             {billingCycle === 'yearly' && (
               <span className="ml-2 bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
-                节省17%
+                Save 17%
               </span>
             )}
           </div>
@@ -192,7 +193,7 @@ const Pricing = () => {
                 {plan.popular && (
                   <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
                     <span className="bg-blue-500 text-white px-4 py-1 rounded-full text-sm font-medium">
-                      最受欢迎
+                      Most Popular
                     </span>
                   </div>
                 )}
@@ -211,24 +212,24 @@ const Pricing = () => {
                   <div className="text-center mb-6">
                     <div className="flex items-baseline justify-center">
                       <span className="text-4xl font-bold text-gray-900">
-                        ¥{plan.price[billingCycle]}
+                        ${plan.price[billingCycle]}
                       </span>
                       {plan.price[billingCycle] > 0 && (
                         <span className="text-gray-500 ml-1">
-                          /{billingCycle === 'monthly' ? '月' : '年'}
+                          /{billingCycle === 'monthly' ? 'month' : 'year'}
                         </span>
                       )}
                     </div>
                     {billingCycle === 'yearly' && plan.price.monthly > 0 && (
                       <p className="text-sm text-gray-500 mt-1">
-                        相当于 ¥{Math.round(plan.price.yearly / 12)}/月
+                        Equivalent to ${Math.round(plan.price.yearly / 12)}/month
                       </p>
                     )}
                   </div>
 
                   {/* Features */}
                   <div className="mb-6">
-                    <h4 className="font-semibold text-gray-900 mb-3">包含功能：</h4>
+                    <h4 className="font-semibold text-gray-900 mb-3">Included Features:</h4>
                     <ul className="space-y-2">
                       {plan.features.map((feature, index) => (
                         <li key={index} className="flex items-start">
@@ -242,7 +243,7 @@ const Pricing = () => {
                   {/* Limitations */}
                   {plan.limitations.length > 0 && (
                     <div className="mb-6">
-                      <h4 className="font-semibold text-gray-900 mb-3">限制：</h4>
+                      <h4 className="font-semibold text-gray-900 mb-3">Limitations:</h4>
                       <ul className="space-y-2">
                         {plan.limitations.map((limitation, index) => (
                           <li key={index} className="flex items-start">
@@ -269,13 +270,13 @@ const Pricing = () => {
         {/* FAQ Section */}
         <div className="mt-20">
           <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
-            常见问题
+            Frequently Asked Questions
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             <div className="bg-white rounded-lg p-6 shadow-sm">
-              <h3 className="font-semibold text-gray-900 mb-2">可以随时升级或降级吗？</h3>
+              <h3 className="font-semibold text-gray-900 mb-2">Can I upgrade or downgrade anytime?</h3>
               <p className="text-gray-600 text-sm">
-                是的，您可以随时升级或降级您的方案。升级立即生效，降级将在下个计费周期生效。
+                Yes, you can upgrade or downgrade your plan at any time. Upgrades take effect immediately, while downgrades will take effect at the next billing cycle.
               </p>
             </div>
             <div className="bg-white rounded-lg p-6 shadow-sm">
